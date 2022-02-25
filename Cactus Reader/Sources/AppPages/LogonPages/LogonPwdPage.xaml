@@ -1,0 +1,60 @@
+﻿<Page
+    x:Class="Cactus_Reader.Sources.AppPages.LogonPwdPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cactus_Reader.Sources.AppPages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d"
+    muxc:BackdropMaterial.ApplyToRootOrPageBackground="True">
+
+    <Grid>
+        <Frame x:Name="contentFrame">
+            <Frame.ContentTransitions>
+                <TransitionCollection>
+                    <NavigationThemeTransition/>
+                </TransitionCollection>
+            </Frame.ContentTransitions>
+
+            <Border Background="{ThemeResource LayerFillColorDefaultBrush}"
+                    VerticalAlignment="Center" HorizontalAlignment="Center" CornerRadius="8" BorderThickness="1"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <StackPanel Orientation="Vertical" Margin="48">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock FontFamily="Microsoft YaHei UI" FontSize="40" FontWeight="Bold" Text="就快完成了"/>
+                        <StackPanel Orientation="Horizontal" Margin="0, 12, 0, 0">
+                            <HyperlinkButton Padding="0" Margin="0, 3, 0, 0" Click="BackPrevPage" >
+                                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="16" Glyph="&#xE760;"/>
+                            </HyperlinkButton>
+                            <TextBlock FontFamily="Microsoft YaHei UI" FontSize="16" Margin="8, 0, 0, 0"
+                                       Text="someone@example.com"/>
+                        </StackPanel>
+                        <TextBlock FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 12, 0, 0" MaxWidth="436"
+                                   Text="就快完成了！现在只需要创建一个密码，你就可以使用密码来登录 Cactus Reader 了。"
+                                   TextWrapping="Wrap"/>
+                        <TextBlock FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 32, 0, 0" Text="帐户密码："/>
+                        <PasswordBox FontSize="16" Margin="0, 8, 0, 0" Height="40" Width="436" MaxLength="20"
+                                     VerticalContentAlignment="Center"/>
+                        <TextBlock FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 16, 0, 0"
+                                   Text="请输入你的 Cactus 帐户密码" Foreground="#E00000" Visibility="Collapsed"/>
+                        <CheckBox Margin="0, 20, 0, 0">
+                            <StackPanel Orientation="Horizontal" Margin="0, -2, 0, 0">
+                                <TextBlock FontFamily="Microsoft YaHei UI" Text="参加"
+                                       VerticalAlignment="Center" FontSize="16"/>
+                                <HyperlinkButton FontFamily="Microsoft YaHei UI" Padding="0" Content="用户体验计划"
+                                             VerticalAlignment="Bottom" FontSize="16"/>
+                                <TextBlock FontFamily="Microsoft YaHei UI" Text="帮助改进软件体验和解决问题"
+                                       VerticalAlignment="Center" FontSize="16"/>
+                            </StackPanel>
+                        </CheckBox>
+                        <Button FontFamily="Microsoft YaHei UI" FontSize="16" FontWeight="Bold"
+                                Width="436" Height="48" Background="#005FB8" HorizontalAlignment="Center"
+                                Content="完  成" CharacterSpacing="50" Margin="0, 32, 0, 0" Click="LogonFinish"
+                                Style="{StaticResource AccentButtonStyle}" Foreground="White"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Frame>
+    </Grid>
+</Page>

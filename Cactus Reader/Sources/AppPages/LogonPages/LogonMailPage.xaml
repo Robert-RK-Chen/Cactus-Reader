@@ -1,0 +1,62 @@
+﻿<Page
+    x:Class="Cactus_Reader.Sources.AppPages.LogonMailPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cactus_Reader.Sources.AppPages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d"
+    muxc:BackdropMaterial.ApplyToRootOrPageBackground="True">
+
+    <Grid>
+        <Frame x:Name="contentFrame">
+            <Frame.ContentTransitions>
+                <TransitionCollection>
+                    <NavigationThemeTransition/>
+                </TransitionCollection>
+            </Frame.ContentTransitions>
+
+            <Border Background="{ThemeResource LayerFillColorDefaultBrush}"
+                    VerticalAlignment="Center" HorizontalAlignment="Center" CornerRadius="8" BorderThickness="1"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <StackPanel Orientation="Vertical" Margin="48">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock FontFamily="Microsoft YaHei UI" FontSize="40" FontWeight="Bold"
+                                   Text="创建 Cactus 帐户"/>
+                        <StackPanel Orientation="Horizontal" Margin="0, 12, 0, 0">
+                            <HyperlinkButton Padding="0" Margin="0, 3, 0, 0" Click="BackPrevPage">
+                                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="16" Glyph="&#xE760;"/>
+                            </HyperlinkButton>
+                            <TextBlock FontFamily="Microsoft YaHei UI" FontSize="16" Margin="8, 0, 0, 0"
+                                       Text="一个账户即可访问与同步你的阅读资源"/>
+                        </StackPanel>
+
+                        <TextBlock FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 32, 0, 0" Text="电子邮箱："/>
+                        <TextBox x:Name="userMailInput" FontSize="16" Margin="0, 8, 0, 0" Height="40" Width="436" 
+                                 MaxLength="20" VerticalContentAlignment="Center" GotFocus="ClearAlertMsg"/>
+                        <TextBlock x:Name="alertMsg" FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 16, 0, 0"
+                                   Text="请输入一个有效的电子邮件地址。"
+                                   Foreground="#E00000" Visibility="Collapsed"/>
+                        <CheckBox Margin="0, 20, 0, 0" Checked="LogonButtonEnabled" Unchecked="LogonButtonDisabled" >
+                            <StackPanel Orientation="Horizontal" Margin="0, -2, 0, 0">
+                                <TextBlock FontFamily="Microsoft YaHei UI" Text="我已阅读并同意"
+                                       VerticalAlignment="Center" FontSize="16"/>
+                                <HyperlinkButton FontFamily="Microsoft YaHei UI" Padding="0" Content="服务条款"
+                                             VerticalAlignment="Bottom" FontSize="16"/>
+                                <TextBlock FontFamily="Microsoft YaHei UI" Text="及"
+                                       VerticalAlignment="Center" FontSize="16"/>
+                                <HyperlinkButton FontFamily="Microsoft YaHei UI" Padding="0" Content="隐私政策"
+                                             VerticalAlignment="Bottom" FontSize="16"/>
+                            </StackPanel>
+                        </CheckBox>
+                        <Button x:Name="continueButton" FontFamily="Microsoft YaHei UI" FontSize="16" FontWeight="Bold"
+                                Width="436" Height="48" Background="#005FB8" HorizontalAlignment="Center"
+                                Content="下 一 步" CharacterSpacing="50" Margin="0, 32, 0, 0" Click="ContinueLogon"
+                                Style="{StaticResource AccentButtonStyle}" Foreground="White" IsEnabled="False"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Frame>
+    </Grid>
+</Page>
