@@ -1,6 +1,8 @@
 ﻿using Cactus_Reader.Entities;
 using Cactus_Reader.Sources.ToolKits;
 using System;
+using System.Threading.Tasks;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
@@ -15,6 +17,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
     /// </summary>
     public sealed partial class LoginPwdPage : Page
     {
+        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         readonly IFreeSql freeSql = (Application.Current as App).freeSql;
         User currentUser = null;
 
@@ -29,7 +32,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
             currentUser = (User)e.Parameter;
             if (currentUser != null)
             {
-                userMailBlock.Text = currentUser.Email;
+                userMailBlock.Text = currentUser.email;
             }
         }
 
@@ -41,11 +44,28 @@ namespace Cactus_Reader.Sources.AppPages.Login
 
         private void MailCodeLogin(object sender, RoutedEventArgs e)
         {
-            contentFrame.Navigate(typeof(LoginCodePage), currentUser, new SlideNavigationTransitionInfo()
-            { Effect = SlideNavigationTransitionEffect.FromRight });
+            try
+            {
+                Code currentCode = freeSql.Select<Code>().Where(code => code.email == currentUser.email).ToOne();
+                if (currentCode.create_time.AddMinutes(2) > DateTime.Now || currentCode == null)
+                {
+                    Task.Factory.StartNew(() =>
+                    {
+                        new VerifyCodeSender().SendVerifyCode(currentUser.email);
+                    });
+                }
+
+                contentFrame.Navigate(typeof(LoginCodePage), currentUser, new SlideNavigationTransitionInfo()
+                { Effect = SlideNavigationTransitionEffect.FromRight });
+            }
+            catch (Exception)
+            {
+                alertMsg.Text = "未连接，请检查网络开关是否已打开。";
+                alertMsg.Visibility = Visibility.Visible;
+            }
         }
 
-        private async void Login(object sender, RoutedEventArgs e)
+        private void Login(object sender, RoutedEventArgs e)
         {
             alertMsg.Visibility = Visibility.Collapsed;
             string password = HashDirectory.GetEncryptedPassword(userPwdInput.Password);
@@ -55,20 +75,15 @@ namespace Cactus_Reader.Sources.AppPages.Login
                 alertMsg.Text = "请在此输入你的帐户密码。";
                 alertMsg.Visibility = Visibility.Visible;
             }
-            else if (freeSql.Select<User>().Where(user => user.Password == password).ToOne() is null)
+            else if (freeSql.Select<User>().Where(user => user.password == password).ToOne() == null)
             {
                 alertMsg.Text = "Cactus 帐户或密码不正确。";
                 alertMsg.Visibility = Visibility.Visible;
             }
             else
             {
-                ContentDialog noWifiDialog = new ContentDialog
-                {
-                    Title = "Cactus 帐户登录",
-                    Content = currentUser.Name + "，欢迎回来！",
-                    CloseButtonText = "确定"
-                };
-                ContentDialogResult result = await noWifiDialog.ShowAsync();
+                localSettings.Values["currentUser"] = currentUser.uid;
+                StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
             }
         }
 

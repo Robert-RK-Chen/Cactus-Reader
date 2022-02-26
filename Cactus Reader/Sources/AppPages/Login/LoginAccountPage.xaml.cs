@@ -29,7 +29,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
             currentUser = (User)e.Parameter;
             if (currentUser != null)
             {
-                accountInput.Text = currentUser.Email;
+                accountInput.Text = currentUser.email;
             }
         }
 
@@ -39,7 +39,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
             string email = accountInput.Text;
             try
             {
-                currentUser = freeSql.Select<User>().Where(user => user.Email == email).ToOne();
+                currentUser = freeSql.Select<User>().Where(user => user.email == email).ToOne();
                 if (currentUser != null)
                 {
                     contentFrame.Navigate(typeof(LoginPwdPage), currentUser, new SlideNavigationTransitionInfo()

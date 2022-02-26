@@ -5,10 +5,85 @@
     xmlns:local="using:Cactus_Reader"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    muxc:BackdropMaterial.ApplyToRootOrPageBackground="True">
 
+    <Page.Resources>
+        <Thickness x:Key="NavigationViewHeaderMargin">0, 0, 0, 0</Thickness>
+        <Thickness x:Key="NavigationViewContentMargin">0, 0, 0, 0</Thickness>
+        <Thickness x:Key="NavigationViewContentGridBorderThickness">0</Thickness>
+        <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent"/>
+    </Page.Resources>
     <Grid>
-
+        <Frame x:Name="mainContent">
+            <Frame.ContentTransitions>
+                <TransitionCollection>
+                    <NavigationThemeTransition/>
+                </TransitionCollection>
+            </Frame.ContentTransitions>
+            <Grid>
+                <Border x:Name="appTitleBar" IsHitTestVisible="True" VerticalAlignment="Top" Background="Transparent"
+                Height="40" Canvas.ZIndex="1" Margin="48, 8, 0, 0">
+                    <StackPanel Orientation="Horizontal">
+                        <Image x:Name="appFontIcon" HorizontalAlignment="Left" VerticalAlignment="Center"
+                       Source="/Assets/Square44x44Logo.scale-100.png" Width="16" Height="16"/>
+                        <TextBlock x:Name="appTitle" Text="Cactus Reader" VerticalAlignment="Center"
+                           Margin="12, 0, 0, 0" Style="{StaticResource CaptionTextBlockStyle}"/>
+                    </StackPanel>
+                </Border>
+                <muxc:NavigationView x:Name="navViewControl" IsTitleBarAutoPaddingEnabled="False"
+                             IsBackEnabled="True" Canvas.ZIndex="0" IsBackButtonVisible="Visible"
+                             DisplayModeChanged="NavViewCtrlDisplayModeChanged"
+                             Loaded="NavViewControlLoaded" ItemInvoked="NavViewControlItemInvoked" 
+                             BackRequested="NavViewControlBackRequested">
+                    <muxc:NavigationView.AutoSuggestBox>
+                        <AutoSuggestBox QueryIcon="Find" PlaceholderText="搜索设置、文档" TextChanged="AutoSuggestBoxTextChanged" SuggestionChosen="AutoSuggestBoxSuggestionChosen" QuerySubmitted="AutoSuggestBoxQuerySubmitted" />
+                    </muxc:NavigationView.AutoSuggestBox>
+                    <muxc:NavigationView.MenuItems>
+                        <muxc:NavigationViewItem Tag="library" Content="资源库">
+                            <muxc:NavigationViewItem.Icon>
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE80F;"/>
+                            </muxc:NavigationViewItem.Icon>
+                        </muxc:NavigationViewItem>
+                        <muxc:NavigationViewItem Tag="favorite" Content="收藏夹">
+                            <muxc:NavigationViewItem.Icon>
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE728;"/>
+                            </muxc:NavigationViewItem.Icon>
+                        </muxc:NavigationViewItem>
+                        <muxc:NavigationViewItem Tag="notes" Content="便签本">
+                            <muxc:NavigationViewItem.Icon>
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70B;"/>
+                            </muxc:NavigationViewItem.Icon>
+                        </muxc:NavigationViewItem>
+                        <muxc:NavigationViewItem Tag="plugins" Content="扩展包">
+                            <muxc:NavigationViewItem.Icon>
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE74c;"/>
+                            </muxc:NavigationViewItem.Icon>
+                        </muxc:NavigationViewItem>
+                        <muxc:NavigationViewItem Tag="recycle" Content="回收站">
+                            <muxc:NavigationViewItem.Icon>
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE74D;"/>
+                            </muxc:NavigationViewItem.Icon>
+                        </muxc:NavigationViewItem>
+                    </muxc:NavigationView.MenuItems>
+                    <muxc:NavigationView.FooterMenuItems>
+                        <muxc:NavigationViewItem Tag="about" Content="关于应用">
+                            <muxc:NavigationViewItem.Icon>
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE946;"/>
+                            </muxc:NavigationViewItem.Icon>
+                        </muxc:NavigationViewItem>
+                    </muxc:NavigationView.FooterMenuItems>
+                    <Grid>
+                        <Frame x:Name="contentFrame">
+                            <Button Content="退出登陆" Width="360" Height="40" FontFamily="Microsoft YaHei UI"
+                                    FontWeight="Bold" Style="{StaticResource AccentButtonStyle}" Foreground="White"
+                                    Background="#005FB8" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                    Click="SignOut"/>
+                        </Frame>
+                    </Grid>
+                </muxc:NavigationView>
+            </Grid>
+        </Frame>
     </Grid>
 </Page>

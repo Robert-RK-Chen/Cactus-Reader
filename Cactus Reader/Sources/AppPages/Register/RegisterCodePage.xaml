@@ -37,12 +37,13 @@
                                    Text="请输入邮件中的代码进行登录。"
                                    TextWrapping="Wrap" Margin="0, 8, 0, 0" MaxWidth="436"/>
                         <TextBlock FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 32, 0, 0" Text="邮件验证码："/>
-                        <TextBox FontSize="16" Margin="0, 8, 0, 0" Height="40" Width="436" MaxLength="20"
-                                     VerticalContentAlignment="Center"/>
-                        <TextBlock FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 16, 0, 0"
-                                   Text="请输入 7 位验证码，该验证码仅包含数字。" Foreground="#E00000" Visibility="Collapsed"/>
+                        <TextBox x:Name="verifyCodeInput" FontSize="16" Margin="0, 8, 0, 0" Height="40" Width="436" 
+                                 MaxLength="20" VerticalContentAlignment="Center" GettingFocus="ClearAlertMsg"/>
+                        <TextBlock x:Name="alertMsg" FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 16, 0, 0"
+                                   TextWrapping="Wrap" Text="请输入 7 位验证码，该验证码仅包含数字。" Foreground="#E00000" 
+                                   Visibility="Collapsed" MaxWidth="436"/>
                         <HyperlinkButton FontFamily="Microsoft YaHei UI" Margin="0, 20, 0, 0" Padding="0"
-                                         Content="我没有收到验证码"/>
+                                         Content="重新发送邮件验证码" Click="ResendVerifyCode"/>
                         <Button FontFamily="Microsoft YaHei UI" FontSize="16" FontWeight="Bold"
                                 Width="436" Height="48" Background="#005FB8" HorizontalAlignment="Center"
                                 Content="继  续" CharacterSpacing="50" Margin="0, 32, 0, 0" Click="ContinueLogon"

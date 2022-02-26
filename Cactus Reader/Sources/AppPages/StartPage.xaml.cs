@@ -16,10 +16,11 @@ namespace Cactus_Reader.Sources.AppPages
     /// </summary>
     public sealed partial class StartPage : Page
     {
+        public static StartPage startPage;
         public StartPage()
         {
             this.InitializeComponent();
-            this.InitializeComponent();
+            startPage = this;
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;
 
             titleBar.ButtonBackgroundColor = Colors.Transparent;
@@ -88,7 +89,7 @@ namespace Cactus_Reader.Sources.AppPages
             }
         }
 
-        private void OpenLoginMailPage(object sender, RoutedEventArgs e)
+        private void ContinueLogin(object sender, RoutedEventArgs e)
         {
             contentFrame.Navigate(typeof(LoginAccountPage), null, new SlideNavigationTransitionInfo()
             { Effect = SlideNavigationTransitionEffect.FromRight });

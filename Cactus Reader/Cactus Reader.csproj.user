@@ -10,5 +10,12 @@
     <SplashScreenSource>C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Sources\Images\Cactus Reader.png</SplashScreenSource>
     <BadgeLogoSource>C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Sources\Images\Cactus Reader.png</BadgeLogoSource>
     <PackageLogoSource>C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Sources\Images\Cactus Reader.png</PackageLogoSource>
+    <UapAppxPackageBuildMode>SideloadOnly</UapAppxPackageBuildMode>
+    <AppxShowAllApps>False</AppxShowAllApps>
+    <AppxBuildConfigurationSelection>x64</AppxBuildConfigurationSelection>
+    <PackageOptionalProjectsInIdeBuilds>False</PackageOptionalProjectsInIdeBuilds>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <AllowLocalNetworkLoopback>false</AllowLocalNetworkLoopback>
   </PropertyGroup>
 </Project>

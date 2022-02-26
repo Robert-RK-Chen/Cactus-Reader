@@ -2,6 +2,7 @@
 using System;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -20,6 +21,7 @@ namespace Cactus_Reader
 
         static readonly string myConnString = "Server=sh-cdb-0q4l9dac.sql.tencentcdb.com;port=59121;User ID=RobertChen;Password=#TSLover1213;Database=cactus_reader;Charset=GBK;SslMode=none;Max pool size=10";
         public IFreeSql freeSql = new FreeSql.FreeSqlBuilder().UseConnectionString(FreeSql.DataType.MySql, myConnString).Build();
+        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
 
         public App()
         {
@@ -61,7 +63,14 @@ namespace Cactus_Reader
                     // 当导航堆栈尚未还原时，导航到第一页，
                     // 并通过将所需信息作为导航参数传入来配置
                     // 参数
-                    rootFrame.Navigate(typeof(StartPage), e.Arguments);
+                    if (localSettings.Values.ContainsKey("currentUser"))
+                    {
+                        rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                    }
+                    else
+                    {
+                        rootFrame.Navigate(typeof(StartPage), e.Arguments);
+                    }
                 }
                 // 确保当前窗口处于活动状态
                 Window.Current.Activate();
