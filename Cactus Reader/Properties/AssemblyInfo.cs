@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // 有关程序集的一般信息由以下
@@ -7,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Cactus Reader")]
 [assembly: AssemblyDescription("Cactus Reader，一款现代化的、高效的文档阅读器。")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("R.C. Software Studio")]
+[assembly: AssemblyCompany("R.S.Software Studio")]
 [assembly: AssemblyProduct("Cactus Reader")]
 [assembly: AssemblyCopyright("Copyright © 2022, Robert Chen.")]
 [assembly: AssemblyTrademark("Cactus Reader")]
@@ -25,4 +26,4 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: ComVisible(false)] 
+[assembly: ComVisible(false)]

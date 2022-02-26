@@ -47,6 +47,10 @@
               "target": "Package",
               "version": "[3.0.100, )"
             },
+            "MailKit": {
+              "target": "Package",
+              "version": "[3.1.1, )"
+            },
             "Microsoft.NETCore.UniversalWindowsPlatform": {
               "target": "Package",
               "version": "[6.2.13, )"

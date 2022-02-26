@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProjectGuid>{3657E508-C8F4-49B4-9A89-4421157417C7}</ProjectGuid>
+    <ProjectGuid>{7A67B3B9-B8AD-4608-A309-80A798F22815}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cactus_Reader</RootNamespace>
@@ -121,37 +121,38 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Sources\AppPages\LoginPages\LoginCodePage.xaml.cs">
-      <DependentUpon>LoginCodePage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Sources\AppPages\LoginPages\LoginAccountPage.xaml.cs">
-      <DependentUpon>LoginAccountPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Sources\AppPages\LoginPages\LoginPwdPage.xaml.cs">
-      <DependentUpon>LoginPwdPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Sources\AppPages\LogonPages\LogonCodePage.xaml.cs">
-      <DependentUpon>LogonCodePage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Sources\AppPages\LogonPages\LogonMailPage.xaml.cs">
-      <DependentUpon>LogonMailPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Sources\AppPages\LogonPages\LogonPwdPage.xaml.cs">
-      <DependentUpon>LogonPwdPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Sources\AppPages\LogonPages\LogonUserInfoPage.xaml.cs">
-      <DependentUpon>LogonUserInfoPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Sources\AppPages\MainPage.xaml.cs">
+    <Compile Include="Entities\Code.cs" />
+    <Compile Include="Entities\User.cs" />
+    <Compile Include="Sources\AppPages\AppUI\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sources\AppPages\Login\LoginAccountPage.xaml.cs">
+      <DependentUpon>LoginAccountPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sources\AppPages\Login\LoginCodePage.xaml.cs">
+      <DependentUpon>LoginCodePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sources\AppPages\Login\LoginPwdPage.xaml.cs">
+      <DependentUpon>LoginPwdPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sources\AppPages\Register\RegisterCodePage.xaml.cs">
+      <DependentUpon>RegisterCodePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sources\AppPages\Register\RegisterMailPage.xaml.cs">
+      <DependentUpon>RegisterMailPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sources\AppPages\Register\RegisterPwdPage.xaml.cs">
+      <DependentUpon>RegisterPwdPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sources\AppPages\Register\RegisterUserInfoPage.xaml.cs">
+      <DependentUpon>RegisterUserInfoPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Sources\AppPages\StartPage.xaml.cs">
       <DependentUpon>StartPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Sources\Utilities\EmailVerify.cs" />
-    <Compile Include="Sources\Utilities\User.cs" />
-    <Compile Include="Sources\Utilities\HashDirectory.cs" />
+    <Compile Include="Sources\ToolKits\EmailVerify.cs" />
+    <Compile Include="Sources\ToolKits\HashDirectory.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -225,37 +226,37 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="Sources\AppPages\LoginPages\LoginCodePage.xaml">
+    <Page Include="Sources\AppPages\AppUI\MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Sources\AppPages\Login\LoginAccountPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Sources\AppPages\LoginPages\LoginAccountPage.xaml">
+    <Page Include="Sources\AppPages\Login\LoginCodePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Sources\AppPages\LoginPages\LoginPwdPage.xaml">
+    <Page Include="Sources\AppPages\Login\LoginPwdPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Sources\AppPages\LogonPages\LogonCodePage.xaml">
+    <Page Include="Sources\AppPages\Register\RegisterCodePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Sources\AppPages\LogonPages\LogonMailPage.xaml">
+    <Page Include="Sources\AppPages\Register\RegisterMailPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Sources\AppPages\LogonPages\LogonPwdPage.xaml">
+    <Page Include="Sources\AppPages\Register\RegisterPwdPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Sources\AppPages\LogonPages\LogonUserInfoPage.xaml">
+    <Page Include="Sources\AppPages\Register\RegisterUserInfoPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Sources\AppPages\MainPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="Sources\AppPages\StartPage.xaml">
       <SubType>Designer</SubType>
@@ -268,6 +269,9 @@
     </PackageReference>
     <PackageReference Include="FreeSql.Provider.MySql">
       <Version>3.0.100</Version>
+    </PackageReference>
+    <PackageReference Include="MailKit">
+      <Version>3.1.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.13</Version>

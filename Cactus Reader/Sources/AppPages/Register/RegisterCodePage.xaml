@@ -1,0 +1,55 @@
+﻿<Page
+    x:Class="Cactus_Reader.Sources.AppPages.Register.RegisterCodePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cactus_Reader.Sources.AppPages.Register"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d"
+    muxc:BackdropMaterial.ApplyToRootOrPageBackground="True">
+
+    <Grid>
+        <Frame x:Name="contentFrame">
+            <Frame.ContentTransitions>
+                <TransitionCollection>
+                    <NavigationThemeTransition/>
+                </TransitionCollection>
+            </Frame.ContentTransitions>
+
+            <Border Background="{ThemeResource LayerFillColorDefaultBrush}"
+                    VerticalAlignment="Center" HorizontalAlignment="Center" CornerRadius="8" BorderThickness="1"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <StackPanel Orientation="Vertical" Margin="48">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock FontFamily="Microsoft YaHei UI" FontSize="40" FontWeight="Bold" Text="输入验证码"/>
+                        <StackPanel Orientation="Horizontal" Margin="0, 12, 0, 0">
+                            <HyperlinkButton Padding="0" Margin="0, 3, 0, 0" Click="BackPrevPage">
+                                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="16" Glyph="&#xE760;"/>
+                            </HyperlinkButton>
+                            <TextBlock x:Name="userMailBlock" FontFamily="Microsoft YaHei UI" FontSize="16"
+                                       Margin="8, 0, 0, 0" Text="someone@example.com"/>
+                        </StackPanel>
+                        <TextBlock FontFamily="Microsoft YaHei UI" FontSize="16"
+                                   Text="我们已通过电子邮件将验证码发送至"
+                                   TextWrapping="Wrap" Margin="0, 12, 0, 0" MaxWidth="436"/>
+                        <TextBlock x:Name="userMail" FontFamily="Microsoft YaHei UI" FontSize="16"
+                                   Text="请输入邮件中的代码进行登录。"
+                                   TextWrapping="Wrap" Margin="0, 8, 0, 0" MaxWidth="436"/>
+                        <TextBlock FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 32, 0, 0" Text="邮件验证码："/>
+                        <TextBox FontSize="16" Margin="0, 8, 0, 0" Height="40" Width="436" MaxLength="20"
+                                     VerticalContentAlignment="Center"/>
+                        <TextBlock FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 16, 0, 0"
+                                   Text="请输入 7 位验证码，该验证码仅包含数字。" Foreground="#E00000" Visibility="Collapsed"/>
+                        <HyperlinkButton FontFamily="Microsoft YaHei UI" Margin="0, 20, 0, 0" Padding="0"
+                                         Content="我没有收到验证码"/>
+                        <Button FontFamily="Microsoft YaHei UI" FontSize="16" FontWeight="Bold"
+                                Width="436" Height="48" Background="#005FB8" HorizontalAlignment="Center"
+                                Content="继  续" CharacterSpacing="50" Margin="0, 32, 0, 0" Click="ContinueLogon"
+                                Style="{StaticResource AccentButtonStyle}" Foreground="White"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Frame>
+    </Grid>
+</Page>

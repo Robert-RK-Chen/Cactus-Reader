@@ -8,7 +8,7 @@
   有关程序包清单文件的详细信息，请参阅 http://go.microsoft.com/fwlink/?LinkID=241727
  -->
   <Identity Name="cactus.reader.robertch.cn" Publisher="CN=Robert Chen" Version="1.0.0.0" ProcessorArchitecture="x64" />
-  <mp:PhoneIdentity PhoneProductId="e8730768-9228-4e6a-9351-eb0e582e8a3f" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <mp:PhoneIdentity PhoneProductId="47624d53-0175-4f5b-a487-ce1018ca6487" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Cactus Reader</DisplayName>
     <PublisherDisplayName>Robert Chen</PublisherDisplayName>
@@ -56,7 +56,7 @@
     <build:Item Name="VisualStudioEdition" Value="Microsoft Visual Studio Enterprise 2022" />
     <build:Item Name="OperatingSystem" Version="10.0.22000.1 (WinBuild.160101.0800)" />
     <build:Item Name="Microsoft.Build.AppxPackage.dll" Version="17.0.32113.165" />
-    <build:Item Name="ProjectGUID" Value="{3657E508-C8F4-49B4-9A89-4421157417C7}" />
+    <build:Item Name="ProjectGUID" Value="{7A67B3B9-B8AD-4608-A309-80A798F22815}" />
     <build:Item Name="OptimizingToolset" Value="None" />
     <build:Item Name="TargetRuntime" Value="Managed" />
     <build:Item Name="Microsoft.Windows.UI.Xaml.Build.Tasks.dll" Version="0.0.0.0" />

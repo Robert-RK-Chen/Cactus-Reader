@@ -18,8 +18,8 @@ namespace Cactus_Reader
         /// 已执行，逻辑上等同于 main() 或 WinMain()。
         /// </summary>
 
+        static readonly string myConnString = "Server=sh-cdb-0q4l9dac.sql.tencentcdb.com;port=59121;User ID=RobertChen;Password=#TSLover1213;Database=cactus_reader;Charset=GBK;SslMode=none;Max pool size=10";
         public IFreeSql freeSql = new FreeSql.FreeSqlBuilder().UseConnectionString(FreeSql.DataType.MySql, myConnString).Build();
-        static string myConnString = "Server=sh-cdb-0q4l9dac.sql.tencentcdb.com;port=59121;User ID=RobertChen;Password=#TSLover1213;Database=cactus_reader;Charset=GBK;SslMode=none;Max pool size=10";
 
         public App()
         {

@@ -8,7 +8,7 @@
     <TargetOsDescription>Windows 10.0</TargetOsDescription>
     <SolutionConfiguration>Debug|x64</SolutionConfiguration>
     <PackageArchitecture>x64</PackageArchitecture>
-    <PackageIdentityName>e8730768-9228-4e6a-9351-eb0e582e8a3f</PackageIdentityName>
+    <PackageIdentityName>47624d53-0175-4f5b-a487-ce1018ca6487</PackageIdentityName>
     <PackageIdentityPublisher>CN=Robert Chen</PackageIdentityPublisher>
     <IntermediateOutputPath>C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\obj\x64\Debug\</IntermediateOutputPath>
     <RemoteDeploymentType>
@@ -19,7 +19,7 @@
     <DeployOptionalPackages>false</DeployOptionalPackages>
     <WindowsSdkPath>C:\Program Files %28x86%29\Windows Kits\10\</WindowsSdkPath>
     <LayoutDir>C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\AppX</LayoutDir>
-    <RegisteredManifestChecksum>5D8F11662497B917FADBBC0C471CFEE61B56379EA6742A7200F911BCAB79D1FE</RegisteredManifestChecksum>
+    <RegisteredManifestChecksum>E93AD0BB0E6D96B71C6E7FD7678D18D4D5C88ACDC0BB72D0D22742F613BC9709</RegisteredManifestChecksum>
     <RegisteredPackageMoniker>cactus.reader.robertch.cn_1.0.0.0_x64__6gn3n1gfsjn1a</RegisteredPackageMoniker>
     <RegisteredUserModeAppID>cactus.reader.robertch.cn_6gn3n1gfsjn1a!App</RegisteredUserModeAppID>
     <RegisteredPackageID>cactus.reader.robertch.cn</RegisteredPackageID>
@@ -30,17 +30,13 @@
     <AppXManifest Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Core\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T14:37:00.105</Modified>
+      <Modified>2022-02-26T03:30:29.956</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Cactus Reader.exe">
       <PackagePath>entrypoint\Cactus Reader.exe</PackagePath>
-      <Modified>2022-02-25T14:36:58.949</Modified>
-    </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Robert Chen\.nuget\packages\bouncycastle.netcore\1.8.5\lib\netstandard2.0\BouncyCastle.Crypto.dll">
-      <PackagePath>BouncyCastle.Crypto.dll</PackagePath>
-      <Modified>2019-03-18T11:53:36.000</Modified>
+      <Modified>2022-02-26T03:29:45.473</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Robert Chen\.nuget\packages\freesql\3.0.100\lib\netstandard2.0\FreeSql.dll">
       <PackagePath>FreeSql.dll</PackagePath>
@@ -66,6 +62,14 @@
       <PackagePath>K4os.Hash.xxHash.dll</PackagePath>
       <Modified>2019-07-03T20:39:02.000</Modified>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Robert Chen\.nuget\packages\mailkit\3.1.1\lib\netstandard2.0\MailKit.dll">
+      <PackagePath>MailKit.dll</PackagePath>
+      <Modified>2022-01-30T16:21:06.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Robert Chen\.nuget\packages\mimekit\3.1.1\lib\netstandard2.0\MimeKit.dll">
+      <PackagePath>MimeKit.dll</PackagePath>
+      <Modified>2022-01-30T15:46:46.000</Modified>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Robert Chen\.nuget\packages\mysql.data\8.0.27\lib\netstandard2.0\MySql.Data.dll">
       <PackagePath>MySql.Data.dll</PackagePath>
       <Modified>2021-09-28T05:29:52.000</Modified>
@@ -78,6 +82,10 @@
       <PackagePath>ZstdNet.dll</PackagePath>
       <Modified>2021-09-28T05:28:28.000</Modified>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Robert Chen\.nuget\packages\portable.bouncycastle\1.9.0\lib\netstandard2.0\BouncyCastle.Crypto.dll">
+      <PackagePath>BouncyCastle.Crypto.dll</PackagePath>
+      <Modified>2021-10-19T11:53:34.000</Modified>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\UWPNuGetPackages\runtime.win10-x64.microsoft.netcore.universalwindowsplatform\6.2.13\runtimes\win10-x64\lib\uap10.0.15138\System.Runtime.dll">
       <PackagePath>System.Runtime.dll</PackagePath>
       <Modified>2021-10-09T22:49:06.000</Modified>
@@ -86,9 +94,17 @@
       <PackagePath>System.Configuration.ConfigurationManager.dll</PackagePath>
       <Modified>2017-11-20T18:09:04.000</Modified>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Robert Chen\.nuget\packages\system.data.datasetextensions\4.5.0\lib\netstandard2.0\System.Data.DataSetExtensions.dll">
+      <PackagePath>System.Data.DataSetExtensions.dll</PackagePath>
+      <Modified>2018-05-15T13:29:36.000</Modified>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Robert Chen\.nuget\packages\system.runtime.compilerservices.unsafe\5.0.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll">
       <PackagePath>System.Runtime.CompilerServices.Unsafe.dll</PackagePath>
       <Modified>2020-10-19T18:46:44.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Robert Chen\.nuget\packages\system.security.cryptography.pkcs\4.7.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.Pkcs.dll">
+      <PackagePath>System.Security.Cryptography.Pkcs.dll</PackagePath>
+      <Modified>2019-11-15T08:53:46.000</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Robert Chen\.nuget\packages\system.security.cryptography.protecteddata\4.4.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll">
       <PackagePath>System.Security.Cryptography.ProtectedData.dll</PackagePath>
@@ -105,252 +121,252 @@
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\BadgeLogo.scale-100.png">
       <PackagePath>Assets\BadgeLogo.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:59.882</Modified>
+      <Modified>2022-02-26T03:30:13.146</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\BadgeLogo.scale-125.png">
       <PackagePath>Assets\BadgeLogo.scale-125.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:59.927</Modified>
+      <Modified>2022-02-26T03:30:13.192</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\BadgeLogo.scale-150.png">
       <PackagePath>Assets\BadgeLogo.scale-150.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:59.974</Modified>
+      <Modified>2022-02-26T03:30:13.238</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\BadgeLogo.scale-200.png">
       <PackagePath>Assets\BadgeLogo.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:26:00.023</Modified>
+      <Modified>2022-02-26T03:30:13.285</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\BadgeLogo.scale-400.png">
       <PackagePath>Assets\BadgeLogo.scale-400.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:26:00.079</Modified>
+      <Modified>2022-02-26T03:30:13.340</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\LargeTile.scale-100.png">
       <PackagePath>Assets\LargeTile.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:57.619</Modified>
+      <Modified>2022-02-26T03:30:10.896</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\LargeTile.scale-125.png">
       <PackagePath>Assets\LargeTile.scale-125.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:57.684</Modified>
+      <Modified>2022-02-26T03:30:10.959</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\LargeTile.scale-150.png">
       <PackagePath>Assets\LargeTile.scale-150.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:57.756</Modified>
+      <Modified>2022-02-26T03:30:11.032</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\LargeTile.scale-200.png">
       <PackagePath>Assets\LargeTile.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:57.849</Modified>
+      <Modified>2022-02-26T03:30:11.125</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\LargeTile.scale-400.png">
       <PackagePath>Assets\LargeTile.scale-400.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.076</Modified>
+      <Modified>2022-02-26T03:30:11.355</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\SmallTile.scale-100.png">
       <PackagePath>Assets\SmallTile.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:56.696</Modified>
+      <Modified>2022-02-26T03:30:09.955</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\SmallTile.scale-125.png">
       <PackagePath>Assets\SmallTile.scale-125.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:56.746</Modified>
+      <Modified>2022-02-26T03:30:10.009</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\SmallTile.scale-150.png">
       <PackagePath>Assets\SmallTile.scale-150.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:56.796</Modified>
+      <Modified>2022-02-26T03:30:10.061</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\SmallTile.scale-200.png">
       <PackagePath>Assets\SmallTile.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:56.845</Modified>
+      <Modified>2022-02-26T03:30:10.111</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\SmallTile.scale-400.png">
       <PackagePath>Assets\SmallTile.scale-400.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:56.904</Modified>
+      <Modified>2022-02-26T03:30:10.170</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\SplashScreen.scale-100.png">
       <PackagePath>Assets\SplashScreen.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:59.170</Modified>
+      <Modified>2022-02-26T03:30:12.454</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\SplashScreen.scale-125.png">
       <PackagePath>Assets\SplashScreen.scale-125.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:59.245</Modified>
+      <Modified>2022-02-26T03:30:12.530</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\SplashScreen.scale-150.png">
       <PackagePath>Assets\SplashScreen.scale-150.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:59.336</Modified>
+      <Modified>2022-02-26T03:30:12.620</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\SplashScreen.scale-400.png">
       <PackagePath>Assets\SplashScreen.scale-400.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:59.828</Modified>
+      <Modified>2022-02-26T03:30:13.099</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square150x150Logo.scale-100.png">
       <PackagePath>Assets\Square150x150Logo.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:56.957</Modified>
+      <Modified>2022-02-26T03:30:10.220</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square150x150Logo.scale-125.png">
       <PackagePath>Assets\Square150x150Logo.scale-125.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:57.008</Modified>
+      <Modified>2022-02-26T03:30:10.271</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square150x150Logo.scale-150.png">
       <PackagePath>Assets\Square150x150Logo.scale-150.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:57.059</Modified>
+      <Modified>2022-02-26T03:30:10.325</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square150x150Logo.scale-400.png">
       <PackagePath>Assets\Square150x150Logo.scale-400.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:57.207</Modified>
+      <Modified>2022-02-26T03:30:10.477</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.altform-lightunplated_targetsize-16.png">
       <PackagePath>Assets\Square44x44Logo.altform-lightunplated_targetsize-16.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.870</Modified>
+      <Modified>2022-02-26T03:30:12.155</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.altform-lightunplated_targetsize-24.png">
       <PackagePath>Assets\Square44x44Logo.altform-lightunplated_targetsize-24.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.917</Modified>
+      <Modified>2022-02-26T03:30:12.202</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.altform-lightunplated_targetsize-256.png">
       <PackagePath>Assets\Square44x44Logo.altform-lightunplated_targetsize-256.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:59.104</Modified>
+      <Modified>2022-02-26T03:30:12.388</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.altform-lightunplated_targetsize-32.png">
       <PackagePath>Assets\Square44x44Logo.altform-lightunplated_targetsize-32.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.964</Modified>
+      <Modified>2022-02-26T03:30:12.248</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.altform-lightunplated_targetsize-48.png">
       <PackagePath>Assets\Square44x44Logo.altform-lightunplated_targetsize-48.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:59.011</Modified>
+      <Modified>2022-02-26T03:30:12.295</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.altform-unplated_targetsize-16.png">
       <PackagePath>Assets\Square44x44Logo.altform-unplated_targetsize-16.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.613</Modified>
+      <Modified>2022-02-26T03:30:11.890</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.altform-unplated_targetsize-256.png">
       <PackagePath>Assets\Square44x44Logo.altform-unplated_targetsize-256.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.821</Modified>
+      <Modified>2022-02-26T03:30:12.095</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.altform-unplated_targetsize-32.png">
       <PackagePath>Assets\Square44x44Logo.altform-unplated_targetsize-32.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.704</Modified>
+      <Modified>2022-02-26T03:30:11.982</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.altform-unplated_targetsize-48.png">
       <PackagePath>Assets\Square44x44Logo.altform-unplated_targetsize-48.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.754</Modified>
+      <Modified>2022-02-26T03:30:12.029</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.scale-100.png">
       <PackagePath>Assets\Square44x44Logo.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.122</Modified>
+      <Modified>2022-02-26T03:30:11.401</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.scale-125.png">
       <PackagePath>Assets\Square44x44Logo.scale-125.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.169</Modified>
+      <Modified>2022-02-26T03:30:11.447</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.scale-150.png">
       <PackagePath>Assets\Square44x44Logo.scale-150.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.215</Modified>
+      <Modified>2022-02-26T03:30:11.493</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.scale-400.png">
       <PackagePath>Assets\Square44x44Logo.scale-400.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.315</Modified>
+      <Modified>2022-02-26T03:30:11.593</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.targetsize-16.png">
       <PackagePath>Assets\Square44x44Logo.targetsize-16.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.364</Modified>
+      <Modified>2022-02-26T03:30:11.641</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.targetsize-24.png">
       <PackagePath>Assets\Square44x44Logo.targetsize-24.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.411</Modified>
+      <Modified>2022-02-26T03:30:11.689</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.targetsize-256.png">
       <PackagePath>Assets\Square44x44Logo.targetsize-256.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.565</Modified>
+      <Modified>2022-02-26T03:30:11.841</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.targetsize-32.png">
       <PackagePath>Assets\Square44x44Logo.targetsize-32.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.457</Modified>
+      <Modified>2022-02-26T03:30:11.735</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.targetsize-48.png">
       <PackagePath>Assets\Square44x44Logo.targetsize-48.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.504</Modified>
+      <Modified>2022-02-26T03:30:11.779</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\StoreLogo.scale-100.png">
       <PackagePath>Assets\StoreLogo.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:26:00.125</Modified>
+      <Modified>2022-02-26T03:30:13.386</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\StoreLogo.scale-125.png">
       <PackagePath>Assets\StoreLogo.scale-125.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:26:00.172</Modified>
+      <Modified>2022-02-26T03:30:13.433</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\StoreLogo.scale-150.png">
       <PackagePath>Assets\StoreLogo.scale-150.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:26:00.220</Modified>
+      <Modified>2022-02-26T03:30:13.479</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\StoreLogo.scale-200.png">
       <PackagePath>Assets\StoreLogo.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:26:00.269</Modified>
+      <Modified>2022-02-26T03:30:13.528</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\StoreLogo.scale-400.png">
       <PackagePath>Assets\StoreLogo.scale-400.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:26:00.329</Modified>
+      <Modified>2022-02-26T03:30:13.589</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Wide310x150Logo.scale-100.png">
       <PackagePath>Assets\Wide310x150Logo.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:57.258</Modified>
+      <Modified>2022-02-26T03:30:10.529</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Wide310x150Logo.scale-125.png">
       <PackagePath>Assets\Wide310x150Logo.scale-125.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:57.312</Modified>
+      <Modified>2022-02-26T03:30:10.584</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Wide310x150Logo.scale-150.png">
       <PackagePath>Assets\Wide310x150Logo.scale-150.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:57.369</Modified>
+      <Modified>2022-02-26T03:30:10.643</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Wide310x150Logo.scale-400.png">
       <PackagePath>Assets\Wide310x150Logo.scale-400.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:57.561</Modified>
+      <Modified>2022-02-26T03:30:10.838</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\LockScreenLogo.scale-200.png">
       <PackagePath>Assets\LockScreenLogo.scale-200.png</PackagePath>
@@ -359,87 +375,87 @@
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\SplashScreen.scale-200.png">
       <PackagePath>Assets\SplashScreen.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:59.458</Modified>
+      <Modified>2022-02-26T03:30:12.744</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square150x150Logo.scale-200.png">
       <PackagePath>Assets\Square150x150Logo.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:57.116</Modified>
+      <Modified>2022-02-26T03:30:10.385</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.scale-200.png">
       <PackagePath>Assets\Square44x44Logo.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.262</Modified>
+      <Modified>2022-02-26T03:30:11.540</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Square44x44Logo.targetsize-24_altform-unplated.png">
       <PackagePath>Assets\Square44x44Logo.targetsize-24_altform-unplated.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:58.659</Modified>
+      <Modified>2022-02-26T03:30:11.937</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Assets\Wide310x150Logo.scale-200.png">
       <PackagePath>Assets\Wide310x150Logo.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-25T01:25:57.435</Modified>
+      <Modified>2022-02-26T03:30:10.711</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Sources\Images\Cactus Reader.png">
       <PackagePath>Sources\Images\Cactus Reader.png</PackagePath>
-      <Modified>2022-02-25T01:23:14.438</Modified>
+      <Modified>2022-02-26T02:27:11.772</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Sources\Images\RCSoftware.png">
       <PackagePath>Sources\Images\RCSoftware.png</PackagePath>
-      <Modified>2022-02-25T01:24:03.024</Modified>
+      <Modified>2022-02-26T02:27:11.777</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Sources\Images\Searching.png">
       <PackagePath>Sources\Images\Searching.png</PackagePath>
-      <Modified>2022-02-25T01:24:03.027</Modified>
+      <Modified>2022-02-26T02:27:11.760</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Properties\Default.rd.xml">
       <PackagePath>Properties\Default.rd.xml</PackagePath>
-      <Modified>2022-02-25T01:21:22.758</Modified>
+      <Modified>2022-02-26T02:15:37.022</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Cactus Reader.xr.xml">
       <PackagePath>Cactus Reader.xr.xml</PackagePath>
-      <Modified>2022-02-25T11:39:04.563</Modified>
+      <Modified>2022-02-26T03:29:45.268</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\App.xbf">
       <PackagePath>App.xbf</PackagePath>
-      <Modified>2022-02-25T14:36:58.839</Modified>
+      <Modified>2022-02-26T03:30:28.690</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\LoginPages\LoginCodePage.xbf">
-      <PackagePath>Sources\AppPages\LoginPages\LoginCodePage.xbf</PackagePath>
-      <Modified>2022-02-25T14:36:58.839</Modified>
+    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\AppUI\MainPage.xbf">
+      <PackagePath>Sources\AppPages\AppUI\MainPage.xbf</PackagePath>
+      <Modified>2022-02-26T03:30:28.691</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\LoginPages\LoginAccountPage.xbf">
-      <PackagePath>Sources\AppPages\LoginPages\LoginAccountPage.xbf</PackagePath>
-      <Modified>2022-02-25T14:36:58.839</Modified>
+    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\Login\LoginAccountPage.xbf">
+      <PackagePath>Sources\AppPages\Login\LoginAccountPage.xbf</PackagePath>
+      <Modified>2022-02-26T03:30:28.691</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\LoginPages\LoginPwdPage.xbf">
-      <PackagePath>Sources\AppPages\LoginPages\LoginPwdPage.xbf</PackagePath>
-      <Modified>2022-02-25T14:36:58.839</Modified>
+    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\Login\LoginCodePage.xbf">
+      <PackagePath>Sources\AppPages\Login\LoginCodePage.xbf</PackagePath>
+      <Modified>2022-02-26T03:30:28.691</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\LogonPages\LogonCodePage.xbf">
-      <PackagePath>Sources\AppPages\LogonPages\LogonCodePage.xbf</PackagePath>
-      <Modified>2022-02-25T14:36:58.839</Modified>
+    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\Login\LoginPwdPage.xbf">
+      <PackagePath>Sources\AppPages\Login\LoginPwdPage.xbf</PackagePath>
+      <Modified>2022-02-26T03:30:28.691</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\LogonPages\LogonMailPage.xbf">
-      <PackagePath>Sources\AppPages\LogonPages\LogonMailPage.xbf</PackagePath>
-      <Modified>2022-02-25T14:36:58.839</Modified>
+    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\Register\RegisterCodePage.xbf">
+      <PackagePath>Sources\AppPages\Register\RegisterCodePage.xbf</PackagePath>
+      <Modified>2022-02-26T03:30:28.691</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\LogonPages\LogonPwdPage.xbf">
-      <PackagePath>Sources\AppPages\LogonPages\LogonPwdPage.xbf</PackagePath>
-      <Modified>2022-02-25T14:36:58.839</Modified>
+    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\Register\RegisterMailPage.xbf">
+      <PackagePath>Sources\AppPages\Register\RegisterMailPage.xbf</PackagePath>
+      <Modified>2022-02-26T03:30:28.691</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\LogonPages\LogonUserInfoPage.xbf">
-      <PackagePath>Sources\AppPages\LogonPages\LogonUserInfoPage.xbf</PackagePath>
-      <Modified>2022-02-25T14:36:58.839</Modified>
+    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\Register\RegisterPwdPage.xbf">
+      <PackagePath>Sources\AppPages\Register\RegisterPwdPage.xbf</PackagePath>
+      <Modified>2022-02-26T03:30:28.691</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\MainPage.xbf">
-      <PackagePath>Sources\AppPages\MainPage.xbf</PackagePath>
-      <Modified>2022-02-25T14:36:58.839</Modified>
+    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\Register\RegisterUserInfoPage.xbf">
+      <PackagePath>Sources\AppPages\Register\RegisterUserInfoPage.xbf</PackagePath>
+      <Modified>2022-02-26T03:30:28.691</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\StartPage.xbf">
       <PackagePath>Sources\AppPages\StartPage.xbf</PackagePath>
-      <Modified>2022-02-25T14:36:58.839</Modified>
+      <Modified>2022-02-26T03:30:28.691</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.UniversalCRT.Debug\10.0.22000.0\\redist\Debug\X64\ucrtbased.dll">
       <PackagePath>ucrtbased.dll</PackagePath>
@@ -451,11 +467,11 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\resources.pri">
       <PackagePath>resources.pri</PackagePath>
-      <Modified>2022-02-25T14:35:09.357</Modified>
+      <Modified>2022-02-26T03:29:46.059</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Core\Cactus Reader.exe">
       <PackagePath>Cactus Reader.exe</PackagePath>
-      <Modified>2022-02-25T14:37:00.105</Modified>
+      <Modified>2022-02-26T03:30:29.951</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Robert Chen\.nuget\packages\microsoft.ui.xaml\2.7.0\buildTransitive\..\lib\uap10.0\Microsoft.UI.Xaml.winmd">
       <PackagePath>Microsoft.UI.Xaml.winmd</PackagePath>

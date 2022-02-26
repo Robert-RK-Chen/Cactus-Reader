@@ -11,7 +11,7 @@
     Publisher="CN=Robert Chen"
     Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="e8730768-9228-4e6a-9351-eb0e582e8a3f" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="47624d53-0175-4f5b-a487-ce1018ca6487" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>Cactus Reader</DisplayName>

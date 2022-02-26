@@ -1,4 +1,5 @@
-﻿using Windows.ApplicationModel.Core;
+﻿using Cactus_Reader.Sources.AppPages.Login;
+using Windows.ApplicationModel.Core;
 using Windows.UI;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -17,6 +18,7 @@ namespace Cactus_Reader.Sources.AppPages
     {
         public StartPage()
         {
+            this.InitializeComponent();
             this.InitializeComponent();
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;
 
