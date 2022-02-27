@@ -22,7 +22,7 @@ namespace Cactus_Reader.Sources.ToolKits
                 {
                     // 随机数生成验证码
                     Random rand = new Random();
-                    string verifyCode = Convert.ToString(rand.Next(0000000, 9999999));
+                    string verifyCode = Convert.ToString(rand.Next(1000000, 9999999));
 
                     // 更新验证码状态
                     recentCode = new Code

@@ -9,6 +9,10 @@
     mc:Ignorable="d"
     muxc:BackdropMaterial.ApplyToRootOrPageBackground="True">
 
+    <Page.Resources>
+        <FontFamily x:Key="SegoeFluentIcons">/Sources/Fonts/Segoe Fluent Icons.ttf#Segoe Fluent Icons</FontFamily>
+    </Page.Resources>
+
     <Grid>
         <Frame x:Name="contentFrame">
             <Frame.ContentTransitions>
@@ -25,7 +29,7 @@
                         <TextBlock FontFamily="Microsoft YaHei UI" FontSize="40" FontWeight="Bold" Text="完善用户信息"/>
                         <StackPanel Orientation="Horizontal" Margin="0, 12, 0, 0">
                             <HyperlinkButton Padding="0" Margin="0, 3, 0, 0" Click="BackPrevPage">
-                                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="16" Glyph="&#xE760;"/>
+                                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" FontSize="16" Glyph="&#xE760;"/>
                             </HyperlinkButton>
                             <TextBlock x:Name="userMailBlock" FontFamily="Microsoft YaHei UI" FontSize="16"
                                        Margin="8, 0, 0, 0" Text="someone@example.com"/>

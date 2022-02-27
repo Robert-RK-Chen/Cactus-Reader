@@ -9,6 +9,10 @@
     mc:Ignorable="d"
     muxc:BackdropMaterial.ApplyToRootOrPageBackground="True">
 
+    <Page.Resources>
+        <FontFamily x:Key="SegoeFluentIcons">/Sources/Fonts/Segoe Fluent Icons.ttf#Segoe Fluent Icons</FontFamily>
+    </Page.Resources>
+
     <Grid>
         <Frame x:Name="mainContent" x:FieldModifier="Public">
             <Frame.ContentTransitions>
