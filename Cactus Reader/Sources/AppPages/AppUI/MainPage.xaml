@@ -77,7 +77,7 @@
                     </muxc:NavigationView.FooterMenuItems>
                     <Grid>
                         <Frame x:Name="contentFrame">
-                            <Button Content="退出登陆" Width="360" Height="40" FontFamily="Microsoft YaHei UI"
+                            <Button Content="退出登录" Width="360" Height="40" FontFamily="Microsoft YaHei UI"
                                     FontWeight="Bold" Style="{StaticResource AccentButtonStyle}" Foreground="White"
                                     Background="#005FB8" HorizontalAlignment="Center" VerticalAlignment="Center"
                                     Click="SignOut"/>

@@ -1,0 +1,10 @@
+App.xbf
+Sources\AppPages\AppUI\MainPage.xbf
+Sources\AppPages\Login\LoginAccountPage.xbf
+Sources\AppPages\Login\LoginCodePage.xbf
+Sources\AppPages\Login\LoginPwdPage.xbf
+Sources\AppPages\Register\RegisterCodePage.xbf
+Sources\AppPages\Register\RegisterMailPage.xbf
+Sources\AppPages\Register\RegisterPwdPage.xbf
+Sources\AppPages\Register\RegisterUserInfoPage.xbf
+Sources\AppPages\StartPage.xbf

@@ -1,5 +1,4 @@
 ﻿using Cactus_Reader.Entities;
-using Cactus_Reader.Sources.AppPages.Register;
 using Cactus_Reader.Sources.ToolKits;
 using System;
 using Windows.Storage;
@@ -17,7 +16,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
     /// </summary>
     public sealed partial class RegisterPwdPage : Page
     {
-        ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         readonly IFreeSql freeSql = (Application.Current as App).freeSql;
         User currentUser = null;
 

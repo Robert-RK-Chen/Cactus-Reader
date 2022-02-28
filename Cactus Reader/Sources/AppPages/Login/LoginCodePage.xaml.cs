@@ -86,20 +86,17 @@ namespace Cactus_Reader.Sources.AppPages.Login
         private void ResendVerifyCode(object sender, RoutedEventArgs e)
         {
             Code currentCode = freeSql.Select<Code>().Where(code => code.email == currentUser.email).ToOne();
-            Task.Factory.StartNew(() =>
+            bool sendFlag = new VerifyCodeSender().SendVerifyCode(currentUser.email);
+            if (sendFlag == true)
             {
-                bool sendFlag = new VerifyCodeSender().SendVerifyCode(currentUser.email);
-                if (sendFlag == true)
-                {
-                    alertMsg.Text = "代码已发送，请注意查收。";
-                    alertMsg.Visibility = Visibility.Visible;
-                }
-                else
-                {
-                    alertMsg.Text = "代码发送过于频繁，请稍后再试。";
-                    alertMsg.Visibility = Visibility.Visible;
-                }
-            });
+                alertMsg.Text = "代码已发送，请注意查收。";
+                alertMsg.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                alertMsg.Text = "代码发送过于频繁，请稍后再试。";
+                alertMsg.Visibility = Visibility.Visible;
+            }
         }
     }
 }

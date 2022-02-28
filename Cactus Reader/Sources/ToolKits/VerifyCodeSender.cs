@@ -6,7 +6,7 @@ using System;
 
 namespace Cactus_Reader.Sources.ToolKits
 {
-    internal class VerifyCodeSender
+    public class VerifyCodeSender
     {
         static string myConnString = "Server=sh-cdb-0q4l9dac.sql.tencentcdb.com;port=59121;User ID=RobertChen;Password=#TSLover1213;Database=cactus_reader;Charset=GBK;SslMode=none;Max pool size=10";
         public static IFreeSql freeSql = new FreeSql.FreeSqlBuilder().UseConnectionString(FreeSql.DataType.MySql, myConnString).UseAutoSyncStructure(true).Build();
@@ -52,11 +52,11 @@ namespace Cactus_Reader.Sources.ToolKits
             try
             {
                 var message = new MimeMessage();
-                message.From.Add(new MailboxAddress("Cactus Reader 账户团队", "cactus-noreply@robertch.cn"));
+                message.From.Add(new MailboxAddress("Cactus Reader 帐户团队", "cactus-noreply@robertch.cn"));
                 message.To.Add(new MailboxAddress(null, email));
                 message.Subject = "Cactus 帐户安全代码";
 
-                string mailText = "<table><tbody><tr><td><p>Cactus Reader 账户</p><p style=\"color: #05A6F0; font-weight: bold; font-size: 26px;\">安全代码</p><p>你正在使用该电子邮件地址注册或登录 Cactus 帐户，请在 5 分钟内使用以下安全代码进行验证。</p><p>安全代码：" + verifyCode + "</p><p>如果你并没有发出注册或登录 Cactus 帐户的请求，请忽略该电子邮件。</p><br/><p>谢谢！</p><p>Cactus Reader 账户团队</p><br/><span style=\"color: #05A6F0; font-weight: bold; font-size: 26px;\">R.</span><span style=\"color: #FFBA08; font-weight: bold; font-size: 26px;\">C.</span><span style=\"color: #737373; font-weight: bold; font-size: 26px;\">Software Studio</span><p style=\"font-size: 14; \">该邮件由系统自动发出，因此请勿在该邮件上回复任何内容。</p></td></tr></tbody></table>";
+                string mailText = "<table><tbody><tr><td><p>Cactus Reader 帐户</p><p style=\"color: #05A6F0; font-weight: bold; font-size: 26px;\">安全代码</p><p>你正在使用该电子邮件地址注册或登录 Cactus 帐户，请在 5 分钟内使用以下安全代码进行验证。</p><p>安全代码：" + verifyCode + "</p><p>如果你并没有发出注册或登录 Cactus 帐户的请求，请忽略该电子邮件。</p><br/><p>谢谢！</p><p>Cactus Reader 帐户团队</p><br/><span style=\"color: #05A6F0; font-weight: bold; font-size: 26px;\">R.</span><span style=\"color: #FFBA08; font-weight: bold; font-size: 26px;\">C.</span><span style=\"color: #737373; font-weight: bold; font-size: 26px;\">Software Studio</span><p style=\"font-size: 14; \">该邮件由系统自动发出，因此请勿在该邮件上回复任何内容。</p></td></tr></tbody></table>";
 
                 message.Body = new TextPart(TextFormat.Html) { Text = mailText };
                 using (var client = new SmtpClient())

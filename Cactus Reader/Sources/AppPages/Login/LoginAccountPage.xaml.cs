@@ -1,6 +1,7 @@
 ﻿using Cactus_Reader.Entities;
 using Cactus_Reader.Sources.AppPages.Register;
 using System;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
@@ -15,6 +16,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
     /// </summary>
     public sealed partial class LoginAccountPage : Page
     {
+        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         readonly IFreeSql freeSql = (Application.Current as App).freeSql;
         User currentUser = null;
 
@@ -37,6 +39,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
         {
             alertMsg.Visibility = Visibility.Collapsed;
             string email = accountInput.Text;
+
             try
             {
                 currentUser = freeSql.Select<User>().Where(user => user.email == email).ToOne();
@@ -67,6 +70,25 @@ namespace Cactus_Reader.Sources.AppPages.Login
         private void ClearAlertMsg(object sender, RoutedEventArgs e)
         {
             alertMsg.Visibility = Visibility.Collapsed;
+        }
+
+        private async void SkipLogin(object sender, RoutedEventArgs e)
+        {
+            ContentDialog skipLoginDialog = new ContentDialog
+            {
+                Title = "跳过登录并使用有限功能？",
+                Content = "登录到 Cactus Reader 帐户，你可以体验文档与阅读进度的同步。",
+                CloseButtonText = "继续登录",
+                PrimaryButtonText = "跳过登录",
+                DefaultButton = ContentDialogButton.Primary
+            };
+
+            ContentDialogResult result = await skipLoginDialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                localSettings.Values["currentUser"] = "TempUser";
+                StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+            }
         }
     }
 }

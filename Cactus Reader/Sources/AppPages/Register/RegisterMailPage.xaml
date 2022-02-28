@@ -33,12 +33,12 @@
                                 <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" FontSize="16" Glyph="&#xE760;"/>
                             </HyperlinkButton>
                             <TextBlock FontFamily="Microsoft YaHei UI" FontSize="16" Margin="8, 0, 0, 0"
-                                       Text="一个账户即可访问与同步你的阅读资源"/>
+                                       Text="一个帐户即可访问与同步你的阅读资源"/>
                         </StackPanel>
 
                         <TextBlock FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 32, 0, 0" Text="电子邮箱："/>
                         <TextBox x:Name="userMailInput" FontSize="16" Margin="0, 8, 0, 0" Height="40" Width="436" 
-                                 MaxLength="20" VerticalContentAlignment="Center" GotFocus="ClearAlertMsg"/>
+                                 MaxLength="255" VerticalContentAlignment="Center" GotFocus="ClearAlertMsg"/>
                         <TextBlock x:Name="alertMsg" FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 16, 0, 0"
                                    Text="请输入一个有效的电子邮件地址。" TextWrapping="Wrap" MaxWidth="436"
                                    Foreground="#E00000" Visibility="Collapsed"/>

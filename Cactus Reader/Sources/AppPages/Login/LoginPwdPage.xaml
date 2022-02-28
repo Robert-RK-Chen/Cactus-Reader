@@ -38,7 +38,7 @@
                                    Text="由于你正在访问敏感信息，因此需要验证密码。"/>
                         <TextBlock FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 32, 0, 0" Text="帐户密码："/>
                         <PasswordBox x:Name="userPwdInput" FontSize="16" Margin="0, 8, 0, 0" Height="40" Width="436"
-                                     MaxLength="20" VerticalContentAlignment="Center" GotFocus="ClearAlertMsg"/>
+                                     MaxLength="255" VerticalContentAlignment="Center" GotFocus="ClearAlertMsg"/>
                         <TextBlock x:Name="alertMsg" FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 16, 0, 0"
                                    TextWrapping="Wrap" Text="请输入你的 Cactus 帐户密码" Foreground="#E00000" 
                                    Visibility="Collapsed" MaxWidth="436"/>

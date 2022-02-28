@@ -39,7 +39,7 @@
                                    TextWrapping="Wrap"/>
                         <TextBlock FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 32, 0, 0" Text="用户昵称："/>
                         <TextBox x:Name="userNameInput" FontSize="16" Margin="0, 8, 0, 0" Height="40" Width="436"
-                                 MaxLength="20" VerticalContentAlignment="Center" GettingFocus="ClearAlertMsg"/>
+                                 MaxLength="255" VerticalContentAlignment="Center" GettingFocus="ClearAlertMsg"/>
                         <TextBlock x:Name="alertMsg" FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 16, 0, 0"
                                    Text="改昵称已被注册，请更换一个后再次尝试。" Foreground="#E00000" Visibility="Collapsed"
                                    TextWrapping="Wrap" MaxWidth="436"/>

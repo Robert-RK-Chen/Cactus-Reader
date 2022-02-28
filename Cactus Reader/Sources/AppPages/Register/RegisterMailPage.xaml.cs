@@ -62,7 +62,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
                 {
                     user.email = mailAddress;
                     Code currentCode = freeSql.Select<Code>().Where(code => code.email == mailAddress).ToOne();
-                    if (currentCode == null || currentCode.create_time.AddMinutes(2) < DateTime.Now)
+                    if (currentCode == null || currentCode.create_time.AddMinutes(1) < DateTime.Now)
                     {
                         Task.Factory.StartNew(() =>
                         {

@@ -1,4 +1,5 @@
 ﻿using Cactus_Reader.Sources.AppPages;
+using Cactus_Reader.Sources.ToolKits;
 using System;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
@@ -22,6 +23,7 @@ namespace Cactus_Reader
         static readonly string myConnString = "Server=sh-cdb-0q4l9dac.sql.tencentcdb.com;port=59121;User ID=RobertChen;Password=#TSLover1213;Database=cactus_reader;Charset=GBK;SslMode=none;Max pool size=10";
         public IFreeSql freeSql = new FreeSql.FreeSqlBuilder().UseConnectionString(FreeSql.DataType.MySql, myConnString).Build();
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+        public VerifyCodeSender codeSender = new VerifyCodeSender();
 
         public App()
         {
