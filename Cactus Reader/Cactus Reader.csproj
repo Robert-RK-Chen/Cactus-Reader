@@ -164,6 +164,7 @@
       <DependentUpon>StartPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Sources\ToolKits\HashDirectory.cs" />
+    <Compile Include="Sources\ToolKits\IFreeSqlService.cs" />
     <Compile Include="Sources\ToolKits\InformationVerify.cs" />
     <Compile Include="Sources\ToolKits\VerifyCodeSender.cs" />
   </ItemGroup>

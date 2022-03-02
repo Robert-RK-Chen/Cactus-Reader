@@ -17,7 +17,8 @@ namespace Cactus_Reader.Sources.AppPages.Register
     /// </summary>
     public sealed partial class RegisterMailPage : Page
     {
-        readonly IFreeSql freeSql = (Application.Current as App).freeSql;
+        readonly IFreeSql freeSql = IFreeSqlService.Instance;
+        readonly VerifyCodeSender codeSender = VerifyCodeSender.Instance;
         User currentUser = null;
 
         public RegisterMailPage()
@@ -66,7 +67,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
                     {
                         Task.Factory.StartNew(() =>
                         {
-                            new VerifyCodeSender().SendVerifyCode(user.email);
+                            codeSender.SendVerifyCode(user.email);
                         });
                     }
                     contentFrame.Navigate(typeof(RegisterCodePage), user, new SlideNavigationTransitionInfo()

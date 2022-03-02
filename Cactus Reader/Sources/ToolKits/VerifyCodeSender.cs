@@ -8,8 +8,16 @@ namespace Cactus_Reader.Sources.ToolKits
 {
     public class VerifyCodeSender
     {
-        static string myConnString = "Server=sh-cdb-0q4l9dac.sql.tencentcdb.com;port=59121;User ID=RobertChen;Password=#TSLover1213;Database=cactus_reader;Charset=GBK;SslMode=none;Max pool size=10";
-        public static IFreeSql freeSql = new FreeSql.FreeSqlBuilder().UseConnectionString(FreeSql.DataType.MySql, myConnString).UseAutoSyncStructure(true).Build();
+        readonly IFreeSql freeSql = IFreeSqlService.Instance;
+
+        private static VerifyCodeSender instance;
+
+        public static VerifyCodeSender Instance
+        {
+            get { return instance ?? (instance = new VerifyCodeSender()); }
+        }
+
+        private VerifyCodeSender() { }
 
         public bool SendVerifyCode(string email)
         {

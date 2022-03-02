@@ -18,8 +18,8 @@ namespace Cactus_Reader.Sources.AppPages.Login
     public sealed partial class LoginPwdPage : Page
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        readonly IFreeSql freeSql = (Application.Current as App).freeSql;
-        readonly VerifyCodeSender codeSender = (Application.Current as App).codeSender;
+        readonly IFreeSql freeSql = IFreeSqlService.Instance;
+        readonly VerifyCodeSender codeSender = VerifyCodeSender.Instance;
         User currentUser = null;
 
         public LoginPwdPage()
@@ -43,14 +43,17 @@ namespace Cactus_Reader.Sources.AppPages.Login
             { Effect = SlideNavigationTransitionEffect.FromLeft });
         }
 
-        private async void MailCodeLogin(object sender, RoutedEventArgs e)
+        private void MailCodeLogin(object sender, RoutedEventArgs e)
         {
             try
             {
                 Code currentCode = freeSql.Select<Code>().Where(code => code.email == currentUser.email).ToOne();
                 if (currentCode == null || currentCode.create_time.AddMinutes(1) < DateTime.Now)
                 {
-                    await codeSender.SendVerifyCode(currentUser.email);
+                    Task.Factory.StartNew(() =>
+                    {
+                        codeSender.SendVerifyCode(currentUser.email);
+                    });
                 }
                 contentFrame.Navigate(typeof(LoginCodePage), currentUser, new SlideNavigationTransitionInfo()
                 { Effect = SlideNavigationTransitionEffect.FromRight });

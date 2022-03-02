@@ -1,7 +1,6 @@
 ﻿using Cactus_Reader.Entities;
 using Cactus_Reader.Sources.ToolKits;
 using System;
-using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -18,7 +17,8 @@ namespace Cactus_Reader.Sources.AppPages.Login
     public sealed partial class LoginCodePage : Page
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        readonly IFreeSql freeSql = (Application.Current as App).freeSql;
+        readonly IFreeSql freeSql = IFreeSqlService.Instance;
+        readonly VerifyCodeSender codeSender = VerifyCodeSender.Instance;
         User currentUser = null;
 
         public LoginCodePage()
@@ -86,7 +86,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
         private void ResendVerifyCode(object sender, RoutedEventArgs e)
         {
             Code currentCode = freeSql.Select<Code>().Where(code => code.email == currentUser.email).ToOne();
-            bool sendFlag = new VerifyCodeSender().SendVerifyCode(currentUser.email);
+            bool sendFlag = codeSender.SendVerifyCode(currentUser.email);
             if (sendFlag == true)
             {
                 alertMsg.Text = "代码已发送，请注意查收。";

@@ -1,5 +1,6 @@
 ﻿using Cactus_Reader.Entities;
 using Cactus_Reader.Sources.AppPages.Register;
+using Cactus_Reader.Sources.ToolKits;
 using System;
 using Windows.Storage;
 using Windows.UI.Xaml;
@@ -17,7 +18,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
     public sealed partial class LoginAccountPage : Page
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        readonly IFreeSql freeSql = (Application.Current as App).freeSql;
+        readonly IFreeSql freeSql = IFreeSqlService.Instance;
         User currentUser = null;
 
         public LoginAccountPage()

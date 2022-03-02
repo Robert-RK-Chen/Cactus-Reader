@@ -1,7 +1,6 @@
 ﻿using Cactus_Reader.Entities;
 using Cactus_Reader.Sources.ToolKits;
 using System;
-using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
@@ -16,7 +15,8 @@ namespace Cactus_Reader.Sources.AppPages.Register
     /// </summary>
     public sealed partial class RegisterCodePage : Page
     {
-        readonly IFreeSql freeSql = (Application.Current as App).freeSql;
+        readonly IFreeSql freeSql = IFreeSqlService.Instance;
+        readonly VerifyCodeSender codeSender = VerifyCodeSender.Instance;
         User currentUser = null;
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -84,7 +84,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
         private void ResendVerifyCode(object sender, RoutedEventArgs e)
         {
             Code currentCode = freeSql.Select<Code>().Where(code => code.email == currentUser.email).ToOne();
-            bool sendFlag = new VerifyCodeSender().SendVerifyCode(currentUser.email);
+            bool sendFlag = codeSender.SendVerifyCode(currentUser.email);
             if (sendFlag == true)
             {
                 alertMsg.Text = "代码已发送，请注意查收。";

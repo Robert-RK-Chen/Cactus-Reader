@@ -17,7 +17,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
     public sealed partial class RegisterPwdPage : Page
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        readonly IFreeSql freeSql = (Application.Current as App).freeSql;
+        readonly IFreeSql freeSql = IFreeSqlService.Instance;
         User currentUser = null;
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
