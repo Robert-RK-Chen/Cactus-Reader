@@ -1,4 +1,5 @@
 ﻿using Cactus_Reader.Sources.AppPages;
+using Cactus_Reader.Sources.AppPages.AppUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace Cactus_Reader
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         public MainPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;
 
             titleBar.ButtonBackgroundColor = Colors.Transparent;
@@ -115,26 +116,29 @@ namespace Cactus_Reader
             if (sender.PaneDisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode.Top)
             {
                 appTitleBar.Margin = new Thickness(topIndent, currMargin.Top, currMargin.Right, currMargin.Bottom);
+                contentFrame.Margin = new Thickness(0, 48, 0, 0);
             }
             else if (sender.DisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewDisplayMode.Minimal)
             {
                 appTitleBar.Margin = new Thickness(minimalIndent, currMargin.Top, currMargin.Right, currMargin.Bottom);
+                contentFrame.Margin = new Thickness(0, 48, 0, 0);
             }
             else
             {
                 appTitleBar.Margin = new Thickness(expandedIndent, currMargin.Top, currMargin.Right, currMargin.Bottom);
+                contentFrame.Margin = new Thickness(28, 48, 0, 0);
             }
         }
 
         // List of ValueTuple holding the Navigation Tag and the relative Navigation Page
         private readonly List<(string Tag, Type Page)> pages = new List<(string Tag, Type Page)>
         {
-            //("library", typeof(LibraryPage)),
-            //("favorite", typeof(FavoritePage)),
-            //("notes", typeof(NotesPage)),
-            //("plugins", typeof(PluginsPage)),
-            //("recycle", typeof(PluginsPage)),
-            //("about", typeof(AboutInfoPage))
+            ("library", typeof(LibraryPage)),
+            ("favorite", typeof(FavoritePage)),
+            ("notes", typeof(NotesPage)),
+            ("plugins", typeof(PluginsPage)),
+            ("recycle", typeof(PluginsPage)),
+            ("about", typeof(AboutInfoPage))
         };
 
         private void NavViewControlLoaded(object sender, RoutedEventArgs e)
@@ -144,7 +148,7 @@ namespace Cactus_Reader
 
             // NavView doesn't load any page by default, so load home page.
             navViewControl.SelectedItem = navViewControl.MenuItems[0];
-            NavViewControlNavigate("library", new Windows.UI.Xaml.Media.Animation.EntranceNavigationTransitionInfo());
+            NavViewControlNavigate("library", new EntranceNavigationTransitionInfo());
 
             // Listen to the window directly so the app responds
             // to accelerator keys regardless of which element has focus.
@@ -168,12 +172,12 @@ namespace Cactus_Reader
             }
         }
 
-        private void NavViewControlNavigate(string navItemTag, Windows.UI.Xaml.Media.Animation.NavigationTransitionInfo transitionInfo)
+        private void NavViewControlNavigate(string navItemTag, NavigationTransitionInfo transitionInfo)
         {
             Type page = null;
             if (navItemTag == "settings")
             {
-                //page = typeof(SettingPage);
+                page = typeof(SettingPage);
             }
             else
             {
@@ -242,25 +246,25 @@ namespace Cactus_Reader
 
         private void OnNavigated(object sender, NavigationEventArgs e)
         {
-            //navViewControl.IsBackEnabled = contentFrame.CanGoBack;
-            //var item = pages.FirstOrDefault(p => p.Page == e.SourcePageType);
+            navViewControl.IsBackEnabled = contentFrame.CanGoBack;
+            var item = pages.FirstOrDefault(p => p.Page == e.SourcePageType);
 
-            //if (contentFrame.SourcePageType == typeof(SettingPage))
-            //{
-            //    navViewControl.SelectedItem = (Microsoft.UI.Xaml.Controls.NavigationViewItem)navViewControl.SettingsItem;
-            //}
-            //else if (contentFrame.SourcePageType == typeof(AboutInfoPage))
-            //{
-            //    navViewControl.SelectedItem = navViewControl.SelectedItem = navViewControl.FooterMenuItems
-            //        .OfType<Microsoft.UI.Xaml.Controls.NavigationViewItem>()
-            //        .First(n => n.Tag.Equals(item.Tag));
-            //}
-            //else if (contentFrame.SourcePageType != null)
-            //{
-            //    navViewControl.SelectedItem = navViewControl.MenuItems
-            //        .OfType<Microsoft.UI.Xaml.Controls.NavigationViewItem>()
-            //        .First(n => n.Tag.Equals(item.Tag));
-            //}
+            if (contentFrame.SourcePageType == typeof(SettingPage))
+            {
+                navViewControl.SelectedItem = (Microsoft.UI.Xaml.Controls.NavigationViewItem)navViewControl.SettingsItem;
+            }
+            else if (contentFrame.SourcePageType == typeof(AboutInfoPage))
+            {
+                navViewControl.SelectedItem = navViewControl.SelectedItem = navViewControl.FooterMenuItems
+                    .OfType<Microsoft.UI.Xaml.Controls.NavigationViewItem>()
+                    .First(n => n.Tag.Equals(item.Tag));
+            }
+            else if (contentFrame.SourcePageType != null)
+            {
+                navViewControl.SelectedItem = navViewControl.MenuItems
+                    .OfType<Microsoft.UI.Xaml.Controls.NavigationViewItem>()
+                    .First(n => n.Tag.Equals(item.Tag));
+            }
         }
 
         private void AutoSuggestBoxTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
@@ -289,25 +293,6 @@ namespace Cactus_Reader
             else
             {
                 // Use args.QueryText to determine what to do.
-            }
-        }
-
-        private async void SignOut(object sender, RoutedEventArgs e)
-        {
-            ContentDialog signOutDialog = new ContentDialog
-            {
-                Title = "登出帐户？",
-                Content = "如果你选择登出 Cactus 帐户，你将返回到欢迎页面，并且只能继续使用有限功能。如果你需要访问全部功能，需要再次登录。\n\n是否登出帐户？",
-                CloseButtonText = "取消",
-                PrimaryButtonText = "登出",
-                DefaultButton = ContentDialogButton.Primary
-            };
-
-            ContentDialogResult result = await signOutDialog.ShowAsync();
-            if (result == ContentDialogResult.Primary)
-            {
-                localSettings.Values.Remove("currentUser");
-                mainContent.Navigate(typeof(StartPage), null, new DrillInNavigationTransitionInfo());
             }
         }
     }

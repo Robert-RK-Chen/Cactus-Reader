@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Cactus_Reader.Sources.ToolKits
 {
-    internal class HashDirectory
+    public class HashDirectory
     {
         public static string GetEncryptedPassword(string password)
         {

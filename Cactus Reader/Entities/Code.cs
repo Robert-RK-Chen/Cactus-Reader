@@ -6,8 +6,8 @@ namespace Cactus_Reader.Entities
     internal class Code
     {
         [Column(IsPrimary = true)]
-        public string email { get; set; }
-        public string verify_code { get; set; }
-        public DateTime create_time { get; set; }
+        public string Email { get; set; }
+        public string VerifyCode { get; set; }
+        public DateTime CreateTime { get; set; }
     }
 }

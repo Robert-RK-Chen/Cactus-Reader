@@ -26,27 +26,25 @@
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                 <StackPanel Orientation="Vertical" Margin="48">
                     <StackPanel Orientation="Vertical">
-                        <TextBlock FontFamily="Microsoft YaHei UI" FontSize="40" FontWeight="Bold" Text="完善用户信息"/>
+                        <TextBlock FontSize="40" FontWeight="Bold" Text="完善用户信息"/>
                         <StackPanel Orientation="Horizontal" Margin="0, 12, 0, 0">
                             <HyperlinkButton Padding="0" Margin="0, 3, 0, 0" Click="BackPrevPage">
                                 <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" FontSize="16" Glyph="&#xE760;"/>
                             </HyperlinkButton>
-                            <TextBlock x:Name="userMailBlock" FontFamily="Microsoft YaHei UI" FontSize="16"
-                                       Margin="8, 0, 0, 0" Text="someone@example.com"/>
+                            <TextBlock x:Name="userMailBlock" FontSize="16" Margin="8, 0, 0, 0"
+                                       Text="someone@example.com"/>
                         </StackPanel>
-                        <TextBlock FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 12, 0, 0" MaxWidth="436"
-                                   Text="我们只需要将一些信息完善一下，你很快就能使用 Cactus Reader 了，期待能够有所帮助！"
-                                   TextWrapping="Wrap"/>
-                        <TextBlock FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 32, 0, 0" Text="用户昵称："/>
+                        <TextBlock FontSize="16" Margin="0, 12, 0, 0" MaxWidth="436" TextWrapping="Wrap"
+                                   Text="我们只需要将一些信息完善一下，你很快就能使用 Cactus Reader 了，期待能够有所帮助！"/>
+                        <TextBlock FontSize="16" Margin="0, 32, 0, 0" Text="用户昵称："/>
                         <TextBox x:Name="userNameInput" FontSize="16" Margin="0, 8, 0, 0" Height="40" Width="436"
                                  MaxLength="255" VerticalContentAlignment="Center" GettingFocus="ClearAlertMsg"/>
-                        <TextBlock x:Name="alertMsg" FontFamily="Microsoft YaHei UI" FontSize="16" Margin="0, 16, 0, 0"
-                                   Text="改昵称已被注册，请更换一个后再次尝试。" Foreground="#E00000" Visibility="Collapsed"
-                                   TextWrapping="Wrap" MaxWidth="436"/>
-                        <Button FontFamily="Microsoft YaHei UI" FontSize="16" FontWeight="Bold"
-                                Width="436" Height="48" Background="#005FB8" HorizontalAlignment="Center"
-                                Content="继  续" CharacterSpacing="50" Margin="0, 32, 0, 0" Click="ContinueLogon"
-                                Style="{StaticResource AccentButtonStyle}" Foreground="White"/>
+                        <TextBlock x:Name="alertMsg" FontSize="16" Margin="0, 16, 0, 0" Foreground="#E00000"
+                                   Text="改昵称已被注册，请更换一个后再次尝试。" Visibility="Collapsed" MaxWidth="436"
+                                   TextWrapping="Wrap"/>
+                        <Button FontSize="16" FontWeight="Bold" Width="436" Height="48" Background="#005FB8"
+                                HorizontalAlignment="Center" Content="继  续" CharacterSpacing="50" Margin="0, 32, 0, 0"
+                                Click="ContinueLogon" Style="{StaticResource AccentButtonStyle}" Foreground="White"/>
                     </StackPanel>
                 </StackPanel>
             </Border>

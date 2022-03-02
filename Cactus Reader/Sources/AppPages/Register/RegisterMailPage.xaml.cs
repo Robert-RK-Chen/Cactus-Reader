@@ -23,16 +23,16 @@ namespace Cactus_Reader.Sources.AppPages.Register
 
         public RegisterMailPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             currentUser = (User)e.Parameter;
-            if (currentUser != null)
+            if (null != currentUser)
             {
-                userMailInput.Text = currentUser.email;
+                userMailInput.Text = currentUser.Email;
             }
         }
 
@@ -47,6 +47,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
             alertMsg.Visibility = Visibility.Collapsed;
             string mailAddress = userMailInput.Text;
             User user = new User();
+
             if (!InformationVerify.IsEmail(mailAddress))
             {
                 alertMsg.Text = "请输入一个有效的电子邮件地址。";
@@ -61,13 +62,13 @@ namespace Cactus_Reader.Sources.AppPages.Register
             {
                 try
                 {
-                    user.email = mailAddress;
-                    Code currentCode = freeSql.Select<Code>().Where(code => code.email == mailAddress).ToOne();
-                    if (currentCode == null || currentCode.create_time.AddMinutes(1) < DateTime.Now)
+                    user.Email = mailAddress;
+                    Code currentCode = freeSql.Select<Code>().Where(code => code.Email == mailAddress).ToOne();
+                    if (currentCode is null || currentCode.CreateTime.AddMinutes(1) < DateTime.Now)
                     {
                         Task.Factory.StartNew(() =>
                         {
-                            codeSender.SendVerifyCode(user.email);
+                            codeSender.SendVerifyCode(user.Email);
                         });
                     }
                     contentFrame.Navigate(typeof(RegisterCodePage), user, new SlideNavigationTransitionInfo()
@@ -78,7 +79,6 @@ namespace Cactus_Reader.Sources.AppPages.Register
                     alertMsg.Text = "未连接，请检查网络开关是否已打开。";
                     alertMsg.Visibility = Visibility.Visible;
                 }
-
             }
         }
 
@@ -99,7 +99,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
 
         private bool EmailEnabled(string email)
         {
-            return freeSql.Select<User>().Where(user => user.email == email).ToOne() == null;
+            return freeSql.Select<User>().Where(user => user.Email == email).ToOne() is null;
         }
     }
 }

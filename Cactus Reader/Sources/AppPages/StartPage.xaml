@@ -43,14 +43,13 @@
                             </TransitionCollection>
                         </Frame.ContentTransitions>
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock FontFamily="Microsoft YaHei UI" FontSize="40" FontWeight="Light"
-                                       Text="欢迎使用 Cactus Reader" CharacterSpacing="32" HorizontalAlignment="Center"/>
+                            <TextBlock FontSize="40" FontWeight="Light" Text="欢迎使用 Cactus Reader"
+                                       CharacterSpacing="32" HorizontalAlignment="Center"/>
                             <Image Source="/Sources/Images/Searching.png" MaxHeight="400" Margin="0, 48, 0, 0"/>
-                            <TextBlock FontFamily="Microsoft YaHei UI" FontSize="18" FontWeight="Light"
-                                       Text="一款为 Windows 打造的现代化的、高效的文档阅读器" HorizontalAlignment="Center"
-                                       CharacterSpacing="50" Margin="0, 48, 0, 0"/>
-                            <Button FontFamily="Microsoft YaHei UI" FontSize="18" FontWeight="Bold" Width="480"
-                                    Height="48" Background="#005FB8" HorizontalAlignment="Center" Margin="0, 40, 0, 0"
+                            <TextBlock FontSize="18" FontWeight="Light" CharacterSpacing="50" Margin="0, 48, 0, 0"
+                                       Text="一款为 Windows 打造的现代化的、高效的文档阅读器" HorizontalAlignment="Center"/>
+                            <Button FontSize="18" FontWeight="Bold" Width="480" Height="48" Background="#005FB8"
+                                    HorizontalAlignment="Center" Margin="0, 40, 0, 0"
                                     Content="开启 Cactus 之旅" CharacterSpacing="50" Foreground="White"
                                     Style="{StaticResource AccentButtonStyle}" Click="ContinueLogin"/>
                         </StackPanel>

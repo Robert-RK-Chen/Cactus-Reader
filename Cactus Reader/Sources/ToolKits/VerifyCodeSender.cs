@@ -23,10 +23,10 @@ namespace Cactus_Reader.Sources.ToolKits
         {
             try
             {
-                Code recentCode = freeSql.Select<Code>().Where(code => code.email == email).ToOne();
+                Code recentCode = freeSql.Select<Code>().Where(code => code.Email == email).ToOne();
 
                 // 用于判断是否发送验证码
-                if (recentCode is null || recentCode.create_time.AddMinutes(1) < DateTime.Now)
+                if (recentCode is null || recentCode.CreateTime.AddMinutes(1) < DateTime.Now)
                 {
                     // 随机数生成验证码
                     Random rand = new Random();
@@ -35,9 +35,9 @@ namespace Cactus_Reader.Sources.ToolKits
                     // 更新验证码状态
                     recentCode = new Code
                     {
-                        email = email,
-                        verify_code = verifyCode,
-                        create_time = DateTime.Now
+                        Email = email,
+                        VerifyCode = verifyCode,
+                        CreateTime = DateTime.Now
                     };
                     freeSql.InsertOrUpdate<Code>().SetSource(recentCode).ExecuteAffrows();
 

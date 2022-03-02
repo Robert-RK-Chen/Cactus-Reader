@@ -30,13 +30,13 @@
     <AppXManifest Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Core\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2022-02-28T07:49:32.918</Modified>
+      <Modified>2022-03-02T14:15:23.007</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Cactus Reader.exe">
       <PackagePath>entrypoint\Cactus Reader.exe</PackagePath>
-      <Modified>2022-02-28T07:49:31.073</Modified>
+      <Modified>2022-03-02T14:15:21.879</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Robert Chen\.nuget\packages\freesql\3.0.100\lib\netstandard2.0\FreeSql.dll">
       <PackagePath>FreeSql.dll</PackagePath>
@@ -81,6 +81,10 @@
     <AppxPackagedFile Include="C:\Users\Robert Chen\.nuget\packages\mysql.data\8.0.27\lib\netstandard2.0\ZstdNet.dll">
       <PackagePath>ZstdNet.dll</PackagePath>
       <Modified>2021-09-28T05:28:28.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Robert Chen\.nuget\packages\newtonsoft.json\13.0.1\lib\netstandard2.0\Newtonsoft.Json.dll">
+      <PackagePath>Newtonsoft.Json.dll</PackagePath>
+      <Modified>2021-03-17T20:03:36.000</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Robert Chen\.nuget\packages\portable.bouncycastle\1.9.0\lib\netstandard2.0\BouncyCastle.Crypto.dll">
       <PackagePath>BouncyCastle.Crypto.dll</PackagePath>
@@ -401,6 +405,18 @@
       <PackagePath>Sources\Images\Cactus Reader.png</PackagePath>
       <Modified>2022-02-26T02:27:11.772</Modified>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Sources\Images\FavoriteCollection.png">
+      <PackagePath>Sources\Images\FavoriteCollection.png</PackagePath>
+      <Modified>2022-03-02T02:40:45.682</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Sources\Images\LibraryEmpty.png">
+      <PackagePath>Sources\Images\LibraryEmpty.png</PackagePath>
+      <Modified>2022-03-02T02:40:45.682</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Sources\Images\NotesEmpty.png">
+      <PackagePath>Sources\Images\NotesEmpty.png</PackagePath>
+      <Modified>2022-03-02T10:01:10.259</Modified>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\Sources\Images\RCSoftware.png">
       <PackagePath>Sources\Images\RCSoftware.png</PackagePath>
       <Modified>2022-02-26T02:27:11.777</Modified>
@@ -419,47 +435,71 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Cactus Reader.xr.xml">
       <PackagePath>Cactus Reader.xr.xml</PackagePath>
-      <Modified>2022-02-28T07:13:18.683</Modified>
+      <Modified>2022-03-02T12:29:14.520</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\App.xbf">
       <PackagePath>App.xbf</PackagePath>
-      <Modified>2022-02-28T07:49:30.948</Modified>
+      <Modified>2022-03-02T14:15:21.744</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\AppUI\AboutInfoPage.xbf">
+      <PackagePath>Sources\AppPages\AppUI\AboutInfoPage.xbf</PackagePath>
+      <Modified>2022-03-02T14:15:21.716</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\AppUI\FavoritePage.xbf">
+      <PackagePath>Sources\AppPages\AppUI\FavoritePage.xbf</PackagePath>
+      <Modified>2022-03-02T14:15:21.744</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\AppUI\LibraryPage.xbf">
+      <PackagePath>Sources\AppPages\AppUI\LibraryPage.xbf</PackagePath>
+      <Modified>2022-03-02T14:15:21.744</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\AppUI\MainPage.xbf">
       <PackagePath>Sources\AppPages\AppUI\MainPage.xbf</PackagePath>
-      <Modified>2022-02-28T07:49:30.948</Modified>
+      <Modified>2022-03-02T14:15:21.744</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\AppUI\NotesPage.xbf">
+      <PackagePath>Sources\AppPages\AppUI\NotesPage.xbf</PackagePath>
+      <Modified>2022-03-02T14:15:21.745</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\AppUI\PluginsPage.xbf">
+      <PackagePath>Sources\AppPages\AppUI\PluginsPage.xbf</PackagePath>
+      <Modified>2022-03-02T14:15:21.745</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\AppUI\SettingPage.xbf">
+      <PackagePath>Sources\AppPages\AppUI\SettingPage.xbf</PackagePath>
+      <Modified>2022-03-02T14:15:21.730</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\Login\LoginAccountPage.xbf">
       <PackagePath>Sources\AppPages\Login\LoginAccountPage.xbf</PackagePath>
-      <Modified>2022-02-28T07:49:30.948</Modified>
+      <Modified>2022-03-02T14:15:21.745</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\Login\LoginCodePage.xbf">
       <PackagePath>Sources\AppPages\Login\LoginCodePage.xbf</PackagePath>
-      <Modified>2022-02-28T07:49:30.948</Modified>
+      <Modified>2022-03-02T14:15:21.745</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\Login\LoginPwdPage.xbf">
       <PackagePath>Sources\AppPages\Login\LoginPwdPage.xbf</PackagePath>
-      <Modified>2022-02-28T07:49:30.948</Modified>
+      <Modified>2022-03-02T14:15:21.745</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\Register\RegisterCodePage.xbf">
       <PackagePath>Sources\AppPages\Register\RegisterCodePage.xbf</PackagePath>
-      <Modified>2022-02-28T07:49:30.948</Modified>
+      <Modified>2022-03-02T14:15:21.745</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\Register\RegisterMailPage.xbf">
       <PackagePath>Sources\AppPages\Register\RegisterMailPage.xbf</PackagePath>
-      <Modified>2022-02-28T07:49:30.948</Modified>
+      <Modified>2022-03-02T14:15:21.745</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\Register\RegisterPwdPage.xbf">
       <PackagePath>Sources\AppPages\Register\RegisterPwdPage.xbf</PackagePath>
-      <Modified>2022-02-28T07:49:30.948</Modified>
+      <Modified>2022-03-02T14:15:21.745</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\Register\RegisterUserInfoPage.xbf">
       <PackagePath>Sources\AppPages\Register\RegisterUserInfoPage.xbf</PackagePath>
-      <Modified>2022-02-28T07:49:30.948</Modified>
+      <Modified>2022-03-02T14:15:21.745</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Sources\AppPages\StartPage.xbf">
       <PackagePath>Sources\AppPages\StartPage.xbf</PackagePath>
-      <Modified>2022-02-28T07:49:30.948</Modified>
+      <Modified>2022-03-02T14:15:21.745</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.UniversalCRT.Debug\10.0.22000.0\\redist\Debug\X64\ucrtbased.dll">
       <PackagePath>ucrtbased.dll</PackagePath>
@@ -471,11 +511,11 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\resources.pri">
       <PackagePath>resources.pri</PackagePath>
-      <Modified>2022-02-28T06:20:25.276</Modified>
+      <Modified>2022-03-02T13:56:41.739</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Core\Cactus Reader.exe">
       <PackagePath>Cactus Reader.exe</PackagePath>
-      <Modified>2022-02-28T07:49:32.906</Modified>
+      <Modified>2022-03-02T14:15:22.997</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Robert Chen\.nuget\packages\microsoft.ui.xaml\2.7.0\buildTransitive\..\lib\uap10.0\Microsoft.UI.Xaml.winmd">
       <PackagePath>Microsoft.UI.Xaml.winmd</PackagePath>

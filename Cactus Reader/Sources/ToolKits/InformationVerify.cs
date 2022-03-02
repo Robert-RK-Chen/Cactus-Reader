@@ -2,7 +2,7 @@
 
 namespace Cactus_Reader.Sources.ToolKits
 {
-    internal class InformationVerify
+    public class InformationVerify
     {
         public static bool IsEmail(string input)
         {

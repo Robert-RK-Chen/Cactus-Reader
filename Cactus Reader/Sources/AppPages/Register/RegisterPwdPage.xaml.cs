@@ -24,12 +24,12 @@ namespace Cactus_Reader.Sources.AppPages.Register
         {
             base.OnNavigatedTo(e);
             currentUser = (User)e.Parameter;
-            userMailBlock.Text = currentUser.email;
+            userMailBlock.Text = currentUser.Email;
         }
 
         public RegisterPwdPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         private void BackPrevPage(object sender, RoutedEventArgs e)
@@ -56,9 +56,9 @@ namespace Cactus_Reader.Sources.AppPages.Register
                 }
                 else
                 {
-                    currentUser.password = HashDirectory.GetEncryptedPassword(password);
-                    currentUser.uid = Guid.NewGuid().ToString("D").ToUpper();
-                    currentUser.profile = "CactusRepo\\" + currentUser.uid;
+                    currentUser.Password = HashDirectory.GetEncryptedPassword(password);
+                    currentUser.UID = Guid.NewGuid().ToString("D").ToUpper();
+                    currentUser.Profile = "CactusRepo\\" + currentUser.UID;
                     freeSql.Insert(currentUser).ExecuteAffrows();
 
                     ContentDialog signInDialog = new ContentDialog
@@ -70,9 +70,9 @@ namespace Cactus_Reader.Sources.AppPages.Register
                     };
 
                     ContentDialogResult result = await signInDialog.ShowAsync();
-                    if (result == ContentDialogResult.Primary)
+                    if (ContentDialogResult.Primary == result)
                     {
-                        localSettings.Values["currentUser"] = currentUser.uid;
+                        localSettings.Values["currentUser"] = currentUser.UID;
                         StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
                     }
                 }

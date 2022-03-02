@@ -19,7 +19,7 @@ namespace Cactus_Reader.Sources.AppPages
         public static StartPage startPage;
         public StartPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
             startPage = this;
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;
 

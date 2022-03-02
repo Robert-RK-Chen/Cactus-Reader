@@ -23,17 +23,17 @@ namespace Cactus_Reader.Sources.AppPages.Login
 
         public LoginCodePage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             currentUser = (User)e.Parameter;
-            if (currentUser != null)
+            if (null != currentUser)
             {
-                userMailBlock.Text = currentUser.email;
-                userMail.Text = currentUser.email + "，请输入邮件中的代码进行登录。";
+                userMailBlock.Text = currentUser.Email;
+                userMail.Text = currentUser.Email + "，请输入邮件中的代码进行登录。";
             }
         }
 
@@ -47,28 +47,24 @@ namespace Cactus_Reader.Sources.AppPages.Login
         {
             alertMsg.Visibility = Visibility.Collapsed;
             string verifyCode = verifyCodeInput.Text;
+
             try
             {
-                Code currentCode = freeSql.Select<Code>().Where(code => code.email == currentUser.email).ToOne();
+                Code currentCode = freeSql.Select<Code>().Where(code => code.Email == currentUser.Email).ToOne();
                 if (verifyCode.Length == 0)
                 {
                     alertMsg.Text = "若要继续，请输入我们刚才发送给你的代码。";
                     alertMsg.Visibility = Visibility.Visible;
                 }
-                else if (verifyCode != currentCode.verify_code)
+                else if (string.Equals(currentCode.VerifyCode, verifyCode))
                 {
-                    alertMsg.Text = "该代码无效，检查该代码并重试。";
-                    alertMsg.Visibility = Visibility.Visible;
-                }
-                else if (currentCode.create_time.AddMinutes(5) < DateTime.Now)
-                {
-                    alertMsg.Text = "该代码无效，检查该代码并重试。";
-                    alertMsg.Visibility = Visibility.Visible;
-                }
-                else if (currentCode.verify_code == verifyCode)
-                {
-                    localSettings.Values["currentUser"] = currentUser.uid;
+                    localSettings.Values["currentUser"] = currentUser.UID;
                     StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+                }
+                else
+                {
+                    alertMsg.Text = "该代码无效，检查该代码并重试。";
+                    alertMsg.Visibility = Visibility.Visible;
                 }
             }
             catch (Exception)
@@ -85,9 +81,9 @@ namespace Cactus_Reader.Sources.AppPages.Login
 
         private void ResendVerifyCode(object sender, RoutedEventArgs e)
         {
-            Code currentCode = freeSql.Select<Code>().Where(code => code.email == currentUser.email).ToOne();
-            bool sendFlag = codeSender.SendVerifyCode(currentUser.email);
-            if (sendFlag == true)
+            Code currentCode = freeSql.Select<Code>().Where(code => code.Email == currentUser.Email).ToOne();
+            bool sendFlag = codeSender.SendVerifyCode(currentUser.Email);
+            if (sendFlag)
             {
                 alertMsg.Text = "代码已发送，请注意查收。";
                 alertMsg.Visibility = Visibility.Visible;

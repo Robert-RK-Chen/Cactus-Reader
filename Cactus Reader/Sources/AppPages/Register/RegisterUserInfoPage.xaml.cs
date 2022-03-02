@@ -22,12 +22,12 @@ namespace Cactus_Reader.Sources.AppPages.Register
         {
             base.OnNavigatedTo(e);
             currentUser = (User)e.Parameter;
-            userMailBlock.Text = currentUser.email;
+            userMailBlock.Text = currentUser.Email;
         }
 
         public RegisterUserInfoPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         private void BackPrevPage(object sender, RoutedEventArgs e)
@@ -59,7 +59,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
                 }
                 else
                 {
-                    currentUser.name = userName;
+                    currentUser.Name = userName;
                     contentFrame.Navigate(typeof(RegisterPwdPage), currentUser, new SlideNavigationTransitionInfo()
                     { Effect = SlideNavigationTransitionEffect.FromRight });
                 }
@@ -78,7 +78,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
 
         private bool UserNameEnabled(string userName)
         {
-            return freeSql.Select<User>().Where(user => user.name == userName).ToOne() == null;
+            return freeSql.Select<User>().Where(user => user.Name == userName).ToOne() is null;
         }
     }
 }

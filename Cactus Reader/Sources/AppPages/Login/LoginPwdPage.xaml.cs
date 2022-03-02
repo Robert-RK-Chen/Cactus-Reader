@@ -24,16 +24,16 @@ namespace Cactus_Reader.Sources.AppPages.Login
 
         public LoginPwdPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             currentUser = (User)e.Parameter;
-            if (currentUser != null)
+            if (null != currentUser)
             {
-                userMailBlock.Text = currentUser.email;
+                userMailBlock.Text = currentUser.Email;
             }
         }
 
@@ -47,12 +47,12 @@ namespace Cactus_Reader.Sources.AppPages.Login
         {
             try
             {
-                Code currentCode = freeSql.Select<Code>().Where(code => code.email == currentUser.email).ToOne();
-                if (currentCode == null || currentCode.create_time.AddMinutes(1) < DateTime.Now)
+                Code currentCode = freeSql.Select<Code>().Where(code => code.Email == currentUser.Email).ToOne();
+                if (currentCode is null || currentCode.CreateTime.AddMinutes(1) < DateTime.Now)
                 {
                     Task.Factory.StartNew(() =>
                     {
-                        codeSender.SendVerifyCode(currentUser.email);
+                        codeSender.SendVerifyCode(currentUser.Email);
                     });
                 }
                 contentFrame.Navigate(typeof(LoginCodePage), currentUser, new SlideNavigationTransitionInfo()
@@ -75,14 +75,14 @@ namespace Cactus_Reader.Sources.AppPages.Login
                 alertMsg.Text = "请在此输入你的帐户密码。";
                 alertMsg.Visibility = Visibility.Visible;
             }
-            else if (freeSql.Select<User>().Where(user => user.password == password).ToOne() == null)
+            else if (freeSql.Select<User>().Where(user => user.Password == password).ToOne() is null)
             {
                 alertMsg.Text = "Cactus 帐户或密码不正确。";
                 alertMsg.Visibility = Visibility.Visible;
             }
             else
             {
-                localSettings.Values["currentUser"] = currentUser.uid;
+                localSettings.Values["currentUser"] = currentUser.UID;
                 StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
             }
         }

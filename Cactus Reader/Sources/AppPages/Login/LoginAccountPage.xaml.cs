@@ -23,16 +23,16 @@ namespace Cactus_Reader.Sources.AppPages.Login
 
         public LoginAccountPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             currentUser = (User)e.Parameter;
-            if (currentUser != null)
+            if (null != currentUser)
             {
-                accountInput.Text = currentUser.email;
+                accountInput.Text = currentUser.Email;
             }
         }
 
@@ -43,8 +43,8 @@ namespace Cactus_Reader.Sources.AppPages.Login
 
             try
             {
-                currentUser = freeSql.Select<User>().Where(user => user.email == email).ToOne();
-                if (currentUser != null)
+                currentUser = freeSql.Select<User>().Where(user => user.Email == email).ToOne();
+                if (null != currentUser)
                 {
                     contentFrame.Navigate(typeof(LoginPwdPage), currentUser, new SlideNavigationTransitionInfo()
                     { Effect = SlideNavigationTransitionEffect.FromRight });
@@ -78,7 +78,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
             ContentDialog skipLoginDialog = new ContentDialog
             {
                 Title = "跳过登录并使用有限功能？",
-                Content = "登录到 Cactus Reader 帐户，你可以体验文档与阅读进度的同步。",
+                Content = "登录到 Cactus Reader 帐户，你可以解锁大部分的 Cactus Reader 功能，并且可以体验文档与阅读进度的同步，还能同步你的设置到任意设备。",
                 CloseButtonText = "继续登录",
                 PrimaryButtonText = "跳过登录",
                 DefaultButton = ContentDialogButton.Primary
