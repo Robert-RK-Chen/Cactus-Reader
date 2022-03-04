@@ -26,7 +26,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
             if (null != currentUser)
             {
                 userMailBlock.Text = currentUser.Email;
-                userMail.Text = currentUser.Email + "，请输入邮件中的代码进行登录。";
+                userMail.Text = currentUser.Email + "，请输入邮件中的代码进行注册。";
             }
         }
 
@@ -79,8 +79,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
 
         private void ResendVerifyCode(object sender, RoutedEventArgs e)
         {
-            Code currentCode = freeSql.Select<Code>().Where(code => code.Email == currentUser.Email).ToOne();
-            bool sendFlag = codeSender.SendVerifyCode(currentUser.Email);
+            bool sendFlag = codeSender.SendVerifyCode(currentUser.Email, "register");
             if (sendFlag)
             {
                 alertMsg.Text = "代码已发送，请注意查收。";

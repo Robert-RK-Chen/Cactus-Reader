@@ -14,14 +14,14 @@ namespace Cactus_Reader.Sources.AppPages.Login
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class LoginCodePage : Page
+    public sealed partial class ForgetPassword : Page
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         readonly IFreeSql freeSql = IFreeSqlService.Instance;
         readonly VerifyCodeSender codeSender = VerifyCodeSender.Instance;
         User currentUser = null;
 
-        public LoginCodePage()
+        public ForgetPassword()
         {
             InitializeComponent();
         }
@@ -33,7 +33,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
             if (null != currentUser)
             {
                 userMailBlock.Text = currentUser.Email;
-                userMail.Text = currentUser.Email + "，请输入邮件中的代码进行登录。";
+                userMail.Text = currentUser.Email + "，请输入邮件中的代码进行重置。";
             }
         }
 
@@ -43,7 +43,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
             { Effect = SlideNavigationTransitionEffect.FromLeft });
         }
 
-        private void Login(object sender, RoutedEventArgs e)
+        private void Continue(object sender, RoutedEventArgs e)
         {
             alertMsg.Visibility = Visibility.Collapsed;
             string verifyCode = verifyCodeInput.Text;
@@ -58,8 +58,8 @@ namespace Cactus_Reader.Sources.AppPages.Login
                 }
                 else if (string.Equals(currentCode.VerifyCode, verifyCode))
                 {
-                    localSettings.Values["currentUser"] = currentUser.UID;
-                    StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+                    contentFrame.Navigate(typeof(ResetPassword), currentUser, new SlideNavigationTransitionInfo()
+                    { Effect = SlideNavigationTransitionEffect.FromRight });
                 }
                 else
                 {
@@ -81,7 +81,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
 
         private void ResendVerifyCode(object sender, RoutedEventArgs e)
         {
-            bool sendFlag = codeSender.SendVerifyCode(currentUser.Email, "login");
+            bool sendFlag = codeSender.SendVerifyCode(currentUser.Email, "reset");
             if (sendFlag)
             {
                 alertMsg.Text = "代码已发送，请注意查收。";

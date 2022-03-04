@@ -1,6 +1,8 @@
 ﻿using Cactus_Reader.Entities;
 using Cactus_Reader.Sources.ToolKits;
+using Cactus_Reader.Sources.WindowsHello;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI.Xaml;
@@ -43,19 +45,61 @@ namespace Cactus_Reader.Sources.AppPages.Login
             { Effect = SlideNavigationTransitionEffect.FromLeft });
         }
 
-        private void MailCodeLogin(object sender, RoutedEventArgs e)
+        private void ClearAlertMsg(object sender, RoutedEventArgs e)
+        {
+            alertMsg.Visibility = Visibility.Collapsed;
+        }
+
+        private void ShowMoreLoginWays(object sender, RoutedEventArgs e)
+        {
+            loginWays.Visibility = loginWays.Visibility == Visibility.Collapsed ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void SendLoginCode(object sender, RoutedEventArgs e)
         {
             try
             {
-                Code currentCode = freeSql.Select<Code>().Where(code => code.Email == currentUser.Email).ToOne();
-                if (currentCode is null || currentCode.CreateTime.AddMinutes(1) < DateTime.Now)
-                {
-                    Task.Factory.StartNew(() =>
-                    {
-                        codeSender.SendVerifyCode(currentUser.Email);
-                    });
-                }
+                Task.Factory.StartNew(() => { codeSender.SendVerifyCode(currentUser.Email, "login"); });
+
                 contentFrame.Navigate(typeof(LoginCodePage), currentUser, new SlideNavigationTransitionInfo()
+                { Effect = SlideNavigationTransitionEffect.FromRight });
+            }
+            catch (Exception)
+            {
+                alertMsg.Text = "未连接，请检查网络开关是否已打开。";
+                alertMsg.Visibility = Visibility.Visible;
+            }
+        }
+
+        private async void WindowsHelloLogin(object sender, RoutedEventArgs e)
+        {
+            User user = freeSql.Select<User>().Where(users => users.Email == currentUser.Email).ToOne();
+            if (user.UID == localSettings.Values["currentUser"].ToString())
+            {
+                bool isSuccessful = await MicrosoftPassportHelper.CreatePassportKeyAsync(user.UID, user.Name);
+                if (isSuccessful)
+                {
+                    localSettings.Values["currentUser"] = currentUser.UID;
+                    StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+                }
+                else
+                {
+                    alertMsg.Text = "Windows Hello 验证失败，请再试一次。";
+                }
+            }
+            else
+            {
+                alertMsg.Text = "若要使用 Windows Hello，请重新登录。";
+            }
+        }
+
+        private void SendResetCode(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Task.Factory.StartNew(() => { codeSender.SendVerifyCode(currentUser.Email, "reset"); });
+
+                contentFrame.Navigate(typeof(ForgetPassword), currentUser, new SlideNavigationTransitionInfo()
                 { Effect = SlideNavigationTransitionEffect.FromRight });
             }
             catch (Exception)
@@ -85,11 +129,6 @@ namespace Cactus_Reader.Sources.AppPages.Login
                 localSettings.Values["currentUser"] = currentUser.UID;
                 StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
             }
-        }
-
-        private void ClearAlertMsg(object sender, RoutedEventArgs e)
-        {
-            alertMsg.Visibility = Visibility.Collapsed;
         }
     }
 }

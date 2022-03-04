@@ -43,9 +43,8 @@
                         <CheckBox Margin="0, 20, 0, 0" Checked="LogonButtonEnabled" Unchecked="LogonButtonDisabled" >
                             <StackPanel Orientation="Horizontal" Margin="0, -2, 0, 0">
                                 <TextBlock Text="我已阅读并同意" VerticalAlignment="Center" FontSize="16"/>
-                                <HyperlinkButton Padding="0" Content="服务条款" VerticalAlignment="Bottom" FontSize="16"/>
-                                <TextBlock Text="及" VerticalAlignment="Center" FontSize="16"/>
-                                <HyperlinkButton Padding="0" Content="隐私政策" VerticalAlignment="Bottom" FontSize="16"/>
+                                <HyperlinkButton Padding="0" Content="服务条款及隐私政策" VerticalAlignment="Bottom"
+                                                 FontSize="16" Click="OpenServiceWindow"/>
                             </StackPanel>
                         </CheckBox>
                         <Button x:Name="continueButton" FontSize="16" FontWeight="Bold" Width="436" Height="48"

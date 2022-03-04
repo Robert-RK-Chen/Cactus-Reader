@@ -10,6 +10,7 @@
     <RootType FullName="Windows.UI.Xaml.Controls.Page">
       <RootProperty Name="Content" />
       <RootProperty Name="Resources" />
+      <RootProperty Name="Background" />
     </RootType>
     <RootType FullName="Microsoft.UI.Xaml.Controls.BackdropMaterial">
       <RootMethod Name="GetApplyToRootOrPageBackground" />
@@ -43,6 +44,7 @@
       <RootProperty Name="Children" />
       <RootProperty Name="Margin" />
       <RootProperty Name="VerticalAlignment" />
+      <RootProperty Name="Visibility" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.TextBlock">
       <RootProperty Name="Text" />
@@ -107,6 +109,7 @@
       <RootProperty Name="CharacterSpacing" />
       <RootProperty Name="Style" />
       <RootProperty Name="Foreground" />
+      <RootProperty Name="Padding" />
       <RootProperty Name="IsEnabled" />
       <RootEvent Name="Click" />
     </RootType>
@@ -131,6 +134,7 @@
       <RootProperty Name="Glyph" />
       <RootProperty Name="FontSize" />
       <RootProperty Name="VerticalAlignment" />
+      <RootProperty Name="Margin" />
     </RootType>
     <RootType FullName="Microsoft.Xaml.DirectUI.ProxyTypes.StaticResourceExtension" />
     <RootType FullName="Windows.UI.Xaml.Controls.MenuFlyout">
@@ -207,11 +211,12 @@
       <RootProperty Name="Margin" />
       <RootProperty Name="Height" />
       <RootProperty Name="Width" />
-      <RootProperty Name="VerticalContentAlignment" />
       <RootProperty Name="MaxLength" />
-      <RootEvent Name="GotFocus" />
+      <RootProperty Name="VerticalContentAlignment" />
       <RootEvent Name="GettingFocus" />
+      <RootEvent Name="GotFocus" />
     </RootType>
+    <RootType FullName="Cactus_Reader.Sources.AppPages.Login.ForgetPassword" />
     <RootType FullName="Cactus_Reader.Sources.AppPages.Login.LoginAccountPage" />
     <RootType FullName="Cactus_Reader.Sources.AppPages.Login.LoginCodePage" />
     <RootType FullName="Windows.UI.Xaml.Controls.PasswordBox">
@@ -222,8 +227,14 @@
       <RootProperty Name="MaxLength" />
       <RootProperty Name="VerticalContentAlignment" />
       <RootEvent Name="GotFocus" />
+      <RootEvent Name="GettingFocus" />
+    </RootType>
+    <RootType FullName="Windows.UI.Xaml.Controls.ToolTipService">
+      <RootMethod Name="GetToolTip" />
+      <RootMethod Name="SetToolTip" />
     </RootType>
     <RootType FullName="Cactus_Reader.Sources.AppPages.Login.LoginPwdPage" />
+    <RootType FullName="Cactus_Reader.Sources.AppPages.Login.ResetPassword" />
     <RootType FullName="Cactus_Reader.Sources.AppPages.Register.RegisterCodePage" />
     <RootType FullName="Windows.UI.Xaml.Controls.CheckBox">
       <RootProperty Name="Margin" />
@@ -234,6 +245,7 @@
     <RootType FullName="Cactus_Reader.Sources.AppPages.Register.RegisterMailPage" />
     <RootType FullName="Cactus_Reader.Sources.AppPages.Register.RegisterPwdPage" />
     <RootType FullName="Cactus_Reader.Sources.AppPages.Register.RegisterUserInfoPage" />
+    <RootType FullName="Cactus_Reader.Sources.AppPages.ServiceAndPrivacy" />
     <RootType FullName="Cactus_Reader.Sources.AppPages.StartPage" />
   </Roots.RootTypes>
 </Roots>

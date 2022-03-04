@@ -3,8 +3,13 @@ using Cactus_Reader.Sources.AppPages.Login;
 using Cactus_Reader.Sources.ToolKits;
 using System;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
+using Windows.UI.ViewManagement;
+using Windows.UI.WindowManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
@@ -63,14 +68,8 @@ namespace Cactus_Reader.Sources.AppPages.Register
                 try
                 {
                     user.Email = mailAddress;
-                    Code currentCode = freeSql.Select<Code>().Where(code => code.Email == mailAddress).ToOne();
-                    if (currentCode is null || currentCode.CreateTime.AddMinutes(1) < DateTime.Now)
-                    {
-                        Task.Factory.StartNew(() =>
-                        {
-                            codeSender.SendVerifyCode(user.Email);
-                        });
-                    }
+                    Task.Factory.StartNew(() => { codeSender.SendVerifyCode(user.Email, "register"); });
+
                     contentFrame.Navigate(typeof(RegisterCodePage), user, new SlideNavigationTransitionInfo()
                     { Effect = SlideNavigationTransitionEffect.FromRight });
                 }
@@ -100,6 +99,10 @@ namespace Cactus_Reader.Sources.AppPages.Register
         private bool EmailEnabled(string email)
         {
             return freeSql.Select<User>().Where(user => user.Email == email).ToOne() is null;
+        }
+
+        private void OpenServiceWindow(object sender, RoutedEventArgs e)
+        {
         }
     }
 }

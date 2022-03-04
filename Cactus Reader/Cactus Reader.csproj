@@ -135,6 +135,7 @@
     </Compile>
     <Compile Include="Entities\Code.cs" />
     <Compile Include="Entities\User.cs" />
+    <Compile Include="Entities\Userkey.cs" />
     <Compile Include="Sources\AppPages\AppUI\AboutInfoPage.xaml.cs">
       <DependentUpon>AboutInfoPage.xaml</DependentUpon>
     </Compile>
@@ -157,6 +158,9 @@
     <Compile Include="Sources\AppPages\AppUI\SettingPage.xaml.cs">
       <DependentUpon>SettingPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Sources\AppPages\Login\ForgetPassword.xaml.cs">
+      <DependentUpon>ForgetPassword.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Sources\AppPages\Login\LoginAccountPage.xaml.cs">
       <DependentUpon>LoginAccountPage.xaml</DependentUpon>
     </Compile>
@@ -165,6 +169,9 @@
     </Compile>
     <Compile Include="Sources\AppPages\Login\LoginPwdPage.xaml.cs">
       <DependentUpon>LoginPwdPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sources\AppPages\Login\ResetPassword.xaml.cs">
+      <DependentUpon>ResetPassword.xaml</DependentUpon>
     </Compile>
     <Compile Include="Sources\AppPages\Register\RegisterCodePage.xaml.cs">
       <DependentUpon>RegisterCodePage.xaml</DependentUpon>
@@ -178,6 +185,9 @@
     <Compile Include="Sources\AppPages\Register\RegisterUserInfoPage.xaml.cs">
       <DependentUpon>RegisterUserInfoPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Sources\AppPages\ServiceAndPrivacy.xaml.cs">
+      <DependentUpon>ServiceAndPrivacy.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Sources\AppPages\StartPage.xaml.cs">
       <DependentUpon>StartPage.xaml</DependentUpon>
     </Compile>
@@ -185,7 +195,11 @@
     <Compile Include="Sources\ToolKits\HashDirectory.cs" />
     <Compile Include="Sources\ToolKits\IFreeSqlService.cs" />
     <Compile Include="Sources\ToolKits\InformationVerify.cs" />
+    <Compile Include="Sources\WindowsHello\AuthService.cs" />
+    <Compile Include="Sources\WindowsHello\DeviceHelper.cs" />
+    <Compile Include="Sources\WindowsHello\MicrosoftPassportHelper.cs" />
     <Compile Include="Sources\ToolKits\VerifyCodeSender.cs" />
+    <Compile Include="Sources\WindowsHello\PassportDevice.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -290,6 +304,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Sources\AppPages\Login\ForgetPassword.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Sources\AppPages\Login\LoginAccountPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -299,6 +317,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Sources\AppPages\Login\LoginPwdPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sources\AppPages\Login\ResetPassword.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -315,6 +337,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Sources\AppPages\Register\RegisterUserInfoPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sources\AppPages\ServiceAndPrivacy.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

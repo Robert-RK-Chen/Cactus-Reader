@@ -1,20 +1,31 @@
 ﻿using Cactus_Reader.Entities;
+using Cactus_Reader.Sources.AppPages.Register;
 using Cactus_Reader.Sources.ToolKits;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
 using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
-namespace Cactus_Reader.Sources.AppPages.Register
+namespace Cactus_Reader.Sources.AppPages.Login
 {
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class RegisterPwdPage : Page
+    public sealed partial class ResetPassword : Page
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         readonly IFreeSql freeSql = IFreeSqlService.Instance;
@@ -27,7 +38,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
             userMailBlock.Text = currentUser.Email;
         }
 
-        public RegisterPwdPage()
+        public ResetPassword()
         {
             InitializeComponent();
         }
@@ -38,7 +49,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
             { Effect = SlideNavigationTransitionEffect.FromLeft });
         }
 
-        private async void LogonFinish(object sender, RoutedEventArgs e)
+        private async void ResetFinish(object sender, RoutedEventArgs e)
         {
             alertMsg.Visibility = Visibility.Collapsed;
             string password = passwordInput.Password;
@@ -53,14 +64,12 @@ namespace Cactus_Reader.Sources.AppPages.Register
                 else if (InformationVerify.IsPassword(password) && string.Equals(password, checkPwd))
                 {
                     currentUser.Password = HashDirectory.GetEncryptedPassword(password);
-                    currentUser.UID = Guid.NewGuid().ToString("D").ToUpper();
-                    currentUser.RegistDate = DateTime.Now;
-                    freeSql.Insert(currentUser).ExecuteAffrows();
+                    freeSql.Update<User>(currentUser).ExecuteAffrows();
 
                     ContentDialog signInDialog = new ContentDialog
                     {
-                        Title = "欢迎来到 Cactus Reader",
-                        Content = "你的 Cactus 帐户已准备就绪！请牢记你的帐号与密码。下次登录时，你可以使用 Cactus 帐户与你的密码组合进行登录。点击确定按钮后，我们将自动为你登录。",
+                        Title = "重置密码成功",
+                        Content = "你的 Cactus 帐户密码重置完成。请牢记你的帐号与密码。点击确定按钮后，我们将自动为你登录。",
                         PrimaryButtonText = "确定",
                         DefaultButton = ContentDialogButton.Primary
                     };
@@ -74,7 +83,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
                 }
                 else
                 {
-                    alertMsg.Text = "无效的密码，或两次输入的密码不匹配。请输入一个长度至少为 8 为，且由大小写、数字或符号组成的密码。";
+                    alertMsg.Text = "无效的密码，或两次输入的密码不匹配。";
                     alertMsg.Visibility = Visibility.Visible;
                 }
             }
