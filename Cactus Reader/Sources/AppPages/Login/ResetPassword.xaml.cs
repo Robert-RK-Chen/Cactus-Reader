@@ -2,19 +2,9 @@
 using Cactus_Reader.Sources.AppPages.Register;
 using Cactus_Reader.Sources.ToolKits;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
@@ -46,20 +36,21 @@ namespace Cactus_Reader.Sources.AppPages.Login
         private void BackPrevPage(object sender, RoutedEventArgs e)
         {
             contentFrame.Navigate(typeof(RegisterUserInfoPage), currentUser, new SlideNavigationTransitionInfo()
-            { Effect = SlideNavigationTransitionEffect.FromLeft });
+            {
+                Effect = SlideNavigationTransitionEffect.FromLeft
+            });
         }
 
         private async void ResetFinish(object sender, RoutedEventArgs e)
         {
-            alertMsg.Visibility = Visibility.Collapsed;
             string password = passwordInput.Password;
             string checkPwd = passwordCheck.Password;
+
             try
             {
                 if (password.Length == 0 && checkPwd.Length == 0)
                 {
                     alertMsg.Text = "若要继续，请输入一个长度至少为 8 位，并且含有大小写字母、数字或符号组成的密码。";
-                    alertMsg.Visibility = Visibility.Visible;
                 }
                 else if (InformationVerify.IsPassword(password) && string.Equals(password, checkPwd))
                 {
@@ -73,8 +64,8 @@ namespace Cactus_Reader.Sources.AppPages.Login
                         PrimaryButtonText = "确定",
                         DefaultButton = ContentDialogButton.Primary
                     };
-
                     ContentDialogResult result = await signInDialog.ShowAsync();
+
                     if (ContentDialogResult.Primary == result)
                     {
                         localSettings.Values["currentUser"] = currentUser.UID;
@@ -83,9 +74,9 @@ namespace Cactus_Reader.Sources.AppPages.Login
                 }
                 else
                 {
-                    alertMsg.Text = "无效的密码，或两次输入的密码不匹配。";
-                    alertMsg.Visibility = Visibility.Visible;
+                    alertMsg.Text = "无效的密码，或两次输入的密码不相同。";
                 }
+                alertMsg.Visibility = Visibility.Visible;
             }
             catch (Exception)
             {

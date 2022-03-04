@@ -1,0 +1,204 @@
+﻿<Page
+    x:Class="Cactus_Reader.Sources.AppPages.AppUI.SettingPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cactus_Reader.Sources.AppPages.AppUI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    muxc:BackdropMaterial.ApplyToRootOrPageBackground="True">
+
+    <Page.Resources>
+        <FontFamily x:Key="SegoeFluentIcons">/Sources/Fonts/Segoe Fluent Icons.ttf#Segoe Fluent Icons</FontFamily>
+    </Page.Resources>
+
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <Frame x:ConnectionId='2' x:Name="contentFrame" Margin="16, 0, 16, 16">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="Cactus Reader 设置" FontSize="28" FontWeight="SemiBold"/>
+                    <TextBlock Text="账户" FontSize="20" FontWeight="SemiBold" Margin="0, 16, 0, 0"/>
+                    <Border HorizontalAlignment="Stretch" Margin="0, 12, 0, 0"  VerticalAlignment="Center"
+                            CornerRadius="8" BorderThickness="1"
+                            Background="{ThemeResource LayerFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                        <Grid Margin="16">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                                <PersonPicture ProfilePicture="null"/>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                            Margin="24, 0, 0, 0">
+                                    <TextBlock x:ConnectionId='8' x:Name="name" Text="Cactus User" FontSize="18" FontWeight="SemiBold"/>
+                                    <TextBlock x:ConnectionId='9' x:Name="email" Text="someone@example.com" Margin="0, 4, 0, 8"/>
+                                    <TextBlock x:ConnectionId='10' x:Name="accountKind" Text="Cactus Reader Pro" FontWeight="Medium"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <Button Content="退出登录" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                    Width="160" Height="36"/>
+                        </Grid>
+                    </Border>
+
+                    <TextBlock Text="个性化" FontSize="20" FontWeight="SemiBold" Margin="0, 16, 0, 0"/>
+                    <Border HorizontalAlignment="Stretch" Margin="0, 12, 0, 0"  VerticalAlignment="Center"
+                            CornerRadius="8" BorderThickness="1"
+                            Background="{ThemeResource LayerFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                        <Grid Margin="16">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
+                                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE793;" FontSize="20"/>
+                                <StackPanel Orientation="Vertical" Margin="16, 0, 0, 0" VerticalAlignment="Center">
+                                    <TextBlock Text="应用主题"/>
+                                    <HyperlinkButton Content="Windows 颜色设置" Padding="0" FontWeight="Bold"
+                                                     FontSize="13" NavigateUri="ms-settings:colors"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <ComboBox x:ConnectionId='7' x:Name="appThemeCombo" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                                                                    
+                                      Width="160" Height="36">
+                                <x:String>使用浅色主题</x:String>
+                                <x:String>使用深色主题</x:String>
+                                <x:String>跟随系统主题</x:String>
+                            </ComboBox>
+                        </Grid>
+                    </Border>
+
+                    <Border HorizontalAlignment="Stretch" Margin="0, 4, 0, 0" VerticalAlignment="Center"
+                            CornerRadius="8" BorderThickness="1"
+                            Background="{ThemeResource LayerFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                        <Grid Margin="16">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
+                                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE8D2;" FontSize="20"/>
+                                <StackPanel Orientation="Vertical" Margin="16, 0, 0, 0" VerticalAlignment="Center">
+                                    <TextBlock Text="阅读器字体" FontSize="14" FontWeight="Normal"/>
+                                    <HyperlinkButton Content="Windows 字体设置" Padding="0, 0, 0, 0" FontWeight="Bold"
+                                             FontSize="13" NavigateUri="ms-settings:fonts"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <ComboBox x:ConnectionId='4' x:Name="fontsCombo" Height="36" Width="120" VerticalAlignment="Center"
+                                                                                                   
+                                          HorizontalAlignment="Center">
+                                    <x:String>宋体</x:String>
+                                    <x:String>楷体</x:String>
+                                    <x:String>幼圆</x:String>
+                                    <x:String>等线</x:String>
+                                </ComboBox>
+                                <Button x:ConnectionId='5' x:Name="fontDecreaseButton" VerticalAlignment="Center" Margin="12, 0, 0, 0"
+                                        Height="36" Width="48"                        >
+                                    <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE8E7;"/>
+                                </Button>
+                                <Button x:ConnectionId='6' x:Name="fontFontIncreaseButton" VerticalAlignment="Center" Margin="12, 0, 0, 0" 
+                                        Height="36" Width="48"                         >
+                                    <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE8E8;"/>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Border HorizontalAlignment="Stretch" Margin="0, 4, 0, 0"  VerticalAlignment="Center"
+                            CornerRadius="8" BorderThickness="1"
+                            Background="{ThemeResource LayerFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="16">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE7B3;" FontSize="20"/>
+                                <TextBlock Text="阅读器样式预览" FontSize="14" Margin="16, 0, 0, 0"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock x:ConnectionId='3' x:Name="previewText" Margin="0, 12, 0, 0" HorizontalTextAlignment="Left"
+                                       Text="Cactus Reader 是一款现代化、高效的文档阅读器。" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="讲述人" FontSize="20" FontWeight="SemiBold"  Margin="0, 16, 0, 0"/>
+                    <Border HorizontalAlignment="Stretch" Margin="0, 12, 0, 0"  VerticalAlignment="Center"
+                            CornerRadius="8" BorderThickness="1"
+                            Background="{ThemeResource LayerFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                        <Grid Margin="16">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
+                                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xF2B7;" FontSize="20"/>
+                                <StackPanel Orientation="Vertical" Margin="16, 0, 0, 0" VerticalAlignment="Center">
+                                    <TextBlock Text="讲述人语言"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <ComboBox HorizontalAlignment="Right" VerticalAlignment="Center" Width="200" Height="36">
+                                <x:String>中文（简体中文）</x:String>
+                                <x:String>英语（通用英语）</x:String>
+                            </ComboBox>
+                        </Grid>
+                    </Border>
+
+                    <Border HorizontalAlignment="Stretch" Margin="0, 4, 0, 0"  VerticalAlignment="Center"
+                            CornerRadius="8" BorderThickness="1"
+                            Background="{ThemeResource LayerFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                        <Grid Margin="16">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
+                                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xEFA9;" FontSize="20"/>
+                                <StackPanel Orientation="Vertical" Margin="16, 0, 0, 0" VerticalAlignment="Center">
+                                    <TextBlock Text="讲述人音色"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <ComboBox HorizontalAlignment="Right" VerticalAlignment="Center" Width="200" Height="36">
+                                <x:String>Azure TTS - 晓晓</x:String>
+                                <x:String>Azure TTS - 云希</x:String>
+                                <x:String>Azure TTS - 晓萱</x:String>
+                                <x:String>Azure TTS - 云杨</x:String>
+                            </ComboBox>
+                        </Grid>
+                    </Border>
+
+                    <Border HorizontalAlignment="Stretch" Margin="0, 4, 0, 0"  VerticalAlignment="Center"
+                            CornerRadius="8" BorderThickness="1"
+                            Background="{ThemeResource LayerFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                        <Grid Margin="16">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
+                                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xEC4A;" FontSize="20"/>
+                                <StackPanel Orientation="Vertical" Margin="16, 0, 0, 0" VerticalAlignment="Center">
+                                    <TextBlock Text="讲述人语速"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <Slider Width="200" HorizontalAlignment="Right" Maximum="3" StepFrequency="0.01"/>
+                        </Grid>
+                    </Border>
+
+                    <Border HorizontalAlignment="Stretch" Margin="0, 4, 0, 0"  VerticalAlignment="Center"
+                            CornerRadius="8" BorderThickness="1"
+                            Background="{ThemeResource LayerFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                        <Grid Margin="16">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
+                                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xEDA9;" FontSize="20"/>
+                                <StackPanel Orientation="Vertical" Margin="16, 0, 0, 0" VerticalAlignment="Center">
+                                    <TextBlock Text="讲述人音调"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <Slider Width="200" HorizontalAlignment="Right" Maximum="2" StepFrequency="0.01"/>
+                        </Grid>
+                    </Border>
+
+                    <Border HorizontalAlignment="Stretch" Margin="0, 4, 0, 0"  VerticalAlignment="Center"
+                            CornerRadius="8" BorderThickness="1"
+                            Background="{ThemeResource LayerFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                        <Grid Margin="16">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
+                                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xf0ED;" FontSize="20"/>
+                                <StackPanel Orientation="Vertical" Margin="16, 0, 0, 0" VerticalAlignment="Center">
+                                    <TextBlock Text="试听讲述人声音"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <Button Content="播放讲述人声音" HorizontalAlignment="Right" Width="200" Height="36"/>
+                        </Grid>
+                    </Border>
+
+                    <TextBlock Text="同步与备份" FontSize="20" FontWeight="SemiBold"  Margin="0, 16, 0, 16"/>
+                </StackPanel>
+            </Frame>
+        </ScrollViewer>
+    </Grid>
+</Page>
+

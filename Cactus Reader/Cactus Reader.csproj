@@ -25,7 +25,7 @@
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxBundle>Never</AppxBundle>
-    <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
+    <AppxBundlePlatforms>x64</AppxBundlePlatforms>
     <AppInstallerUri>C:\Users\Robert Chen\Downloads</AppInstallerUri>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     <AppxPackageDir>C:\Users\Robert Chen\Downloads\</AppxPackageDir>
@@ -191,14 +191,15 @@
     <Compile Include="Sources\AppPages\StartPage.xaml.cs">
       <DependentUpon>StartPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Sources\ToolKits\DatabaseGetter.cs" />
+    <Compile Include="Sources\ToolKits\DBProperties.cs" />
     <Compile Include="Sources\ToolKits\HashDirectory.cs" />
     <Compile Include="Sources\ToolKits\IFreeSqlService.cs" />
     <Compile Include="Sources\ToolKits\InformationVerify.cs" />
+    <Compile Include="Sources\ToolKits\MailCodeVerify.cs" />
     <Compile Include="Sources\WindowsHello\AuthService.cs" />
     <Compile Include="Sources\WindowsHello\DeviceHelper.cs" />
     <Compile Include="Sources\WindowsHello\MicrosoftPassportHelper.cs" />
-    <Compile Include="Sources\ToolKits\VerifyCodeSender.cs" />
+    <Compile Include="Sources\ToolKits\MailCodeSender.cs" />
     <Compile Include="Sources\WindowsHello\PassportDevice.cs" />
   </ItemGroup>
   <ItemGroup>

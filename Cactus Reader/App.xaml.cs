@@ -26,6 +26,8 @@ namespace Cactus_Reader
         {
             InitializeComponent();
             Suspending += OnSuspending;
+
+            // 应用加载时处理 IfreeSql 单例的加载，避免等待时间过长
             Task.Factory.StartNew(() =>
             {
                 IFreeSql freesql = IFreeSqlService.Instance;
@@ -41,13 +43,11 @@ namespace Cactus_Reader
         {
             Frame rootFrame = Window.Current.Content as Frame;
 
-            // 不要在窗口已包含内容时重复应用程序初始化，
-            // 只需确保窗口处于活动状态
+            // 不要在窗口已包含内容时重复应用程序初始化，只需确保窗口处于活动状态
             if (rootFrame == null)
             {
                 // 创建要充当导航上下文的框架，并导航到第一页
                 rootFrame = new Frame();
-
                 rootFrame.NavigationFailed += OnNavigationFailed;
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
@@ -63,18 +63,18 @@ namespace Cactus_Reader
             {
                 if (rootFrame.Content == null)
                 {
-                    // 当导航堆栈尚未还原时，导航到第一页，
-                    // 并通过将所需信息作为导航参数传入来配置
-                    // 参数
-                    //if (localSettings.Values.ContainsKey("currentUser"))
-                    //{
-                    //    rootFrame.Navigate(typeof(MainPage), e.Arguments);
-                    //}
-                    //else
-                    //{
+                    // 当导航堆栈尚未还原时，导航到第一页，并通过将所需信息作为导航参数传入来配置参数
+                    // 当用户配置记载当前用户处于登陆状态则无需进行登录过程
+                    if (localSettings.Values.ContainsKey("currentUser"))
+                    {
+                        rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                    }
+                    else
+                    {
                         rootFrame.Navigate(typeof(StartPage), e.Arguments);
-                    //}
+                    }
                 }
+
                 // 确保当前窗口处于活动状态
                 Window.Current.Activate();
             }
@@ -91,8 +91,8 @@ namespace Cactus_Reader
         }
 
         /// <summary>
-        /// 在将要挂起应用程序执行时调用。  在不知道应用程序
-        /// 无需知道应用程序会被终止还是会恢复，
+        /// 在将要挂起应用程序执行时调用。
+        /// 在不知道应用程序无需知道应用程序会被终止还是会恢复，
         /// 并让内存内容保持不变。
         /// </summary>
         /// <param name="sender">挂起的请求的源。</param>
@@ -101,6 +101,7 @@ namespace Cactus_Reader
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: 保存应用程序状态并停止任何后台活动
+
             deferral.Complete();
         }
     }

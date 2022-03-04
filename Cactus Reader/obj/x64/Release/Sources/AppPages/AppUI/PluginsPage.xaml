@@ -1,0 +1,30 @@
+﻿<Page
+    x:Class="Cactus_Reader.Sources.AppPages.AppUI.PluginsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d"
+    muxc:BackdropMaterial.ApplyToRootOrPageBackground="True">
+
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Height="auto">
+            <Frame x:ConnectionId='2' x:Name="contentFrame" Margin="16, 0, 16, 16">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Grid.Row="0">
+                        <TextBlock Text="扩展包" FontSize="28" FontWeight="SemiBold"/>
+                        <TextBlock Text="你看，更多神奇的功能都在这里。" Margin="0, 12, 0, 0"/>
+                    </StackPanel>
+                    <Grid Grid.Row="1" Margin="0, 16, 0, 0">
+                    </Grid>
+                </Grid>
+            </Frame>
+        </ScrollViewer>
+    </Grid>
+</Page>
+

@@ -30,8 +30,8 @@
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.ScrollViewer">
       <RootProperty Name="VerticalScrollBarVisibility" />
-      <RootProperty Name="Height" />
       <RootProperty Name="Content" />
+      <RootProperty Name="Height" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.Frame">
       <RootProperty Name="Margin" />
@@ -196,8 +196,8 @@
       <RootProperty Name="HorizontalAlignment" />
       <RootProperty Name="VerticalAlignment" />
       <RootProperty Name="Width" />
-      <RootProperty Name="Items" />
       <RootProperty Name="Height" />
+      <RootProperty Name="Items" />
       <RootEvent Name="Loaded" />
       <RootEvent Name="SelectionChanged" />
     </RootType>

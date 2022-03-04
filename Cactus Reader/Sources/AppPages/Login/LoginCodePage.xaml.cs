@@ -18,7 +18,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         readonly IFreeSql freeSql = IFreeSqlService.Instance;
-        readonly VerifyCodeSender codeSender = VerifyCodeSender.Instance;
+        readonly MailCodeSender codeSender = MailCodeSender.Instance;
         User currentUser = null;
 
         public LoginCodePage()
@@ -40,32 +40,34 @@ namespace Cactus_Reader.Sources.AppPages.Login
         private void BackPrevPage(object sender, RoutedEventArgs e)
         {
             contentFrame.Navigate(typeof(LoginPwdPage), currentUser, new SlideNavigationTransitionInfo()
-            { Effect = SlideNavigationTransitionEffect.FromLeft });
+            {
+                Effect = SlideNavigationTransitionEffect.FromLeft
+            });
         }
 
         private void Login(object sender, RoutedEventArgs e)
         {
-            alertMsg.Visibility = Visibility.Collapsed;
-            string verifyCode = verifyCodeInput.Text;
-
+            string codeInput = verifyCodeInput.Text;
             try
             {
                 Code currentCode = freeSql.Select<Code>().Where(code => code.Email == currentUser.Email).ToOne();
-                if (verifyCode.Length == 0)
+                switch (MailCodeVerify.Verify(codeInput, currentCode))
                 {
-                    alertMsg.Text = "若要继续，请输入我们刚才发送给你的代码。";
-                    alertMsg.Visibility = Visibility.Visible;
+                    case "CODE_INPUT_LENGTH_0":
+                        alertMsg.Text = "若要继续，请输入我们刚才发送给你的代码。";
+                        break;
+                    case "INVALID_MAIL_CODE":
+                        alertMsg.Text = "该代码无效，检查该代码并重试。";
+                        break;
+                    case "VALID_CODE":
+                        StartPage.startPage.mainContent.Navigate(typeof(MainPage), null,
+                            new DrillInNavigationTransitionInfo());
+                        break;
+                    default:
+                        alertMsg.Text = "该代码无效，检查该代码并重试。";
+                        break;
                 }
-                else if (string.Equals(currentCode.VerifyCode, verifyCode))
-                {
-                    localSettings.Values["currentUser"] = currentUser.UID;
-                    StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
-                }
-                else
-                {
-                    alertMsg.Text = "该代码无效，检查该代码并重试。";
-                    alertMsg.Visibility = Visibility.Visible;
-                }
+                alertMsg.Visibility = Visibility.Visible;
             }
             catch (Exception)
             {
@@ -85,13 +87,12 @@ namespace Cactus_Reader.Sources.AppPages.Login
             if (sendFlag)
             {
                 alertMsg.Text = "代码已发送，请注意查收。";
-                alertMsg.Visibility = Visibility.Visible;
             }
             else
             {
                 alertMsg.Text = "代码发送过于频繁，请稍后再试。";
-                alertMsg.Visibility = Visibility.Visible;
             }
+            alertMsg.Visibility = Visibility.Visible;
         }
     }
 }

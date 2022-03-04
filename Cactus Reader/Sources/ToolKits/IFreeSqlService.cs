@@ -3,11 +3,14 @@
     public class IFreeSqlService
     {
         private static IFreeSql instance;
-        static readonly string dbConnString = DatabaseGetter.GetDatabase();
+        static readonly string dbConnString = DBProperties.GetDatabase();
 
         public static IFreeSql Instance
         {
-            get { return instance ?? (instance = new FreeSql.FreeSqlBuilder().UseConnectionString(FreeSql.DataType.MySql, dbConnString).Build()); }
+            get
+            {
+                return instance ?? (instance = new FreeSql.FreeSqlBuilder().UseConnectionString(FreeSql.DataType.MySql, dbConnString).Build());
+            }
         }
 
         private IFreeSqlService() { }

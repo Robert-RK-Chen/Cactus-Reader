@@ -1,8 +1,9 @@
-﻿using Cactus_Reader.Sources.AppPages;
-using Cactus_Reader.Sources.AppPages.AppUI;
+﻿using Cactus_Reader.Sources.AppPages.AppUI;
+using Cactus_Reader.Sources.ToolKits;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.Storage;
 using Windows.System;
@@ -14,6 +15,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+using User = Cactus_Reader.Entities.User;
 
 // https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x804 上介绍了“空白页”项模板
 
@@ -26,9 +28,13 @@ namespace Cactus_Reader
     {
         public static MainPage current;
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+        readonly IFreeSql freeSql = IFreeSqlService.Instance;
+
         public MainPage()
         {
             InitializeComponent();
+            Task.Factory.StartNew(() => AsyncUserProfile());
+
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;
 
             titleBar.ButtonBackgroundColor = Colors.Transparent;
@@ -294,6 +300,14 @@ namespace Cactus_Reader
             {
                 // Use args.QueryText to determine what to do.
             }
+        }
+
+        /// <summary>
+        /// 同步的类型：用户配置文件；加载时间：登陆完成后；
+        /// 在用户的应用端创建一个 UID 的文件夹保存用户数据。
+        /// </summary>
+        private void AsyncUserProfile()
+        {
         }
     }
 }

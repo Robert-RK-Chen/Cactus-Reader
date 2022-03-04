@@ -16,11 +16,15 @@ namespace Cactus_Reader.Sources.AppPages
     /// </summary>
     public sealed partial class StartPage : Page
     {
+        // 创建一个全局的 StartPage，用于登录完成将页面切换到应用页面
         public static StartPage startPage;
+
         public StartPage()
         {
             InitializeComponent();
             startPage = this;
+
+            // 以下是将 Mica 效果扩展到标题栏
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;
 
             titleBar.ButtonBackgroundColor = Colors.Transparent;
@@ -89,10 +93,13 @@ namespace Cactus_Reader.Sources.AppPages
             }
         }
 
+        // 开始用户登陆与注册的过程
         private void ContinueLogin(object sender, RoutedEventArgs e)
         {
             contentFrame.Navigate(typeof(LoginAccountPage), null, new SlideNavigationTransitionInfo()
-            { Effect = SlideNavigationTransitionEffect.FromRight });
+            {
+                Effect = SlideNavigationTransitionEffect.FromRight 
+            });
         }
     }
 }

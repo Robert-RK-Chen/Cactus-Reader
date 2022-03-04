@@ -33,36 +33,37 @@ namespace Cactus_Reader.Sources.AppPages.Register
         private void BackPrevPage(object sender, RoutedEventArgs e)
         {
             contentFrame.Navigate(typeof(RegisterCodePage), currentUser, new SlideNavigationTransitionInfo()
-            { Effect = SlideNavigationTransitionEffect.FromLeft });
+            { 
+                Effect = SlideNavigationTransitionEffect.FromLeft
+            });
         }
 
         private void ContinueLogon(object sender, RoutedEventArgs e)
         {
-            alertMsg.Visibility = Visibility.Collapsed;
             string userName = userNameInput.Text;
             try
             {
                 if (userName.Length == 0)
                 {
                     alertMsg.Text = "若要继续，请输入一个用户名";
-                    alertMsg.Visibility = Visibility.Visible;
                 }
                 else if (!InformationVerify.IsUserName(userName))
                 {
                     alertMsg.Text = "无效的用户名，有效的用户名仅由非空格起始或结尾的字母、数字与空格组成";
-                    alertMsg.Visibility = Visibility.Visible;
                 }
                 else if (!UserNameEnabled(userName))
                 {
-                    alertMsg.Text = "这个用户名称已被注册，请换一个尝试。";
-                    alertMsg.Visibility = Visibility.Visible;
+                    alertMsg.Text = "用户名称已被注册，请换一个尝试。";
                 }
                 else
                 {
                     currentUser.Name = userName;
                     contentFrame.Navigate(typeof(RegisterPwdPage), currentUser, new SlideNavigationTransitionInfo()
-                    { Effect = SlideNavigationTransitionEffect.FromRight });
+                    {
+                        Effect = SlideNavigationTransitionEffect.FromRight
+                    });
                 }
+                alertMsg.Visibility = Visibility.Visible;
             }
             catch(Exception)
             {

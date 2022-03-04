@@ -1,7 +1,9 @@
-﻿using Windows.Storage;
+﻿using System;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Navigation;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -12,44 +14,35 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
     /// </summary>
     public sealed partial class SettingPage : Page
     {
-        ApplicationDataContainer localSettings = null;
-        const string appThemeStyle = "appTheme";
-        const string appFont = "font";
-        const string appFontSize = "fontSize";
+        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
 
         public SettingPage()
         {
             InitializeComponent();
-            localSettings = ApplicationData.Current.LocalSettings;
-            if (localSettings.Values[appFontSize] == null)
+            if (localSettings.Values["fontSize"] == null)
             {
-                localSettings.Values[appFontSize] = 14;
+                localSettings.Values["fontSize"] = 14;
             }
-            if (localSettings.Values[appFont] == null)
-            {
-                localSettings.Values[appFont] = "宋体";
-            }
-            //previewText.FontFamily = new FontFamily(localSettings.Values[appFont].ToString() ?? "宋体");
-            //previewText.FontSize = int.Parse(localSettings.Values[appFontSize].ToString());
+            previewText.FontSize = (int)localSettings.Values["fontSize"];
         }
 
         private void AppThemeComboLoaded(object sender, RoutedEventArgs e)
         {
-            if (localSettings.Values[appThemeStyle] == null)
+            if (localSettings.Values["appTheme"] == null)
             {
-                localSettings.Values[appThemeStyle] = "跟随系统设置";
+                localSettings.Values["appTheme"] = "跟随系统设置";
                 appThemeCombo.SelectedValue = "跟随系统设置";
             }
             else
             {
-                appThemeCombo.SelectedValue = localSettings.Values[appThemeStyle];
+                appThemeCombo.SelectedValue = localSettings.Values["appTheme"];
             }
         }
 
         private void ChangeAppTheme(object sender, SelectionChangedEventArgs e)
         {
             string appTheme = appThemeCombo.SelectedValue.ToString();
-            localSettings.Values[appThemeStyle] = appTheme;
+            localSettings.Values["appTheme"] = appTheme;
             switch (appTheme)
             {
                 case "使用浅色主题":
@@ -77,43 +70,38 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
         private void FontComboLoaded(object sender, RoutedEventArgs e)
         {
-            if (localSettings.Values[appFont] == null)
+            if (localSettings.Values["font"] == null)
             {
-                localSettings.Values[appFont] = "宋体";
-                fontsCombo.SelectedValue = "宋体";
+                localSettings.Values["font"] = "宋体";
             }
-            else
-            {
-                fontsCombo.SelectedValue = localSettings.Values[appFont];
-            }
+            fontsCombo.SelectedValue = localSettings.Values["font"];
         }
 
         private void ChangeAppFont(object sender, SelectionChangedEventArgs e)
         {
             string currentFont = fontsCombo.SelectedValue.ToString();
-            localSettings.Values[appFont] = currentFont;
+            localSettings.Values["font"] = currentFont;
             previewText.FontFamily = new FontFamily(currentFont);
         }
 
         private void DeceaseFontSize(object sender, RoutedEventArgs e)
         {
-            var test = localSettings.Values[appFontSize];
-            int currentFontSize = int.Parse(localSettings.Values[appFontSize].ToString());
+            int currentFontSize = int.Parse(localSettings.Values["fontSize"].ToString());
             if (currentFontSize > 12)
             {
                 currentFontSize--;
-                localSettings.Values[appFontSize] = currentFontSize;
+                localSettings.Values["fontSize"] = currentFontSize;
                 previewText.FontSize = currentFontSize;
             }
         }
 
         private void IncreaseFontSize(object sender, RoutedEventArgs e)
         {
-            int currentFontSize = int.Parse(localSettings.Values[appFontSize].ToString());
+            int currentFontSize = int.Parse(localSettings.Values["fontSize"].ToString());
             if (currentFontSize < 30)
             {
                 currentFontSize++;
-                localSettings.Values[appFontSize] = currentFontSize;
+                localSettings.Values["fontSize"] = currentFontSize;
                 previewText.FontSize = currentFontSize;
             }
         }

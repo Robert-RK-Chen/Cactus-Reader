@@ -26,6 +26,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
             InitializeComponent();
         }
 
+        // 用于接受其他页面过渡到这一页时传入的用户信息
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -38,22 +39,25 @@ namespace Cactus_Reader.Sources.AppPages.Login
 
         private void ContinueLogin(object sender, RoutedEventArgs e)
         {
-            alertMsg.Visibility = Visibility.Collapsed;
             string email = accountInput.Text;
-
+            // 检查网络未连接异常
             try
             {
                 currentUser = freeSql.Select<User>().Where(user => user.Email == email).ToOne();
+
+                // 输入的用户帐号是存在的，则要求用户输入密码
                 if (null != currentUser)
                 {
                     contentFrame.Navigate(typeof(LoginPwdPage), currentUser, new SlideNavigationTransitionInfo()
-                    { Effect = SlideNavigationTransitionEffect.FromRight });
+                    {
+                        Effect = SlideNavigationTransitionEffect.FromRight
+                    });
                 }
                 else
                 {
                     alertMsg.Text = "请输入有效的电子邮件地址或帐户信息。";
-                    alertMsg.Visibility = Visibility.Visible;
                 }
+                alertMsg.Visibility = Visibility.Visible;
             }
             catch (Exception)
             {
@@ -62,19 +66,9 @@ namespace Cactus_Reader.Sources.AppPages.Login
             }
         }
 
-        private void CreateAccountPage(object sender, RoutedEventArgs e)
-        {
-            contentFrame.Navigate(typeof(RegisterMailPage), null, new SlideNavigationTransitionInfo()
-            { Effect = SlideNavigationTransitionEffect.FromRight });
-        }
-
-        private void ClearAlertMsg(object sender, RoutedEventArgs e)
-        {
-            alertMsg.Visibility = Visibility.Collapsed;
-        }
-
         private async void SkipLogin(object sender, RoutedEventArgs e)
         {
+            // 询问用户是否跳过登录
             ContentDialog skipLoginDialog = new ContentDialog
             {
                 Title = "跳过登录并使用有限功能？",
@@ -83,13 +77,27 @@ namespace Cactus_Reader.Sources.AppPages.Login
                 PrimaryButtonText = "跳过登录",
                 DefaultButton = ContentDialogButton.Primary
             };
-
             ContentDialogResult result = await skipLoginDialog.ShowAsync();
+
+            // 确认跳过登录则创建临时帐户
             if (result == ContentDialogResult.Primary)
             {
                 localSettings.Values["currentUser"] = "TempUser";
                 StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
             }
+        }
+
+        private void CreateAccountPage(object sender, RoutedEventArgs e)
+        {
+            contentFrame.Navigate(typeof(RegisterMailPage), null, new SlideNavigationTransitionInfo()
+            {
+                Effect = SlideNavigationTransitionEffect.FromRight
+            });
+        }
+
+        private void ClearAlertMsg(object sender, RoutedEventArgs e)
+        {
+            alertMsg.Visibility = Visibility.Collapsed;
         }
     }
 }

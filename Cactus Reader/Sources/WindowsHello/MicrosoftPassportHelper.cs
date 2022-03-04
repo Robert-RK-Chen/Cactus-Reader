@@ -15,7 +15,6 @@ namespace Cactus_Reader.Sources.WindowsHello
             bool keyCredentialAvailable = await KeyCredentialManager.IsSupportedAsync();
             if (keyCredentialAvailable == false)
             {
-                Debug.WriteLine("Microsoft 帐户未设置，请前往 Windows 设置配置 PIN 码。");
                 return false;
             }
             return true;

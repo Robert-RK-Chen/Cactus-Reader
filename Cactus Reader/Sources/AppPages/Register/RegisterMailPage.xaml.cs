@@ -3,13 +3,8 @@ using Cactus_Reader.Sources.AppPages.Login;
 using Cactus_Reader.Sources.ToolKits;
 using System;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
-using Windows.UI.Core;
-using Windows.UI.ViewManagement;
-using Windows.UI.WindowManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
@@ -23,7 +18,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
     public sealed partial class RegisterMailPage : Page
     {
         readonly IFreeSql freeSql = IFreeSqlService.Instance;
-        readonly VerifyCodeSender codeSender = VerifyCodeSender.Instance;
+        readonly MailCodeSender codeSender = MailCodeSender.Instance;
         User currentUser = null;
 
         public RegisterMailPage()
@@ -44,41 +39,46 @@ namespace Cactus_Reader.Sources.AppPages.Register
         private void BackPrevPage(object sender, RoutedEventArgs e)
         {
             contentFrame.Navigate(typeof(LoginAccountPage), null, new SlideNavigationTransitionInfo()
-            { Effect = SlideNavigationTransitionEffect.FromLeft });
+            {
+                Effect = SlideNavigationTransitionEffect.FromLeft
+            });
         }
 
-        private void ContinueLogon(object sender, RoutedEventArgs e)
+        private void ContinueRegister(object sender, RoutedEventArgs e)
         {
-            alertMsg.Visibility = Visibility.Collapsed;
             string mailAddress = userMailInput.Text;
             User user = new User();
-
-            if (!InformationVerify.IsEmail(mailAddress))
+            try
             {
-                alertMsg.Text = "请输入一个有效的电子邮件地址。";
-                alertMsg.Visibility = Visibility.Visible;
-            }
-            else if (!EmailEnabled(mailAddress))
-            {
-                alertMsg.Text = "电子邮件地址已被注册，请尝试使用其他电子邮件。";
-                alertMsg.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                try
+                if (!InformationVerify.IsEmail(mailAddress))
+                {
+                    alertMsg.Text = "请输入一个有效的电子邮件地址。";
+                }
+                else if (!EmailEnabled(mailAddress))
+                {
+                    alertMsg.Text = "电子邮件地址已被注册，请尝试使用其他电子邮件。";
+                }
+                else
                 {
                     user.Email = mailAddress;
-                    Task.Factory.StartNew(() => { codeSender.SendVerifyCode(user.Email, "register"); });
+                    Task.Factory.StartNew(() =>
+                    {
+                        codeSender.SendVerifyCode(user.Email, "register");
+                    });
 
                     contentFrame.Navigate(typeof(RegisterCodePage), user, new SlideNavigationTransitionInfo()
-                    { Effect = SlideNavigationTransitionEffect.FromRight });
+                    {
+                        Effect = SlideNavigationTransitionEffect.FromRight
+                    });
                 }
-                catch (Exception)
-                {
-                    alertMsg.Text = "未连接，请检查网络开关是否已打开。";
-                    alertMsg.Visibility = Visibility.Visible;
-                }
+
             }
+            catch (Exception)
+            {
+                alertMsg.Text = "未连接，请检查网络开关是否已打开。";
+                alertMsg.Visibility = Visibility.Visible;
+            }
+            alertMsg.Visibility = Visibility.Visible;
         }
 
         private void LogonButtonEnabled(object sender, RoutedEventArgs e)
