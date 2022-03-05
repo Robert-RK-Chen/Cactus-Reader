@@ -1,8 +1,8 @@
-﻿using System;
-using Windows.Storage;
+﻿using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
@@ -24,6 +24,21 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 localSettings.Values["fontSize"] = 14;
             }
             previewText.FontSize = (int)localSettings.Values["fontSize"];
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            string UID = localSettings.Values["UID"].ToString();
+
+            name.Text = localSettings.Values["Name"].ToString();
+            email.Text = localSettings.Values["Email"].ToString();
+        }
+
+        private void SignOut(object sender, RoutedEventArgs e)
+        {
+            localSettings.Values["isLogin"] = "false";
+            StartPage.startPage.mainContent.Navigate(typeof(StartPage), null, new DrillInNavigationTransitionInfo());
         }
 
         private void AppThemeComboLoaded(object sender, RoutedEventArgs e)
@@ -103,6 +118,18 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 currentFontSize++;
                 localSettings.Values["fontSize"] = currentFontSize;
                 previewText.FontSize = currentFontSize;
+            }
+        }
+
+        private void HideUserImage(object sender, SizeChangedEventArgs e)
+        {
+            if (Window.Current.Bounds.Width <= 640)
+            {
+                userProfileImage.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                userProfileImage.Visibility = Visibility.Visible;
             }
         }
     }

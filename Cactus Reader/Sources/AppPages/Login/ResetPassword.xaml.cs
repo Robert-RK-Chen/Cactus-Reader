@@ -19,6 +19,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         readonly IFreeSql freeSql = IFreeSqlService.Instance;
+        readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
         User currentUser = null;
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -68,7 +69,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
 
                     if (ContentDialogResult.Primary == result)
                     {
-                        localSettings.Values["currentUser"] = currentUser.UID;
+                        syncTool.LoadCurrentUser(currentUser);
                         StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
                     }
                 }

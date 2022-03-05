@@ -11,6 +11,7 @@
       <RootProperty Name="Content" />
       <RootProperty Name="Resources" />
       <RootProperty Name="Background" />
+      <RootEvent Name="SizeChanged" />
     </RootType>
     <RootType FullName="Microsoft.UI.Xaml.Controls.BackdropMaterial">
       <RootMethod Name="GetApplyToRootOrPageBackground" />
@@ -161,11 +162,12 @@
       <RootProperty Name="IsTitleBarAutoPaddingEnabled" />
       <RootProperty Name="IsBackEnabled" />
       <RootProperty Name="IsBackButtonVisible" />
+      <RootProperty Name="CompactModeThresholdWidth" />
+      <RootProperty Name="OpenPaneLength" />
       <RootProperty Name="AutoSuggestBox" />
       <RootProperty Name="MenuItems" />
       <RootProperty Name="FooterMenuItems" />
       <RootProperty Name="Content" />
-      <RootEvent Name="DisplayModeChanged" />
       <RootEvent Name="Loaded" />
       <RootEvent Name="ItemInvoked" />
       <RootEvent Name="BackRequested" />
@@ -173,6 +175,8 @@
     <RootType FullName="Windows.UI.Xaml.Controls.AutoSuggestBox">
       <RootProperty Name="QueryIcon" />
       <RootProperty Name="PlaceholderText" />
+      <RootProperty Name="Height" />
+      <RootProperty Name="VerticalContentAlignment" />
       <RootEvent Name="TextChanged" />
       <RootEvent Name="SuggestionChosen" />
       <RootEvent Name="QuerySubmitted" />
@@ -198,12 +202,13 @@
       <RootProperty Name="Width" />
       <RootProperty Name="Height" />
       <RootProperty Name="Items" />
+      <RootProperty Name="Margin" />
       <RootEvent Name="Loaded" />
       <RootEvent Name="SelectionChanged" />
     </RootType>
     <RootType FullName="System.String" />
     <RootType FullName="Windows.UI.Xaml.Controls.PersonPicture">
-      <RootProperty Name="ProfilePicture" />
+      <RootProperty Name="Margin" />
     </RootType>
     <RootType FullName="Cactus_Reader.Sources.AppPages.AppUI.SettingPage" />
     <RootType FullName="Windows.UI.Xaml.Controls.TextBox">

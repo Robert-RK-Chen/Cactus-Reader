@@ -10,7 +10,7 @@
 
     <Page.Resources>
         <Thickness x:Key="NavigationViewHeaderMargin">0, 0, 0, 0</Thickness>
-        <Thickness x:Key="NavigationViewContentMargin">0, 0, 0, 0</Thickness>
+        <Thickness x:Key="NavigationViewContentMargin">0, 48, 0, 0</Thickness>
         <FontFamily x:Key="SegoeFluentIcons">/Sources/Fonts/Segoe Fluent Icons.ttf#Segoe Fluent Icons</FontFamily>
     </Page.Resources>
     
@@ -26,19 +26,19 @@
                         Height="40" Canvas.ZIndex="1" Margin="48, 8, 0, 0">
                     <StackPanel Orientation="Horizontal">
                         <Image x:Name="appFontIcon" HorizontalAlignment="Left" VerticalAlignment="Center"
-                               Source="/Assets/Square44x44Logo.scale-100.png" Width="20" Height="20" Margin="12, 0, 0, 0"/>
+                               Source="/Assets/Square44x44Logo.scale-100.png" Width="20" Height="20"/>
                         <TextBlock x:Name="appTitle" Text="Cactus Reader" VerticalAlignment="Center"
                                    Margin="8, 0, 0, 0" Style="{StaticResource CaptionTextBlockStyle}"/>
                     </StackPanel>
                 </Border>
                 <muxc:NavigationView x:Name="navViewControl" IsTitleBarAutoPaddingEnabled="False"
                                      IsBackEnabled="True" Canvas.ZIndex="0" IsBackButtonVisible="Visible"
-                                     DisplayModeChanged="NavViewCtrlDisplayModeChanged"
+                                     CompactModeThresholdWidth="0" OpenPaneLength="280"
                                      Loaded="NavViewControlLoaded" ItemInvoked="NavViewControlItemInvoked"
                                      BackRequested="NavViewControlBackRequested">
                     <muxc:NavigationView.AutoSuggestBox>
-                        <AutoSuggestBox QueryIcon="Find" PlaceholderText="搜索设置、文档"
-                                        TextChanged="AutoSuggestBoxTextChanged"
+                        <AutoSuggestBox QueryIcon="Find" PlaceholderText="搜索设置、文档" Height="36"
+                                        TextChanged="AutoSuggestBoxTextChanged" VerticalContentAlignment="Center"
                                         SuggestionChosen="AutoSuggestBoxSuggestionChosen"
                                         QuerySubmitted="AutoSuggestBoxQuerySubmitted" />
                     </muxc:NavigationView.AutoSuggestBox>
@@ -48,36 +48,36 @@
                                 <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE80F;"/>
                             </muxc:NavigationViewItem.Icon>
                         </muxc:NavigationViewItem>
-                        <muxc:NavigationViewItem Tag="favorite" Content="收藏夹">
+                        <muxc:NavigationViewItem Tag="favorite" Content="收藏夹" Height="44">
                             <muxc:NavigationViewItem.Icon>
                                 <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE728;"/>
                             </muxc:NavigationViewItem.Icon>
                         </muxc:NavigationViewItem>
-                        <muxc:NavigationViewItem Tag="notes" Content="便签本">
+                        <muxc:NavigationViewItem Tag="notes" Content="便签本" Height="44">
                             <muxc:NavigationViewItem.Icon>
                                 <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE70B;"/>
                             </muxc:NavigationViewItem.Icon>
                         </muxc:NavigationViewItem>
-                        <muxc:NavigationViewItem Tag="plugins" Content="扩展包">
+                        <muxc:NavigationViewItem Tag="plugins" Content="扩展包" Height="44">
                             <muxc:NavigationViewItem.Icon>
                                 <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE74c;"/>
                             </muxc:NavigationViewItem.Icon>
                         </muxc:NavigationViewItem>
-                        <muxc:NavigationViewItem Tag="recycle" Content="回收站">
+                        <muxc:NavigationViewItem Tag="recycle" Content="回收站" Height="44">
                             <muxc:NavigationViewItem.Icon>
                                 <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE74D;"/>
                             </muxc:NavigationViewItem.Icon>
                         </muxc:NavigationViewItem>
                     </muxc:NavigationView.MenuItems>
                     <muxc:NavigationView.FooterMenuItems>
-                        <muxc:NavigationViewItem Tag="about" Content="关于应用">
+                        <muxc:NavigationViewItem Tag="about" Content="关于应用" Height="44">
                             <muxc:NavigationViewItem.Icon>
                                 <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE946;"/>
                             </muxc:NavigationViewItem.Icon>
                         </muxc:NavigationViewItem>
                     </muxc:NavigationView.FooterMenuItems>
                     <Grid>
-                        <Frame x:Name="contentFrame" Margin="28, 48, 0, 0">
+                        <Frame x:Name="contentFrame">
                         </Frame>
                     </Grid>
                 </muxc:NavigationView>

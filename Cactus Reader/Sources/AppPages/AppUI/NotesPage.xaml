@@ -14,14 +14,14 @@
 
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Auto" Height="auto">
-            <Frame x:Name="contentFrame" Margin="16, 0, 16, 16">
+            <Frame x:Name="contentFrame" Margin="24, 24, 24, 0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Grid.Row="0">
-                        <TextBlock Text="便签本" FontSize="28" FontWeight="SemiBold"/>
+                        <TextBlock Text="便签本" FontSize="26" FontWeight="SemiBold"/>
                         <TextBlock Text="再好的记性，也要记一记笔记。" Margin="0, 12, 0, 0"/>
                     </StackPanel>
                     <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0, 16, 0, 0">
@@ -36,7 +36,7 @@
                                        TextWrapping="Wrap"/>
                             <TextBlock Margin="0, 8, 0, 0" Foreground="#9A9A9A" TextWrapping="Wrap"
                                        Text="使用 Cactus Note 创建阅读计划，或者记下读书灵感。"/>
-                            <Button Margin="0, 12, 0, 0">
+                            <Button Margin="0, 16, 0, 0" Width="180" Height="36">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE710;"

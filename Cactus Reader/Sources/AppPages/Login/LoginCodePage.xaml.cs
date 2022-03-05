@@ -18,6 +18,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         readonly IFreeSql freeSql = IFreeSqlService.Instance;
+        readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
         readonly MailCodeSender codeSender = MailCodeSender.Instance;
         User currentUser = null;
 
@@ -60,6 +61,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
                         alertMsg.Text = "该代码无效，检查该代码并重试。";
                         break;
                     case "VALID_CODE":
+                        syncTool.LoadCurrentUser(currentUser);
                         StartPage.startPage.mainContent.Navigate(typeof(MainPage), null,
                             new DrillInNavigationTransitionInfo());
                         break;

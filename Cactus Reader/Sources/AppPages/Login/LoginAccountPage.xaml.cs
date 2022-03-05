@@ -82,7 +82,10 @@ namespace Cactus_Reader.Sources.AppPages.Login
             // 确认跳过登录则创建临时帐户
             if (result == ContentDialogResult.Primary)
             {
-                localSettings.Values["currentUser"] = "TempUser";
+                localSettings.Values["isLogin"] = "true";
+                localSettings.Values["UID"] = "Temp User";
+                localSettings.Values["Email"] = "你将使用使用有限的功能";
+                localSettings.Values["Name"] = "未登录用户";
                 StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
             }
         }

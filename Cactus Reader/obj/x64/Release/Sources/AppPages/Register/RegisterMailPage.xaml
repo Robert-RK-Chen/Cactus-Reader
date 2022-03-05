@@ -48,7 +48,7 @@
                         </CheckBox>
                         <Button x:ConnectionId='6' x:Name="continueButton" FontSize="16" FontWeight="Bold" Width="436" Height="48"
                                 Background="#005FB8" HorizontalAlignment="Center" Content="下 一 步"
-                                CharacterSpacing="50" Margin="0, 32, 0, 0"                      
+                                CharacterSpacing="50" Margin="0, 32, 0, 0"                         
                                 Style="{StaticResource AccentButtonStyle}" Foreground="White" IsEnabled="False"/>
                     </StackPanel>
                 </StackPanel>

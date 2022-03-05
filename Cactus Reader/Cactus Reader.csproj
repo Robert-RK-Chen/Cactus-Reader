@@ -196,6 +196,7 @@
     <Compile Include="Sources\ToolKits\IFreeSqlService.cs" />
     <Compile Include="Sources\ToolKits\InformationVerify.cs" />
     <Compile Include="Sources\ToolKits\MailCodeVerify.cs" />
+    <Compile Include="Sources\ToolKits\ProfileSyncTool.cs" />
     <Compile Include="Sources\WindowsHello\AuthService.cs" />
     <Compile Include="Sources\WindowsHello\DeviceHelper.cs" />
     <Compile Include="Sources\WindowsHello\MicrosoftPassportHelper.cs" />

@@ -161,11 +161,12 @@
       <RootProperty Name="IsTitleBarAutoPaddingEnabled" />
       <RootProperty Name="IsBackEnabled" />
       <RootProperty Name="IsBackButtonVisible" />
+      <RootProperty Name="CompactModeThresholdWidth" />
+      <RootProperty Name="OpenPaneLength" />
       <RootProperty Name="AutoSuggestBox" />
       <RootProperty Name="MenuItems" />
       <RootProperty Name="FooterMenuItems" />
       <RootProperty Name="Content" />
-      <RootEvent Name="DisplayModeChanged" />
       <RootEvent Name="Loaded" />
       <RootEvent Name="ItemInvoked" />
       <RootEvent Name="BackRequested" />
@@ -173,6 +174,8 @@
     <RootType FullName="Windows.UI.Xaml.Controls.AutoSuggestBox">
       <RootProperty Name="QueryIcon" />
       <RootProperty Name="PlaceholderText" />
+      <RootProperty Name="Height" />
+      <RootProperty Name="VerticalContentAlignment" />
       <RootEvent Name="TextChanged" />
       <RootEvent Name="SuggestionChosen" />
       <RootEvent Name="QuerySubmitted" />

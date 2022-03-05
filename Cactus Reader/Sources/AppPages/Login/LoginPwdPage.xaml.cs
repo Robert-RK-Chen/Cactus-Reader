@@ -20,6 +20,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         readonly IFreeSql freeSql = IFreeSqlService.Instance;
+        readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
         readonly MailCodeSender codeSender = MailCodeSender.Instance;
         User currentUser = null;
 
@@ -97,17 +98,16 @@ namespace Cactus_Reader.Sources.AppPages.Login
             {
                 try
                 {
-                    User user = freeSql.Select<User>().Where(users => users.Email == currentUser.Email).ToOne();
-                    if (null == oCurrentUID || !string.Equals(user.Email, oCurrentUID.ToString()))
+                    if (null == oCurrentUID || !string.Equals(currentUser.Email, oCurrentUID.ToString()))
                     {
                         alertMsg.Text = "若要使用 Windows Hello，请重新登录。";
                     }
                     else
                     {
-                        bool isSuccessful = await MicrosoftPassportHelper.CreatePassportKeyAsync(user.UID, user.Name);
+                        bool isSuccessful = await MicrosoftPassportHelper.CreatePassportKeyAsync(currentUser.UID, currentUser.Name);
                         if (isSuccessful)
                         {
-                            localSettings.Values["currentUser"] = currentUser.UID;
+                            syncTool.LoadCurrentUser(currentUser);
                             StartPage.startPage.mainContent.Navigate(typeof(MainPage), null,
                                 new DrillInNavigationTransitionInfo());
                         }
@@ -156,19 +156,18 @@ namespace Cactus_Reader.Sources.AppPages.Login
             try
             {
                 string password = HashDirectory.GetEncryptedPassword(userPwdInput.Password);
-                User currentUser = freeSql.Select<User>().Where(user => user.Password == password).ToOne();
 
                 if (userPwdInput.Password.Length == 0)
                 {
                     alertMsg.Text = "请在此输入你的帐户密码。";
                 }
-                else if (currentUser is null)
+                else if (!string.Equals(password, currentUser.Password))
                 {
                     alertMsg.Text = "Cactus 帐户或密码不正确。";
                 }
                 else
-                {
-                    localSettings.Values["currentUser"] = currentUser.UID;
+{
+                    syncTool.LoadCurrentUser(currentUser);
                     StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
                 }
                 alertMsg.Visibility = Visibility.Visible;

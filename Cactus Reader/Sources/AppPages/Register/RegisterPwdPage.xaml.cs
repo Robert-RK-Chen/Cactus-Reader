@@ -18,6 +18,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         readonly IFreeSql freeSql = IFreeSqlService.Instance;
+        readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
         User currentUser = null;
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -54,12 +55,15 @@ namespace Cactus_Reader.Sources.AppPages.Register
                 else if (InformationVerify.IsPassword(password) && string.Equals(password, checkPwd))
                 {
                     currentUser.Password = HashDirectory.GetEncryptedPassword(password);
-                    freeSql.Update<User>(currentUser).ExecuteAffrows();
+                    currentUser.UID = Guid.NewGuid().ToString("D").ToUpper();
+                    currentUser.RegistDate = DateTime.Now;
+                    currentUser.Mobile = string.Empty;
+                    freeSql.Insert(currentUser).ExecuteAffrows();
 
                     ContentDialog signInDialog = new ContentDialog
                     {
-                        Title = "重置密码成功",
-                        Content = "你的 Cactus 帐户密码重置完成。请牢记你的帐号与密码。点击确定按钮后，我们将自动为你登录。",
+                        Title = "欢迎来到 Cactus Reader",
+                        Content = "你的 Cactus 帐户已准备就绪！请牢记你的帐号与密码。下次登录时，你可以使用 Cactus 帐户与你的密码组合进行登录。点击确定按钮后，我们将自动为你登录。",
                         PrimaryButtonText = "确定",
                         DefaultButton = ContentDialogButton.Primary
                     };
@@ -67,7 +71,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
 
                     if (ContentDialogResult.Primary == result)
                     {
-                        localSettings.Values["currentUser"] = currentUser.UID;
+                        syncTool.LoadCurrentUser(currentUser);
                         StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
                     }
                 }

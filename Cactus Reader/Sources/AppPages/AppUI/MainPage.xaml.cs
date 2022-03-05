@@ -15,7 +15,6 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
-using User = Cactus_Reader.Entities.User;
 
 // https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x804 上介绍了“空白页”项模板
 
@@ -28,6 +27,7 @@ namespace Cactus_Reader
     {
         public static MainPage current;
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+        ProfileSyncTool syncTool = ProfileSyncTool.Instance;
         readonly IFreeSql freeSql = IFreeSqlService.Instance;
 
         public MainPage()
@@ -100,39 +100,6 @@ namespace Cactus_Reader
             else
             {
                 appTitle.Foreground = defaultForegroundBrush;
-            }
-        }
-
-        // Update the TitleBar content layout depending on NavigationView DisplayMode
-        private void NavViewCtrlDisplayModeChanged(Microsoft.UI.Xaml.Controls.NavigationView sender, Microsoft.UI.Xaml.Controls.NavigationViewDisplayModeChangedEventArgs args)
-        {
-            const int topIndent = 16;
-            const int expandedIndent = 48;
-            int minimalIndent = 104;
-
-            // If the back button is not visible, reduce the TitleBar content indent.
-            if (navViewControl.IsBackButtonVisible.Equals(Microsoft.UI.Xaml.Controls.NavigationViewBackButtonVisible.Collapsed))
-            {
-                minimalIndent = 48;
-            }
-
-            Thickness currMargin = appTitleBar.Margin;
-
-            // Set the TitleBar margin dependent on NavigationView display mode
-            if (sender.PaneDisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode.Top)
-            {
-                appTitleBar.Margin = new Thickness(topIndent, currMargin.Top, currMargin.Right, currMargin.Bottom);
-                contentFrame.Margin = new Thickness(0, 48, 0, 0);
-            }
-            else if (sender.DisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewDisplayMode.Minimal)
-            {
-                appTitleBar.Margin = new Thickness(minimalIndent, currMargin.Top, currMargin.Right, currMargin.Bottom);
-                contentFrame.Margin = new Thickness(0, 48, 0, 0);
-            }
-            else
-            {
-                appTitleBar.Margin = new Thickness(expandedIndent, currMargin.Top, currMargin.Right, currMargin.Bottom);
-                contentFrame.Margin = new Thickness(28, 48, 0, 0);
             }
         }
 
@@ -308,6 +275,8 @@ namespace Cactus_Reader
         /// </summary>
         private void AsyncUserProfile()
         {
+            string UID = localSettings.Values["UID"].ToString();
+            syncTool.SyncUserImage(UID);
         }
     }
 }
