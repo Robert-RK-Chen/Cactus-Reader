@@ -63,7 +63,7 @@ namespace Cactus_Reader.Sources.ToolKits
             try
             {
                 var message = new MimeMessage();
-                message.From.Add(new MailboxAddress("Cactus Reader 帐户团队", "cactus-noreply@robertch.cn"));
+                message.From.Add(new MailboxAddress("Cactus Reader 帐户团队", "someone@example.com"));
                 message.To.Add(new MailboxAddress(null, email));
                 message.Subject = "Cactus 帐户安全代码";
 
@@ -73,8 +73,8 @@ namespace Cactus_Reader.Sources.ToolKits
 
                 using (var client = new SmtpClient())
                 {
-                    client.Connect("smtp.office365.com", 587, false);
-                    client.Authenticate("cactus-noreply@robertch.cn", "Robert@Cactus126");
+                    client.Connect("passwordclient", 587, false);
+                    client.Authenticate("someone@example.com", "password");
                     client.Send(message);
                     client.Disconnect(true);
                 }

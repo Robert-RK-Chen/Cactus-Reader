@@ -54,7 +54,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
                 {
                     alertMsg.Text = "请输入一个有效的电子邮件地址。";
                 }
-                else if (!EmailEnabled(mailAddress))
+                else if (!InformationVerify.EmailEnabled(mailAddress))
                 {
                     alertMsg.Text = "电子邮件地址已被注册，请尝试使用其他电子邮件。";
                 }
@@ -94,11 +94,6 @@ namespace Cactus_Reader.Sources.AppPages.Register
         private void ClearAlertMsg(object sender, RoutedEventArgs e)
         {
             alertMsg.Visibility = Visibility.Collapsed;
-        }
-
-        private bool EmailEnabled(string email)
-        {
-            return freeSql.Select<User>().Where(user => user.Email == email).ToOne() is null;
         }
 
         private void OpenServiceWindow(object sender, RoutedEventArgs e)

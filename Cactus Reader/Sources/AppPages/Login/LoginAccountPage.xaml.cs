@@ -24,6 +24,11 @@ namespace Cactus_Reader.Sources.AppPages.Login
         public LoginAccountPage()
         {
             InitializeComponent();
+            Object oEmail = localSettings.Values["Email"];
+            if (null != oEmail)
+            {
+                accountInput.Text = oEmail.ToString();
+            }
         }
 
         // 用于接受其他页面过渡到这一页时传入的用户信息
@@ -84,7 +89,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
             {
                 localSettings.Values["isLogin"] = "true";
                 localSettings.Values["UID"] = "Temp User";
-                localSettings.Values["Email"] = "你将使用使用有限的功能";
+                localSettings.Values["Email"] = "你将使用 Cactus Reader 的有限功能";
                 localSettings.Values["Name"] = "未登录用户";
                 StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
             }

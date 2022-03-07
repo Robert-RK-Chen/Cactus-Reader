@@ -8,7 +8,7 @@ namespace Cactus_Reader.Sources.ToolKits
     public class ProfileSyncTool
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        readonly static string SERVER_ADDRESS = "http://106.54.173.192/cactus-reader-repo/";
+        readonly static string SERVER_ADDRESS = "server_ip_address";
 
         private static ProfileSyncTool instance;
 
@@ -56,7 +56,7 @@ namespace Cactus_Reader.Sources.ToolKits
             }
             catch (Exception)
             {
-                System.Diagnostics.Debug.Write("未连接，无法同步。");
+                System.Diagnostics.Debug.Write("未连接，无法同步或无法访问资源。");
             }
         }
     }

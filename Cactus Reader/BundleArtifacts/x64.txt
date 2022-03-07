@@ -1,5 +1,0 @@
-MainPackage=C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Cactus Reader_1.0.0.0_x64_Debug.msix
-ResourcePack=C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Cactus Reader_1.0.0.0_scale-100.msix
-ResourcePack=C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Cactus Reader_1.0.0.0_scale-125.msix
-ResourcePack=C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Cactus Reader_1.0.0.0_scale-150.msix
-ResourcePack=C:\Storages\Visual Studio Projects\Cactus Reader\Cactus Reader\bin\x64\Debug\Cactus Reader_1.0.0.0_scale-400.msix

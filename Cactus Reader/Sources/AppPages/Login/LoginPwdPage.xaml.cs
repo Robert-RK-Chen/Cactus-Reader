@@ -91,7 +91,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
         /// <param name="e"></param>
         private async void WindowsHelloLogin(object sender, RoutedEventArgs e)
         {
-            Object oCurrentUID = localSettings.Values["currentUser"];
+            Object oCurrentUID = localSettings.Values["Email"];
             bool isTPMEnabled = await MicrosoftPassportHelper.MicrosoftPassportAvailableCheckAsync();
 
             if (isTPMEnabled)
@@ -125,7 +125,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
             }
             else
             {
-                alertMsg.Text = "TPM 安全处理器未开启，或 Windows 未设置 PIN 码。";
+                alertMsg.Text = "TPM 安全处理器未打开，或未设置 Windows Hello PIN。";
             }
             alertMsg.Visibility = Visibility.Visible;
         }

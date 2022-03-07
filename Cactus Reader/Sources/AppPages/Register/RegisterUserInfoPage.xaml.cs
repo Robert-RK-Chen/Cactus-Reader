@@ -51,7 +51,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
                 {
                     alertMsg.Text = "无效的用户名，有效的用户名仅由非空格起始或结尾的字母、数字与空格组成";
                 }
-                else if (!UserNameEnabled(userName))
+                else if (!InformationVerify.UserNameEnabled(userName))
                 {
                     alertMsg.Text = "用户名称已被注册，请换一个尝试。";
                 }
@@ -75,11 +75,6 @@ namespace Cactus_Reader.Sources.AppPages.Register
         private void ClearAlertMsg(object sender, RoutedEventArgs e)
         {
             alertMsg.Visibility = Visibility.Collapsed;
-        }
-
-        private bool UserNameEnabled(string userName)
-        {
-            return freeSql.Select<User>().Where(user => user.Name == userName).ToOne() is null;
         }
     }
 }

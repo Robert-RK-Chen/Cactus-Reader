@@ -28,7 +28,7 @@
                             <PersonPicture x:Name="userProfileImage" Margin="0, 0, 24, 0"/>
                             <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center">
                                 <TextBlock x:Name="name" Text="Cactus User" FontSize="20" FontWeight="SemiBold"/>
-                                <TextBlock x:Name="email" Text="someone@example.com" Margin="0, 4, 0, 8" FontSize="16"/>
+                                <TextBlock x:Name="email" Text="someone@example.com" Margin="0, 8, 0, 8" FontSize="16"/>
                                 <TextBlock x:Name="accountKind" Text="Cactus Personal Pro" FontWeight="Medium"
                                            FontSize="16"/>
                             </StackPanel>
@@ -74,8 +74,8 @@
                                 </StackPanel>
                             </StackPanel>
                             <ComboBox x:Name="appThemeCombo" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                      SelectionChanged="ChangeAppTheme" Loaded="AppThemeComboLoaded"
-                                      Width="200" Height="40" Grid.Column="1" Margin="16, 0, 0, 0">
+                                      SelectionChanged="ChangeAppTheme" Width="200" Height="40" Grid.Column="1"
+                                      Margin="16, 0, 0, 0">
                                 <x:String>使用浅色主题</x:String>
                                 <x:String>使用深色主题</x:String>
                                 <x:String>跟随系统主题</x:String>
@@ -104,8 +104,7 @@
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center"
                                         Grid.Column="1" Margin="16, 0, 0, 0">
                                 <ComboBox x:Name="fontsCombo" Height="40" Width="120" VerticalAlignment="Center"
-                                          Loaded="FontComboLoaded" SelectionChanged="ChangeAppFont"
-                                          HorizontalAlignment="Center">
+                                          SelectionChanged="ChangeAppFont" HorizontalAlignment="Center">
                                     <x:String>宋体</x:String>
                                     <x:String>楷体</x:String>
                                     <x:String>幼圆</x:String>
@@ -150,7 +149,8 @@
                                     <TextBlock Text="讲述人语言"/>
                                 </StackPanel>
                             </StackPanel>
-                            <ComboBox HorizontalAlignment="Right" VerticalAlignment="Center" Width="200" Height="40">
+                            <ComboBox x:Name="langCombo" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                      Width="200" Height="40" SelectionChanged="ChangeSpeechLang">
                                 <x:String>中文（简体中文）</x:String>
                                 <x:String>英语（通用英语）</x:String>
                             </ComboBox>
@@ -168,7 +168,8 @@
                                     <TextBlock Text="讲述人音色"/>
                                 </StackPanel>
                             </StackPanel>
-                            <ComboBox HorizontalAlignment="Right" VerticalAlignment="Center" Width="200" Height="40">
+                            <ComboBox x:Name="voiceCombo" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                      Width="200" Height="40" SelectionChanged="ChangeSpeechVoice">
                                 <x:String>Azure TTS - 晓晓</x:String>
                                 <x:String>Azure TTS - 云希</x:String>
                                 <x:String>Azure TTS - 晓萱</x:String>
@@ -188,7 +189,8 @@
                                     <TextBlock Text="讲述人语速"/>
                                 </StackPanel>
                             </StackPanel>
-                            <Slider Width="200" HorizontalAlignment="Right" Maximum="3" StepFrequency="0.01"/>
+                            <Slider x:Name="speedSlider" Width="200" HorizontalAlignment="Right" Maximum="3"
+                                    StepFrequency="0.1" SmallChange="0.1" ValueChanged="ChangeSpeechSpeed"/>
                         </Grid>
                     </Border>
 
@@ -203,7 +205,8 @@
                                     <TextBlock Text="讲述人音调"/>
                                 </StackPanel>
                             </StackPanel>
-                            <Slider Width="200" HorizontalAlignment="Right" Maximum="2" StepFrequency="0.01"/>
+                            <Slider x:Name="tuneSlider" Width="200" HorizontalAlignment="Right" Maximum="2"
+                                    StepFrequency="0.1" SmallChange="0.1" ValueChanged="ChangeSpeechTune"/>
                         </Grid>
                     </Border>
 
@@ -213,12 +216,13 @@
                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                         <Grid Margin="16">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
-                                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xf0ED;" FontSize="20"/>
+                                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xF0ED;" FontSize="20"/>
                                 <StackPanel Orientation="Vertical" Margin="16, 0, 0, 0" VerticalAlignment="Center">
                                     <TextBlock Text="试听讲述人声音"/>
                                 </StackPanel>
                             </StackPanel>
-                            <Button Content="播放讲述人声音" HorizontalAlignment="Right" Width="200" Height="40"/>
+                            <Button Content="播放讲述人声音" HorizontalAlignment="Right" Width="200" Height="40"
+                                    Click="PlaySpeechTextExample"/>
                         </Grid>
                     </Border>
 
