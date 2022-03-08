@@ -25,7 +25,7 @@ namespace Cactus_Reader
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        public static MainPage current;
+        public static MainPage mainPage;
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         ProfileSyncTool syncTool = ProfileSyncTool.Instance;
         readonly IFreeSql freeSql = IFreeSqlService.Instance;
@@ -33,6 +33,7 @@ namespace Cactus_Reader
         public MainPage()
         {
             InitializeComponent();
+            mainPage = this;
             Task.Factory.StartNew(() => AsyncUserProfile());
 
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;
@@ -110,7 +111,7 @@ namespace Cactus_Reader
             ("favorite", typeof(FavoritePage)),
             ("notes", typeof(NotesPage)),
             ("plugins", typeof(PluginsPage)),
-            ("recycle", typeof(PluginsPage)),
+            ("recycle", typeof(RecyclePage)),
             ("about", typeof(AboutInfoPage))
         };
 

@@ -10,49 +10,48 @@
 
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <Frame x:Name="contentFrame" Margin="24, 24, 24, 0">
+            <Frame x:Name="contentFrame" Margin="24, 24, 24, 24">
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
                     <TextBlock Text="关于 Cactus Reader" FontSize="26" FontWeight="SemiBold"/>
                     <TextBlock Text="版本信息" FontSize="20" FontWeight="SemiBold" Margin="0, 24, 0, 0"/>
-                    <Border HorizontalAlignment="Stretch" Margin="0, 12, 0, 0"  VerticalAlignment="Center"
-                            CornerRadius="8" BorderThickness="1"
-                            Background="{ThemeResource LayerFillColorDefaultBrush}"
-                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
-                        <Grid Margin="12, 16, 16, 12">
-                            <StackPanel Orientation="Horizontal">
-                                <Image Source="/Assets/StoreLogo.png" Stretch="Uniform"/>
-                                <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="16, 0, 0, 0">
-                                    <TextBlock Text="Cactus Reader" FontWeight="SemiBold" FontSize="16"/>
-                                    <TextBlock Text="Version 1.0.0.0 Alpha 6" Foreground="#9A9A9A" Margin="0, 4, 0, 0"/>
-                                </StackPanel>
+                    <Grid Margin="0, 20, 0, 16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Stretch">
+                            <Image Source="/Assets/StoreLogo.png" Stretch="Uniform"/>
+                            <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="16, 0, 0, 0">
+                                <TextBlock Text="Cactus Reader" FontWeight="SemiBold" FontSize="16"/>
+                                <TextBlock Text="Version 1.0.0.0 内部测试" Foreground="#9A9A9A" Margin="0, 4, 0, 0"/>
                             </StackPanel>
-                            <Button Content="立即检查更新" HorizontalAlignment="Right" Width="150" Height="36"/>
-                        </Grid>
-                    </Border>
+                        </StackPanel>
+                        <Button Grid.Row="1" Content="立即检查更新" HorizontalAlignment="Right"
+                                Width="160" Height="36" Margin="16, 0, 16, 0"/>
+                    </Grid>
 
-                    <TextBlock Text="订阅产品" FontSize="20" FontWeight="SemiBold" Margin="0, 24, 0, 0"/>
-                    <Border HorizontalAlignment="Stretch" Margin="0, 12, 0, 0"  VerticalAlignment="Center"
-                            CornerRadius="8" BorderThickness="1"
+                    <TextBlock Text="订阅产品" FontSize="20" FontWeight="SemiBold" Margin="0, 12, 0, 12"/>
+                    <Border HorizontalAlignment="Stretch" VerticalAlignment="Center" CornerRadius="8" BorderThickness="1"
                             Background="{ThemeResource LayerFillColorDefaultBrush}"
                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
-                        <Grid Margin="12">
+                        <Grid Margin="16">
                             <StackPanel Orientation="Vertical">
-                                <TextBlock Text="Cactus Reader Pro" FontWeight="SemiBold" FontSize="16"/>
+                                <TextBlock Text="Cactus Personal Pro" FontWeight="SemiBold" FontSize="16"/>
                                 <StackPanel Orientation="Horizontal" Margin="0, 8, 0, 0">
                                     <TextBlock Text="产品属于："/>
-                                    <TextBlock Text="iamrobert@qq.com"/>
+                                    <TextBlock x:Name="email" Text="不可用"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0, 8, 0, 0">
-                                    <TextBlock Text="下次续订："/>
-                                    <TextBlock Text="2023 年 1 月 18 日"/>
+                                    <TextBlock Text="续订时间："/>
+                                    <TextBlock x:Name="renewTime" Text="不可用"/>
                                 </StackPanel>
                             </StackPanel>
-                            <Button Content="更改订阅设置" HorizontalAlignment="Right" Width="150" Height="36"/>
+                            <Button Content="更改订阅设置" HorizontalAlignment="Right" Width="160" Height="36"/>
                         </Grid>
                     </Border>
 
                     <TextBlock Text="版权" FontSize="20" FontWeight="SemiBold" Margin="0, 24, 0, 0"/>
-                    <TextBlock Margin="0, 12, 0, 0" Text="Copyright © 2022，Robert Chen，R. C. Software Studio"/>
+                    <TextBlock Margin="0, 12, 0, 0" Text="Copyright © 2022，Robert Chen，R.C. Software Studio"/>
                     <TextBlock Margin="0, 12, 0, 0" Text="部分插图内容来源于 undraw.co。"/>
                     <TextBlock Margin="0, 12, 0, 0" Text="讲述人（TTS） 由 Microsoft Azure 提供技术支持。"/>
 
@@ -71,14 +70,10 @@
 
                     <StackPanel Orientation="Horizontal" Margin="0, 20, 0, 0">
                         <TextBlock Text="支持 ID："/>
-                        <TextBlock Text="940786A8-92C8-4F7F-B231-0B04E838E7E3"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0, 12, 0, 16">
-                        <TextBlock Text="许可证 ID："/>
-                        <TextBlock Text="8FAF763B-53F5-491F-BBFD-700687379BE6"/>
+                        <TextBlock x:Name="supportID" Text="不可用"/>
                     </StackPanel>
                     <Image Source="/Sources/Images/RCSoftware.png" Height="32" HorizontalAlignment="Left"
-                           Margin="0, 12, 0, 0"/>
+                           Margin="0, 20, 0, 0"/>
                 </StackPanel>
             </Frame>
         </ScrollViewer>

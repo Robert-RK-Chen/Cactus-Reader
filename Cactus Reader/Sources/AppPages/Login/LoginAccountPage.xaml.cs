@@ -24,10 +24,10 @@ namespace Cactus_Reader.Sources.AppPages.Login
         public LoginAccountPage()
         {
             InitializeComponent();
-            Object oEmail = localSettings.Values["Email"];
-            if (null != oEmail)
+            Object oUID = localSettings.Values["UID"];
+            if (null != oUID && Guid.TryParse(oUID.ToString(), out _))
             {
-                accountInput.Text = oEmail.ToString();
+                accountInput.Text = localSettings.Values["Email"].ToString();
             }
         }
 

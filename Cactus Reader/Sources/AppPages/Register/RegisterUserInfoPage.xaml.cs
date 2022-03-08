@@ -15,7 +15,6 @@ namespace Cactus_Reader.Sources.AppPages.Register
     /// </summary>
     public sealed partial class RegisterUserInfoPage : Page
     {
-        readonly IFreeSql freeSql = IFreeSqlService.Instance;
         User currentUser = null;
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

@@ -15,7 +15,7 @@
     </Page.Resources>
     
     <Grid>
-        <Frame x:Name="mainContent">
+        <Frame x:Name="mainContent" x:FieldModifier="Public">
             <Frame.ContentTransitions>
                 <TransitionCollection>
                     <NavigationThemeTransition/>

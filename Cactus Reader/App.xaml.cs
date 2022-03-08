@@ -68,7 +68,7 @@ namespace Cactus_Reader
 
                     Object OisLogin = localSettings.Values["isLogin"];
 
-                    if (OisLogin != null && string.Equals(OisLogin.ToString(), "true"))
+                    if (OisLogin != null && OisLogin is true)
                     {
                         rootFrame.Navigate(typeof(MainPage), e.Arguments);
                     }

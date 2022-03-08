@@ -1,5 +1,5 @@
 ﻿<Page
-    x:Class="Cactus_Reader.Sources.AppPages.AppUI.PluginsPage"
+    x:Class="Cactus_Reader.Sources.AppPages.AppUI.RecyclePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -17,8 +17,7 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Grid.Row="0">
-                        <TextBlock Text="扩展包" FontSize="26" FontWeight="SemiBold"/>
-                        <TextBlock Text="你看，更多神奇的功能都在这里。" Margin="0, 12, 0, 0"/>
+                        <TextBlock Text="回收站" FontSize="26" FontWeight="SemiBold"/>
                     </StackPanel>
                     <Grid Grid.Row="1" Margin="0, 16, 0, 0">
                     </Grid>

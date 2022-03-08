@@ -17,7 +17,6 @@ namespace Cactus_Reader.Sources.AppPages.Register
     /// </summary>
     public sealed partial class RegisterMailPage : Page
     {
-        readonly IFreeSql freeSql = IFreeSqlService.Instance;
         readonly MailCodeSender codeSender = MailCodeSender.Instance;
         User currentUser = null;
 

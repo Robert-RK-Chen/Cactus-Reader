@@ -14,7 +14,7 @@
 
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Auto" Height="auto">
-            <Frame x:Name="contentFrame" Margin="24, 24, 24, 0">
+            <Frame x:Name="contentFrame" Margin="24, 24, 24, 24">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>

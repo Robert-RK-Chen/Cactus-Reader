@@ -19,7 +19,6 @@ namespace Cactus_Reader.Sources.AppPages.Login
     public sealed partial class LoginPwdPage : Page
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        readonly IFreeSql freeSql = IFreeSqlService.Instance;
         readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
         readonly MailCodeSender codeSender = MailCodeSender.Instance;
         User currentUser = null;

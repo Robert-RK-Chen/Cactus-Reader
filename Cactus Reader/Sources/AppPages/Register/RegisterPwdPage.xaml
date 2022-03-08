@@ -34,7 +34,7 @@
                                        Text="someone@example.com"/>
                         </StackPanel>
                         <TextBlock FontSize="16" Margin="0, 12, 0, 0" MaxWidth="436" TextWrapping="Wrap"
-                                   Text="就快完成了！现在只需要创建一个密码，你就可以使用密码来登录 Cactus Reader 了。"/>
+                                   Text="就快完成了！现在为你的帐户创建一个密码。密码的长度至少为 8 位，并且含有大小写字母、数字或符号。"/>
                         <TextBlock FontSize="16" Margin="0, 32, 0, 0" Text="帐户密码："/>
                         <PasswordBox x:Name="passwordInput" FontSize="16" Margin="0, 8, 0, 0" Height="40" Width="436"
                                      MaxLength="255" VerticalContentAlignment="Center" GettingFocus="ClearAlertMsg"/>

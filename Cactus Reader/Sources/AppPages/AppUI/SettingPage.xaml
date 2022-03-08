@@ -14,12 +14,12 @@
 
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <Frame x:Name="contentFrame" Margin="24, 24, 24, 0">
+            <Frame x:Name="contentFrame" Margin="24, 24, 24, 24">
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
                     <TextBlock Text="Cactus Reader 设置" FontSize="26" FontWeight="SemiBold"/>
                     
                     <TextBlock Text="账户" FontSize="20" FontWeight="SemiBold" Margin="0, 16, 0, 0"/>
-                    <Grid Margin="0, 16, 0, 12">
+                    <Grid Margin="0, 20, 0, 16">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition Width="auto"/>
@@ -34,10 +34,10 @@
                             </StackPanel>
                         </StackPanel>
                         <Button Grid.Column="1" VerticalAlignment="Center" Margin="16, 0, 16, 0" Click="SignOut"
-                                    Height="40" Width="200" Content="退出登录" HorizontalAlignment="Right"/>
+                                Height="40" Width="200" Content="退出登录" HorizontalAlignment="Right"/>
                     </Grid>
 
-                    <TextBlock Text="个性化" FontSize="20" FontWeight="SemiBold" Margin="0, 16, 0, 12"/>
+                    <TextBlock Text="个性化" FontSize="20" FontWeight="SemiBold" Margin="0, 12, 0, 12"/>
                     <Border HorizontalAlignment="Stretch" VerticalAlignment="Center"
                             CornerRadius="8" BorderThickness="1"
                             Background="{ThemeResource LayerFillColorDefaultBrush}"

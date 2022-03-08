@@ -7,10 +7,10 @@ namespace Cactus_Reader.Sources.ToolKits
     {
         readonly static string DB_PROPERTY = @"
         {
-            'Server=': '127.0.0.1',
-            ';Port=': '3306',
-            ';User ID=': 'root',
-            ';Password=': '123456',
+            'Server=': 'sh-cdb-0q4l9dac.sql.tencentcdb.com',
+            ';Port=': '59121',
+            ';User ID=': 'RobertChen',
+            ';Password=': '#TSLover1213',
             ';Database=': 'cactus_reader',
             ';Charset=': 'GBK',
             ';SslMode=': 'none',

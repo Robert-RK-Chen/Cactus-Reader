@@ -14,7 +14,7 @@
 
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Auto" Height="auto">
-            <Frame x:Name="contentFrame" Margin="24, 24, 24, 0">
+            <Frame x:Name="contentFrame" Margin="24, 24, 24, 24">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
@@ -36,7 +36,7 @@
                                        TextWrapping="Wrap"/>
                             <TextBlock Margin="0, 8, 0, 0" Foreground="#9A9A9A" TextWrapping="Wrap"
                                        Text="使用 Cactus Note 创建阅读计划，或者记下读书灵感。"/>
-                            <Button Margin="0, 16, 0, 0" Width="180" Height="36">
+                            <Button Margin="0, 16, 0, 0" Width="180" Height="36" Click="CreateNewSticky">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE710;"

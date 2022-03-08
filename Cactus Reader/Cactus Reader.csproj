@@ -155,6 +155,9 @@
     <Compile Include="Sources\AppPages\AppUI\PluginsPage.xaml.cs">
       <DependentUpon>PluginsPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Sources\AppPages\AppUI\RecyclePage.xaml.cs">
+      <DependentUpon>RecyclePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Sources\AppPages\AppUI\SettingPage.xaml.cs">
       <DependentUpon>SettingPage.xaml</DependentUpon>
     </Compile>
@@ -185,11 +188,17 @@
     <Compile Include="Sources\AppPages\Register\RegisterUserInfoPage.xaml.cs">
       <DependentUpon>RegisterUserInfoPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Sources\AppPages\Register\RegisterWindowsHello.xaml.cs">
+      <DependentUpon>RegisterWindowsHello.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Sources\AppPages\ServiceAndPrivacy.xaml.cs">
       <DependentUpon>ServiceAndPrivacy.xaml</DependentUpon>
     </Compile>
     <Compile Include="Sources\AppPages\StartPage.xaml.cs">
       <DependentUpon>StartPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sources\AppPages\Widget\Sticky.xaml.cs">
+      <DependentUpon>Sticky.xaml</DependentUpon>
     </Compile>
     <Compile Include="Sources\ToolKits\DBProperties.cs" />
     <Compile Include="Sources\ToolKits\HashDirectory.cs" />
@@ -302,6 +311,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Sources\AppPages\AppUI\RecyclePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Sources\AppPages\AppUI\SettingPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -342,11 +355,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Sources\AppPages\Register\RegisterWindowsHello.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Sources\AppPages\ServiceAndPrivacy.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Sources\AppPages\StartPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sources\AppPages\Widget\Sticky.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

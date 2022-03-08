@@ -1,7 +1,6 @@
 ﻿using Cactus_Reader.Entities;
 using Cactus_Reader.Sources.ToolKits;
 using System;
-using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
@@ -16,7 +15,6 @@ namespace Cactus_Reader.Sources.AppPages.Login
     /// </summary>
     public sealed partial class LoginCodePage : Page
     {
-        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         readonly IFreeSql freeSql = IFreeSqlService.Instance;
         readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
         readonly MailCodeSender codeSender = MailCodeSender.Instance;

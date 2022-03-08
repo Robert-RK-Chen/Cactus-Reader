@@ -8,7 +8,7 @@ namespace Cactus_Reader.Sources.ToolKits
     public class ProfileSyncTool
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        readonly static string SERVER_ADDRESS = "server_ip_address";
+        readonly static string SERVER_ADDRESS = "http://106.54.173.192/cactus-reader-repo/";
 
         private static ProfileSyncTool instance;
 
@@ -26,12 +26,12 @@ namespace Cactus_Reader.Sources.ToolKits
         {
             try
             {
-                localSettings.Values["isLogin"] = "true";
+                localSettings.Values["isLogin"] = true;
                 localSettings.Values["UID"] = currentUser.UID;
                 localSettings.Values["Email"] = currentUser.Email;
                 localSettings.Values["Name"] = currentUser.Name;
                 localSettings.Values["Mobile"] = currentUser.Mobile;
-                localSettings.Values["RegistDate"] = currentUser.RegistDate;
+                localSettings.Values["RegistDate"] = currentUser.RegistDate.ToString("yyyy' 年 'MM' 月 'dd' 日'");
                 return true;
             }
             catch (Exception)
@@ -52,6 +52,7 @@ namespace Cactus_Reader.Sources.ToolKits
                     BackgroundDownloader downloader = new BackgroundDownloader();
                     DownloadOperation download = downloader.CreateDownload(source, userImageFile);
                     await download.StartAsync();
+                    System.Diagnostics.Debug.WriteLine("同步完成！");
                 }
             }
             catch (Exception)

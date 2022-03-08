@@ -1,5 +1,4 @@
 ﻿using Cactus_Reader.Entities;
-using Cactus_Reader.Sources.AppPages.Login;
 using Cactus_Reader.Sources.ToolKits;
 using System;
 using Windows.UI.Xaml;

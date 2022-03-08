@@ -16,7 +16,6 @@ namespace Cactus_Reader.Sources.AppPages.Login
     /// </summary>
     public sealed partial class ForgetPassword : Page
     {
-        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         readonly IFreeSql freeSql = IFreeSqlService.Instance;
         readonly MailCodeSender codeSender = MailCodeSender.Instance;
         User currentUser = null;

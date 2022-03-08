@@ -36,7 +36,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             if (localSettings.Values["speed"] == null) { localSettings.Values["speed"] = 1.0; }
             if (localSettings.Values["tune"] == null) { localSettings.Values["tune"] = 1.0; }
 
-            this.mediaPlayer = new MediaPlayer();
+            mediaPlayer = new MediaPlayer();
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -45,9 +45,13 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             string UID = localSettings.Values["UID"].ToString();
 
             // TODO: Load User Profile Image
-            StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
-            BitmapImage image = new BitmapImage(new Uri(storageFolder.Path + "\\ProfilePicture.PNG"));
-            userProfileImage.ProfilePicture = image;
+            try
+            {
+                StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
+                BitmapImage image = new BitmapImage(new Uri(storageFolder.Path + "\\ProfilePicture.PNG"));
+                userProfileImage.ProfilePicture = image;
+            }
+            catch (Exception) { }
 
             // TODO: Load User Information
             name.Text = localSettings.Values["Name"].ToString();
@@ -77,8 +81,8 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
         private void SignOut(object sender, RoutedEventArgs e)
         {
-            localSettings.Values["isLogin"] = "false";
-            StartPage.startPage.mainContent.Navigate(typeof(StartPage), null, new DrillInNavigationTransitionInfo());
+            localSettings.Values["isLogin"] = false;
+            MainPage.mainPage.mainContent.Navigate(typeof(StartPage), null, new DrillInNavigationTransitionInfo());
         }
 
         private void ChangeAppTheme(object sender, SelectionChangedEventArgs e)
@@ -166,7 +170,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         private async void PlaySpeechTextExample(object sender, RoutedEventArgs e)
         {
             // 语速与语调暂不可用
-            var config = SpeechConfig.FromSubscription("********************************", "eastasia");
+            var config = SpeechConfig.FromSubscription("4c28aeca36ba4709a5c52a2ec64193e6", "eastasia");
             switch (localSettings.Values["voice"].ToString())
             {
                 case "Azure TTS - 晓晓":
