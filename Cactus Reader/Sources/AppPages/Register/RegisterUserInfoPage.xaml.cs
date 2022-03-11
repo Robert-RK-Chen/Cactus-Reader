@@ -40,8 +40,12 @@ namespace Cactus_Reader.Sources.AppPages.Register
         private void ContinueLogon(object sender, RoutedEventArgs e)
         {
             string userName = userNameInput.Text;
+
             try
             {
+                ControllerVisibility.ShowProgressBar(statusBar);
+                bool isUserNameEnabled = InformationVerify.UserNameEnabled(userName);
+
                 if (userName.Length == 0)
                 {
                     alertMsg.Text = "若要继续，请输入一个用户名";
@@ -50,7 +54,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
                 {
                     alertMsg.Text = "无效的用户名，有效的用户名仅由非空格起始或结尾的字母、数字与空格组成";
                 }
-                else if (!InformationVerify.UserNameEnabled(userName))
+                else if (!isUserNameEnabled)
                 {
                     alertMsg.Text = "用户名称已被注册，请换一个尝试。";
                 }
@@ -62,13 +66,14 @@ namespace Cactus_Reader.Sources.AppPages.Register
                         Effect = SlideNavigationTransitionEffect.FromRight
                     });
                 }
-                alertMsg.Visibility = Visibility.Visible;
             }
             catch(Exception)
             {
                 alertMsg.Text = "未连接，请检查网络开关是否已打开。";
-                alertMsg.Visibility = Visibility.Visible;
             }
+
+            ControllerVisibility.HideProgressBar(statusBar);
+            alertMsg.Visibility = Visibility.Visible;
         }
 
         private void ClearAlertMsg(object sender, RoutedEventArgs e)

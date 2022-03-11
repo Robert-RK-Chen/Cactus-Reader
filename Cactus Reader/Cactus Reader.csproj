@@ -191,21 +191,19 @@
     <Compile Include="Sources\AppPages\Register\RegisterWindowsHello.xaml.cs">
       <DependentUpon>RegisterWindowsHello.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Sources\AppPages\ServiceAndPrivacy.xaml.cs">
+    <Compile Include="Sources\AppPages\Widget\ServiceAndPrivacy.xaml.cs">
       <DependentUpon>ServiceAndPrivacy.xaml</DependentUpon>
     </Compile>
     <Compile Include="Sources\AppPages\StartPage.xaml.cs">
       <DependentUpon>StartPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Sources\AppPages\Widget\Sticky.xaml.cs">
-      <DependentUpon>Sticky.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Sources\ToolKits\ControllerVisibility.cs" />
     <Compile Include="Sources\ToolKits\DBProperties.cs" />
     <Compile Include="Sources\ToolKits\HashDirectory.cs" />
     <Compile Include="Sources\ToolKits\IFreeSqlService.cs" />
     <Compile Include="Sources\ToolKits\InformationVerify.cs" />
-    <Compile Include="Sources\ToolKits\MailCodeVerify.cs" />
     <Compile Include="Sources\ToolKits\ProfileSyncTool.cs" />
+    <Compile Include="Sources\ToolKits\ProfileUploadTool.cs" />
     <Compile Include="Sources\WindowsHello\AuthService.cs" />
     <Compile Include="Sources\WindowsHello\DeviceHelper.cs" />
     <Compile Include="Sources\WindowsHello\MicrosoftPassportHelper.cs" />
@@ -359,15 +357,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Sources\AppPages\ServiceAndPrivacy.xaml">
+    <Page Include="Sources\AppPages\Widget\ServiceAndPrivacy.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Sources\AppPages\StartPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Sources\AppPages\Widget\Sticky.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

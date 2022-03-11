@@ -1,4 +1,5 @@
 ﻿using Cactus_Reader.Entities;
+using System;
 using System.Text.RegularExpressions;
 
 namespace Cactus_Reader.Sources.ToolKits
@@ -23,6 +24,23 @@ namespace Cactus_Reader.Sources.ToolKits
         {
             string matchRule = @"(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*";
             return Regex.IsMatch(input, matchRule, RegexOptions.IgnoreCase);
+        }
+
+        public static string MailCodeVerify(string codeInput, Code mailCode)
+        {
+            if (codeInput.Length == 0)
+            {
+                return "CODE_INPUT_LENGTH_0";
+            }
+            if (codeInput != mailCode.VerifyCode)
+            {
+                return "INVALID_MAIL_CODE";
+            }
+            if (mailCode.CreateTime.AddMinutes(5) < DateTime.Now)
+            {
+                return "INVALID_MAIL_CODE";
+            }
+            return "VALID_CODE";
         }
 
         public static bool UserNameEnabled(string userName)

@@ -23,34 +23,36 @@
             <Border Background="{ThemeResource LayerFillColorDefaultBrush}"
                     VerticalAlignment="Center" HorizontalAlignment="Center" CornerRadius="8" BorderThickness="1"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
-                <StackPanel Orientation="Vertical" Margin="48">
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock FontSize="40" FontWeight="Bold" Text="创建 Cactus 帐户"/>
-                        <StackPanel Orientation="Horizontal" Margin="0, 12, 0, 0">
-                            <HyperlinkButton Padding="0" Margin="0, 3, 0, 0" Click="BackPrevPage">
-                                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" FontSize="16" Glyph="&#xE760;"/>
-                            </HyperlinkButton>
-                            <TextBlock FontSize="16" Margin="8, 0, 0, 0" Text="一个帐户即可访问与同步你的阅读资源"/>
+                <StackPanel Orientation="Vertical" Margin="48" MaxWidth="436">
+                    <TextBlock FontSize="40" FontWeight="Bold" Text="创建 Cactus 帐户" TextWrapping="Wrap"/>
+                    <Grid Margin="0, 12, 0, 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <HyperlinkButton Grid.Column="0" Padding="0" Margin="0, 3, 0, 0" Click="BackPrevPage">
+                            <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" FontSize="16" Glyph="&#xE760;"/>
+                        </HyperlinkButton>
+                        <TextBlock FontSize="16" Margin="8, 0, 0, 0" TextWrapping="Wrap" Grid.Column="1"
+                                   Text="一个帐户即可访问与同步你的阅读资源"/>
+                    </Grid>
+                    <TextBlock FontSize="16" Margin="0, 32, 0, 0" Text="电子邮箱：" Width="436"/>
+                    <TextBox x:Name="userMailInput" FontSize="16" Margin="0, 8, 0, 0" Height="40"
+                             MaxLength="255" VerticalContentAlignment="Center" GotFocus="ClearAlertMsg"/>
+                    <muxc:ProgressBar x:Name="statusBar" IsIndeterminate="False" Opacity="0" Margin="0, 8, 0, 0"/>
+                    <TextBlock x:Name="alertMsg" FontSize="16" Margin="0, 8, 0, 0" TextWrapping="Wrap"
+                               Text="请输入一个有效的电子邮件地址。" Foreground="#E00000" Visibility="Collapsed"/>
+                    <CheckBox Margin="0, 20, 0, 0" Checked="LogonButtonEnabled" Unchecked="LogonButtonDisabled" >
+                        <StackPanel Orientation="Horizontal" Margin="0, -2, 0, 0">
+                            <TextBlock Text="我已阅读并同意" VerticalAlignment="Center" FontSize="16"/>
+                            <HyperlinkButton Padding="0" Content="服务条款及隐私政策" VerticalAlignment="Bottom"
+                                             FontSize="16" Click="OpenServiceWindow"/>
                         </StackPanel>
-
-                        <TextBlock FontSize="16" Margin="0, 32, 0, 0" Text="电子邮箱："/>
-                        <TextBox x:Name="userMailInput" FontSize="16" Margin="0, 8, 0, 0" Height="40" Width="436" 
-                                 MaxLength="255" VerticalContentAlignment="Center" GotFocus="ClearAlertMsg"/>
-                        <TextBlock x:Name="alertMsg" FontSize="16" Margin="0, 16, 0, 0" TextWrapping="Wrap"
-                                   Text="请输入一个有效的电子邮件地址。" MaxWidth="436" Foreground="#E00000"
-                                   Visibility="Collapsed"/>
-                        <CheckBox Margin="0, 20, 0, 0" Checked="LogonButtonEnabled" Unchecked="LogonButtonDisabled" >
-                            <StackPanel Orientation="Horizontal" Margin="0, -2, 0, 0">
-                                <TextBlock Text="我已阅读并同意" VerticalAlignment="Center" FontSize="16"/>
-                                <HyperlinkButton Padding="0" Content="服务条款及隐私政策" VerticalAlignment="Bottom"
-                                                 FontSize="16" Click="OpenServiceWindow"/>
-                            </StackPanel>
-                        </CheckBox>
-                        <Button x:Name="continueButton" FontSize="16" FontWeight="Bold" Width="436" Height="48"
-                                Background="#005FB8" HorizontalAlignment="Center" Content="下 一 步"
-                                CharacterSpacing="50" Margin="0, 32, 0, 0" Click="ContinueRegister"
-                                Style="{StaticResource AccentButtonStyle}" Foreground="White" IsEnabled="False"/>
-                    </StackPanel>
+                    </CheckBox>
+                    <Button x:Name="continueButton" FontSize="16" FontWeight="Bold" Height="48" IsEnabled="False"
+                            Background="#005FB8" Style="{StaticResource AccentButtonStyle}" Foreground="White"
+                            HorizontalAlignment="Stretch" Content="下 一 步" CharacterSpacing="50" Margin="0, 32, 0, 0"
+                            Click="ContinueRegister"/>
                 </StackPanel>
             </Border>
         </Frame>

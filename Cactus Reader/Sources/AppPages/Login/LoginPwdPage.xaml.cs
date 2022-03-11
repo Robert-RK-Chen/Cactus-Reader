@@ -103,7 +103,9 @@ namespace Cactus_Reader.Sources.AppPages.Login
                     }
                     else
                     {
+                        ControllerVisibility.ShowProgressBar(statusBar);
                         bool isSuccessful = await MicrosoftPassportHelper.CreatePassportKeyAsync(currentUser.UID, currentUser.Name);
+
                         if (isSuccessful)
                         {
                             syncTool.LoadCurrentUser(currentUser);
@@ -119,13 +121,13 @@ namespace Cactus_Reader.Sources.AppPages.Login
                 catch (Exception)
                 {
                     alertMsg.Text = "未连接，请检查网络开关是否已打开。";
-                    alertMsg.Visibility = Visibility.Visible;
                 }
             }
             else
             {
                 alertMsg.Text = "TPM 安全处理器未打开，或未设置 Windows Hello PIN。";
             }
+            ControllerVisibility.HideProgressBar(statusBar);
             alertMsg.Visibility = Visibility.Visible;
         }
 
@@ -148,6 +150,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
                 alertMsg.Text = "未连接，请检查网络开关是否已打开。";
                 alertMsg.Visibility = Visibility.Visible;
             }
+
         }
 
         private void Login(object sender, RoutedEventArgs e)
@@ -165,17 +168,16 @@ namespace Cactus_Reader.Sources.AppPages.Login
                     alertMsg.Text = "Cactus 帐户或密码不正确。";
                 }
                 else
-{
+                {
                     syncTool.LoadCurrentUser(currentUser);
                     StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
                 }
-                alertMsg.Visibility = Visibility.Visible;
             }
             catch(Exception)
             {
                 alertMsg.Text = "未连接，请检查网络开关是否已打开。";
-                alertMsg.Visibility = Visibility.Visible;
             }
+            alertMsg.Visibility = Visibility.Visible;
         }
 
         private void ClearAlertMsg(object sender, RoutedEventArgs e)

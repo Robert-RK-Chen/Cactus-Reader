@@ -2,6 +2,7 @@
 using Cactus_Reader.Sources.AppPages.Register;
 using Cactus_Reader.Sources.ToolKits;
 using System;
+using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
@@ -53,8 +54,9 @@ namespace Cactus_Reader.Sources.AppPages.Login
                 }
                 else if (InformationVerify.IsPassword(password) && string.Equals(password, checkPwd))
                 {
+                    ControllerVisibility.ShowProgressBar(statusBar);
                     currentUser.Password = HashDirectory.GetEncryptedPassword(password);
-                    freeSql.Update<User>(currentUser).ExecuteAffrows();
+                    await Task.Factory.StartNew(() => freeSql.Update<User>(currentUser).ExecuteAffrows());
 
                     ContentDialog signInDialog = new ContentDialog
                     {
@@ -75,13 +77,14 @@ namespace Cactus_Reader.Sources.AppPages.Login
                 {
                     alertMsg.Text = "无效的密码，或两次输入的密码不相同。";
                 }
-                alertMsg.Visibility = Visibility.Visible;
             }
             catch (Exception)
             {
                 alertMsg.Text = "未连接，请检查网络开关是否已打开。";
-                alertMsg.Visibility = Visibility.Visible;
             }
+
+            ControllerVisibility.HideProgressBar(statusBar);
+            alertMsg.Visibility = Visibility.Visible;
         }
 
         private void ClearAlertMsg(object sender, RoutedEventArgs e)

@@ -46,9 +46,14 @@ namespace Cactus_Reader.Sources.ToolKits
             {
                 if (Guid.TryParse(UID, out _))
                 {
-                    StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(UID, CreationCollisionOption.OpenIfExists);
+                    // 获取服务器资源路径
                     Uri source = new Uri(SERVER_ADDRESS + UID + "/ProfilePicture.PNG");
+
+                    // 本地保存位置
+                    StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(UID, CreationCollisionOption.OpenIfExists);
                     StorageFile userImageFile = await storageFolder.CreateFileAsync("ProfilePicture.PNG", CreationCollisionOption.OpenIfExists);
+
+                    // 下载服务器资源
                     BackgroundDownloader downloader = new BackgroundDownloader();
                     DownloadOperation download = downloader.CreateDownload(source, userImageFile);
                     await download.StartAsync();

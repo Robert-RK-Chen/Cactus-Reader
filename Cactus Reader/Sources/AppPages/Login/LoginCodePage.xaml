@@ -23,32 +23,32 @@
             <Border Background="{ThemeResource LayerFillColorDefaultBrush}"
                     VerticalAlignment="Center" HorizontalAlignment="Center" CornerRadius="8" BorderThickness="1"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
-                <StackPanel Orientation="Vertical" Margin="48">
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock FontSize="40" FontWeight="Bold" Text="输入验证码"/>
-                        <StackPanel Orientation="Horizontal" Margin="0, 12, 0, 0">
-                            <HyperlinkButton Padding="0" Margin="0, 3, 0, 0" Click="BackPrevPage">
-                                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" FontSize="16" Glyph="&#xE760;"/>
-                            </HyperlinkButton>
-                            <TextBlock x:Name="userMailBlock" FontSize="16" Margin="8, 0, 0, 0"
+                <StackPanel Orientation="Vertical" Margin="48" MaxWidth="436">
+                    <TextBlock FontSize="40" FontWeight="Bold" Text="输入验证码"/>
+                    <StackPanel Orientation="Horizontal" Margin="0, 12, 0, 0">
+                        <HyperlinkButton Padding="0" Margin="0, 3, 0, 0" Click="BackPrevPage">
+                            <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" FontSize="16" Glyph="&#xE760;"/>
+                        </HyperlinkButton>
+                        <TextBlock x:Name="userMailBlock" FontSize="16" Margin="8, 0, 0, 0"
                                        Text="someone@example.com"/>
-                        </StackPanel>
-                        <TextBlock FontSize="16" Text="我们已通过电子邮件将验证码发送至"
-                                   TextWrapping="Wrap" Margin="0, 12, 0, 0" MaxWidth="436"/>
-                        <TextBlock x:Name="userMail" FontSize="16" Text="请输入邮件中的代码进行登录。"
-                                   TextWrapping="Wrap" Margin="0, 8, 0, 0" MaxWidth="436"/>
-                        <TextBlock FontSize="16" Margin="0, 32, 0, 0" Text="邮件验证码："/>
-                        <TextBox x:Name="verifyCodeInput" FontSize="16" Margin="0, 8, 0, 0" Height="40" Width="436"
-                                 MaxLength="7" VerticalContentAlignment="Center" GettingFocus="ClearAlertMsg"/>
-                        <TextBlock x:Name="alertMsg" FontSize="16" Margin="0, 16, 0, 0" TextWrapping="Wrap"
-                                   Text="请输入 7 位验证码，该验证码仅包含数字。" Foreground="#E00000" 
-                                   Visibility="Collapsed" MaxWidth="436"/>
-                        <HyperlinkButton Margin="0, 20, 0, 0" Padding="0" Content="重新发送邮件验证码"
-                                         Click="ResendVerifyCode"/>
-                        <Button FontSize="16" FontWeight="Bold" Width="436" Height="48" Background="#005FB8"
-                                HorizontalAlignment="Center" Content="登  录" CharacterSpacing="50" Margin="0, 32, 0, 0"  
-                                Click="Login" Style="{StaticResource AccentButtonStyle}" Foreground="White"/>
                     </StackPanel>
+                    <TextBlock FontSize="16" Text="我们已通过电子邮件将验证码发送至"
+                               Margin="0, 12, 0, 0"/>
+                    <TextBlock x:Name="userMail" FontSize="16" Text="，请输入邮件中的代码进行登录。"
+                                   TextWrapping="Wrap" Margin="0, 8, 0, 0"/>
+                    <TextBlock FontSize="16" Margin="0, 32, 0, 0" Text="邮件验证码：" Width="436"/>
+                    <TextBox x:Name="verifyCodeInput" FontSize="16" Margin="0, 8, 0, 0" Height="40"
+                                 MaxLength="7" VerticalContentAlignment="Center" GettingFocus="ClearAlertMsg"/>
+                    <muxc:ProgressBar x:Name="statusBar" IsIndeterminate="False" Opacity="0"
+                                          Margin="0, 8, 0, 0"/>
+                    <TextBlock x:Name="alertMsg" FontSize="16" Margin="0, 8, 0, 0" TextWrapping="Wrap"
+                                   Text="请输入 7 位验证码，该验证码仅包含数字。" Foreground="#E00000" 
+                                   Visibility="Collapsed"/>
+                    <HyperlinkButton Margin="0, 20, 0, 0" Padding="0" Content="重新发送邮件验证码"
+                                         Click="ResendVerifyCode"/>
+                    <Button FontSize="16" FontWeight="Bold" Height="48" HorizontalAlignment="Stretch"
+                            Style="{StaticResource AccentButtonStyle}" Foreground="White" Background="#005FB8"
+                            Content="登  录" CharacterSpacing="50" Margin="0, 32, 0, 0" Click="Login" />
                 </StackPanel>
             </Border>
         </Frame>

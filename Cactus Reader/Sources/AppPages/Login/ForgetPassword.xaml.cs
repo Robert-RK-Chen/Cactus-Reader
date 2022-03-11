@@ -1,7 +1,7 @@
 ﻿using Cactus_Reader.Entities;
 using Cactus_Reader.Sources.ToolKits;
 using System;
-using Windows.Storage;
+using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
@@ -44,13 +44,15 @@ namespace Cactus_Reader.Sources.AppPages.Login
             });
         }
 
-        private void Continue(object sender, RoutedEventArgs e)
+        private async void Continue(object sender, RoutedEventArgs e)
         {
             string codeInput = verifyCodeInput.Text;
             try
             {
-                Code currentCode = freeSql.Select<Code>().Where(code => code.Email == currentUser.Email).ToOne();
-                switch (MailCodeVerify.Verify(codeInput, currentCode))
+                ControllerVisibility.ShowProgressBar(statusBar);
+                Code currentCode = await Task.Factory.StartNew(() => freeSql.Select<Code>().Where(code => code.Email == currentUser.Email).ToOne());
+
+                switch (InformationVerify.MailCodeVerify(codeInput, currentCode))
                 {
                     case "CODE_INPUT_LENGTH_0":
                         alertMsg.Text = "若要继续，请输入我们刚才发送给你的代码。";
@@ -68,13 +70,13 @@ namespace Cactus_Reader.Sources.AppPages.Login
                         alertMsg.Text = "该代码无效，检查该代码并重试。";
                         break;
                 }
-                alertMsg.Visibility = Visibility.Visible;
             }
             catch (Exception)
             {
                 alertMsg.Text = "未连接，请检查网络开关是否已打开。";
-                alertMsg.Visibility = Visibility.Visible;
             }
+            ControllerVisibility.HideProgressBar(statusBar);
+            alertMsg.Visibility = Visibility.Visible;
         }
 
         private void ClearAlertMsg(object sender, RoutedEventArgs e)
@@ -82,9 +84,12 @@ namespace Cactus_Reader.Sources.AppPages.Login
             alertMsg.Visibility = Visibility.Collapsed;
         }
 
-        private void ResendVerifyCode(object sender, RoutedEventArgs e)
+        private async void ResendVerifyCode(object sender, RoutedEventArgs e)
         {
-            bool sendFlag = codeSender.SendVerifyCode(currentUser.Email, "reset");
+            ControllerVisibility.ShowProgressBar(statusBar);
+            bool sendFlag = await Task.Factory.StartNew(() => codeSender.SendVerifyCode(currentUser.Email, "reset"));
+            ControllerVisibility.HideProgressBar(statusBar);
+
             if (sendFlag)
             {
                 alertMsg.Text = "代码已发送，请注意查收。";

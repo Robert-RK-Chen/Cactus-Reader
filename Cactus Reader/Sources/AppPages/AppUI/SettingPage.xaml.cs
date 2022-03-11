@@ -11,6 +11,8 @@ using Windows.UI.Xaml.Navigation;
 using System.IO;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Windows.UI.Xaml.Media.Imaging;
+using Windows.Storage.Pickers;
+using Cactus_Reader.Sources.ToolKits;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -23,11 +25,11 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         private MediaPlayer mediaPlayer;
+        readonly ProfileUploadTool uploadTool = ProfileUploadTool.Instance;
 
         public SettingPage()
         {
             InitializeComponent();
-
             if (localSettings.Values["appTheme"] == null) { localSettings.Values["appTheme"] = "跟随系统主题"; }
             if (localSettings.Values["font"] == null) { localSettings.Values["font"] = "宋体"; }
             if (localSettings.Values["fontSize"] == null) { localSettings.Values["fontSize"] = 15; }
@@ -35,7 +37,6 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             if (localSettings.Values["voice"] == null) { localSettings.Values["voice"] = "Azure TTS - 晓晓"; }
             if (localSettings.Values["speed"] == null) { localSettings.Values["speed"] = 1.0; }
             if (localSettings.Values["tune"] == null) { localSettings.Values["tune"] = 1.0; }
-
             mediaPlayer = new MediaPlayer();
         }
 
@@ -65,6 +66,9 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             voiceCombo.SelectedValue = localSettings.Values["voice"].ToString();
             speedSlider.Value = (double)localSettings.Values["speed"];
             tuneSlider.Value = (double)localSettings.Values["tune"];
+
+            // TODO: 恢复后台传输列表
+            uploadTool.RecoveryBackgroundTransfer();
         }
 
         private void HideUserImage(object sender, SizeChangedEventArgs e)
@@ -220,6 +224,32 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                     .AddText("Cactus Reader 讲述人")
                     .AddText("我们出了点问题。若要使用语音服务，请稍后再试。")
                     .Show();
+            }
+        }
+
+        private async void ChangeProfileImg(object sender, RoutedEventArgs e)
+        {
+            string UID = localSettings.Values["UID"].ToString();
+
+            FileOpenPicker picker = new FileOpenPicker
+            {
+                SuggestedStartLocation = PickerLocationId.ComputerFolder
+            };
+            picker.FileTypeFilter.Add(".png");
+            picker.FileTypeFilter.Add(".PNG");
+            StorageFile imageFile = await picker.PickSingleFileAsync();
+            if (imageFile != null)
+            {
+                // 本地留存以及立即替换用户头像
+                StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
+                await imageFile.CopyAsync(storageFolder, "ProfilePicture.PNG", NameCollisionOption.ReplaceExisting);
+
+                // 优化：直接将选择的图片设置为头像
+                BitmapImage image = new BitmapImage(new Uri(storageFolder.Path + "\\ProfilePicture.PNG"));
+                userProfileImage.ProfilePicture = image;
+
+                // 向服务器上传用户头像
+                uploadTool.UploadProfileImg(imageFile, UID, "/upload-profile-image");
             }
         }
     }

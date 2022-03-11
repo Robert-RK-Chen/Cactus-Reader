@@ -43,24 +43,28 @@ namespace Cactus_Reader.Sources.AppPages.Register
             });
         }
 
-        private void ContinueRegister(object sender, RoutedEventArgs e)
+        private async void ContinueRegister(object sender, RoutedEventArgs e)
         {
-            string mailAddress = userMailInput.Text;
             User user = new User();
+            string mailAddress = userMailInput.Text;
+
             try
             {
+                ControllerVisibility.ShowProgressBar(statusBar);
+                bool isMailEnabled = await Task.Factory.StartNew(() => InformationVerify.EmailEnabled(mailAddress));
+
                 if (!InformationVerify.IsEmail(mailAddress))
                 {
                     alertMsg.Text = "请输入一个有效的电子邮件地址。";
                 }
-                else if (!InformationVerify.EmailEnabled(mailAddress))
+                else if (!isMailEnabled)
                 {
                     alertMsg.Text = "电子邮件地址已被注册，请尝试使用其他电子邮件。";
                 }
                 else
                 {
                     user.Email = mailAddress;
-                    Task.Factory.StartNew(() =>
+                    await Task.Factory.StartNew(() =>
                     {
                         codeSender.SendVerifyCode(user.Email, "register");
                     });
@@ -70,13 +74,12 @@ namespace Cactus_Reader.Sources.AppPages.Register
                         Effect = SlideNavigationTransitionEffect.FromRight
                     });
                 }
-
             }
             catch (Exception)
             {
                 alertMsg.Text = "未连接，请检查网络开关是否已打开。";
-                alertMsg.Visibility = Visibility.Visible;
             }
+            ControllerVisibility.HideProgressBar(statusBar);
             alertMsg.Visibility = Visibility.Visible;
         }
 

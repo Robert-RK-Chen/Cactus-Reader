@@ -30,18 +30,18 @@
                                 Width="160" Height="36" Margin="16, 0, 16, 0"/>
                     </Grid>
 
-                    <TextBlock Text="订阅产品" FontSize="20" FontWeight="SemiBold" Margin="0, 12, 0, 12"/>
+                    <TextBlock Text="订阅产品" FontSize="20" FontWeight="SemiBold" Margin="0, 12, 0, 0"/>
                     <Border HorizontalAlignment="Stretch" VerticalAlignment="Center" CornerRadius="8" BorderThickness="1"
-                            Background="{ThemeResource LayerFillColorDefaultBrush}"
+                            Margin="0, 12, 0, 0" Background="{ThemeResource LayerFillColorDefaultBrush}"
                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                         <Grid Margin="16">
-                            <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Vertical" Spacing="8">
                                 <TextBlock Text="Cactus Personal Pro" FontWeight="SemiBold" FontSize="16"/>
-                                <StackPanel Orientation="Horizontal" Margin="0, 8, 0, 0">
+                                <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="产品属于："/>
                                     <TextBlock x:Name="email" Text="不可用"/>
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0, 8, 0, 0">
+                                <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="续订时间："/>
                                     <TextBlock x:Name="renewTime" Text="不可用"/>
                                 </StackPanel>
@@ -50,27 +50,31 @@
                         </Grid>
                     </Border>
 
-                    <TextBlock Text="版权" FontSize="20" FontWeight="SemiBold" Margin="0, 24, 0, 0"/>
-                    <TextBlock Margin="0, 12, 0, 0" Text="Copyright © 2022，Robert Chen，R.C. Software Studio"/>
-                    <TextBlock Margin="0, 12, 0, 0" Text="部分插图内容来源于 undraw.co。"/>
-                    <TextBlock Margin="0, 12, 0, 0" Text="讲述人（TTS） 由 Microsoft Azure 提供技术支持。"/>
+                    <TextBlock Text="版权" FontSize="20" FontWeight="SemiBold" Margin="0, 20, 0, 0"/>
+                    <StackPanel Orientation="Vertical" Margin="0, 12, 0, 0" Spacing="12">
+                        <TextBlock Text="Copyright © 2022，Robert Chen，R.C. Software Studio"/>
+                        <TextBlock Text="部分插图内容来源于 undraw.co。"/>
+                        <TextBlock Text="讲述人（TTS） 由 Microsoft Azure 提供技术支持。"/>
+                    </StackPanel>
 
-                    <TextBlock Text="相关链接" FontSize="20" FontWeight="SemiBold" Margin="0, 24, 0, 0"/>
-                    <HyperlinkButton Content="unDraw, Open-source illustrations" Padding="0" Margin="0, 12, 0, 0"
+                    <TextBlock Text="相关链接" FontSize="20" FontWeight="SemiBold" Margin="0, 20, 0, 0"/>
+                    <StackPanel Orientation="Vertical" Margin="0, 12, 0, 0" Spacing="12">
+                        <HyperlinkButton Content="unDraw, Open-source illustrations" Padding="0"
                                      NavigateUri="https://undraw.co"/>
-                    <HyperlinkButton Content="Cactus Reader 软件许可条款与服务协议" Padding="0" Margin="0, 12, 0, 0"/>
-                    <HyperlinkButton Content="Cactus Reader 隐私声明" Padding="0" Margin="0, 12, 0, 0"/>
+                        <HyperlinkButton Content="Cactus Reader 软件许可条款与服务协议" Padding="0"/>
+                        <HyperlinkButton Content="Cactus Reader 隐私声明" Padding="0"/>
+                    </StackPanel>
 
-                    <TextBlock Text="应用" FontSize="20" FontWeight="SemiBold" Margin="0, 24, 0, 0"/>
-                    <HyperlinkButton Content="Cactus Reader 官网" FontWeight="SemiBold" Padding="0" Margin="0, 12, 0, 0"/>
-                    <HyperlinkButton Content="Cactus Reader 用户指南" FontWeight="SemiBold"
-                                     Padding="0" Margin="0, 12, 0, 0"/>
-                    <HyperlinkButton Content="Cactus Reader 反馈中心" FontWeight="SemiBold"
-                                     Padding="0" Margin="0, 12, 0, 0"/>
+                    <TextBlock Text="应用" FontSize="20" FontWeight="SemiBold" Margin="0, 20, 0, 0"/>
+                    <StackPanel Orientation="Vertical" Margin="0, 12, 0, 0" Spacing="12">
+                        <HyperlinkButton Content="Cactus Reader 官网" FontWeight="SemiBold" Padding="0"/>
+                        <HyperlinkButton Content="Cactus Reader 用户指南" FontWeight="SemiBold" Padding="0" />
+                        <HyperlinkButton Content="Cactus Reader 反馈中心" FontWeight="SemiBold" Padding="0"/>
+                    </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0, 20, 0, 0">
                         <TextBlock Text="支持 ID："/>
-                        <TextBlock x:Name="supportID" Text="不可用"/>
+                        <TextBlock x:Name="supportID" Text="不可用" IsTextSelectionEnabled="True"/>
                     </StackPanel>
                     <Image Source="/Sources/Images/RCSoftware.png" Height="32" HorizontalAlignment="Left"
                            Margin="0, 20, 0, 0"/>

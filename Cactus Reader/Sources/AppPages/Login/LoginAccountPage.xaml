@@ -18,32 +18,31 @@
             <Border Background="{ThemeResource LayerFillColorDefaultBrush}"
                     VerticalAlignment="Center" HorizontalAlignment="Center" CornerRadius="8" BorderThickness="1"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
-                <Grid Margin="48">
+                <Grid Margin="48" MaxWidth="436">
                     <Grid.RowDefinitions>
                         <RowDefinition />
-                        <RowDefinition />
+                        <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
-                    <StackPanel Orientation="Vertical" Grid.Row="0">
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock FontSize="40" FontWeight="Bold" Text="登 录"/>
-                            <TextBlock FontSize="16" Margin="0, 12, 0, 0"
-                                       Text="登录到你的帐户激活 Cactus Reader 及进行云同步。"/>
-                            <TextBlock FontSize="16" Margin="0, 32, 0, 0" Text="Cactus 帐户、电子邮件或电话号码："/>
-                            <TextBox x:Name="accountInput" FontSize="16" Margin="0, 8, 0, 0" Height="40" Width="436"
-                                     VerticalContentAlignment="Center" GotFocus="ClearAlertMsg" MaxLength="255"/>
-                            <TextBlock x:Name="alertMsg" FontSize="16" Margin="0, 16, 0, 0"
-                                       Text="请输入有效的电子邮件地址或帐户信息。" Foreground="#E00000" MaxWidth="436"
-                                       TextWrapping="Wrap" Visibility="Collapsed"/>
-                            <HyperlinkButton Margin="0, 20, 0, 0" Padding="0"
-                                             Content="跳过登录并使用有限功能" Click="SkipLogin"/>
-                            <Button FontSize="16" FontWeight="Bold" Width="436" Height="48" Background="#005FB8"
-                                    HorizontalAlignment="Center" Content="下 一 步" CharacterSpacing="50"
-                                    Margin="0, 36, 0, 0" Click="ContinueLogin"
-                                    Style="{StaticResource AccentButtonStyle}" Foreground="White"/>
-                        </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Grid.Row="0" >
+                        <TextBlock FontSize="40" FontWeight="Bold" Text="登 录" Width="436"/>
+                        <TextBlock FontSize="16" Margin="0, 12, 0, 0" TextWrapping="Wrap"
+                                   Text="登录到你的帐户激活 Cactus Reader 并进行云同步。"/>
+                        <TextBlock FontSize="16" Margin="0, 32, 0, 0" Text="Cactus 帐户、电子邮件或电话号码："/>
+                        <TextBox x:Name="accountInput" FontSize="16" Margin="0, 8, 0, 0" Height="40"
+                                 VerticalContentAlignment="Center" GotFocus="ClearAlertMsg" MaxLength="255"/>
+                        <muxc:ProgressBar x:Name="statusBar" IsIndeterminate="False" Opacity="0" Margin="0, 8, 0, 0"/>
+                        <TextBlock x:Name="alertMsg" FontSize="16" Margin="0, 8, 0, 0"
+                                   Text="请输入有效的电子邮件地址或帐户信息。" Foreground="#E00000"
+                                   TextWrapping="Wrap" Visibility="Collapsed"/>
+                        <HyperlinkButton Margin="0, 20, 0, 0" Padding="0" Content="跳过登录并使用有限功能" Click="SkipLogin"/>
+                        <Button FontSize="16" FontWeight="Bold" Height="48" HorizontalAlignment="Stretch"
+                                Background="#005FB8"  Style="{StaticResource AccentButtonStyle}" Foreground="White"
+                                Content="下 一 步" CharacterSpacing="50" Margin="0, 32, 0, 0" Click="ContinueLogin"/>
                     </StackPanel>
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center"
-                                VerticalAlignment="Bottom" Margin="0, 48, 0, 0">
+                    
+                    <StackPanel Name="registTip" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center"
+                                VerticalAlignment="Bottom" Margin="0, 32, 0, 0">
                         <TextBlock Text="第一次使用 Cactus Reader？" VerticalAlignment="Center"/>
                         <HyperlinkButton Content="创建一个帐户！" Padding="0" Click="CreateAccountPage"/>
                     </StackPanel>

@@ -23,47 +23,46 @@
             <Border Background="{ThemeResource LayerFillColorDefaultBrush}"
                     VerticalAlignment="Center" HorizontalAlignment="Center" CornerRadius="8" BorderThickness="1"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
-                <StackPanel Orientation="Vertical" Margin="48">
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock FontSize="40" FontWeight="Bold" Text="输入密码"/>
-                        <StackPanel Orientation="Horizontal" Margin="0, 12, 0, 0">
-                            <HyperlinkButton Padding="0" Margin="0, 3, 0, 0" Click="BackPrevPage" >
-                                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" FontSize="16" Glyph="&#xE760;"/>
-                            </HyperlinkButton>
-                            <TextBlock x:Name="userMailBlock" FontSize="16" Margin="8, 0, 0, 0"
-                                       Text="someone@example.com"/>
-                        </StackPanel>
-                        <TextBlock FontSize="16" Margin="0, 12, 0, 0"
-                                   Text="由于你正在访问敏感信息，因此需要验证密码。"/>
-                        <TextBlock FontSize="16" Margin="0, 32, 0, 0" Text="帐户密码："/>
-                        <PasswordBox x:Name="userPwdInput" FontSize="16" Margin="0, 8, 0, 0" Height="40" Width="436"
-                                     MaxLength="255" VerticalContentAlignment="Center" GotFocus="ClearAlertMsg"/>
-                        <TextBlock x:Name="alertMsg" FontSize="16" Margin="0, 16, 0, 0" TextWrapping="Wrap"
-                                   Text="请输入你的 Cactus 帐户密码" Foreground="#E00000" Visibility="Collapsed"
-                                   MaxWidth="436"/>
-                        <HyperlinkButton Margin="0, 20, 0, 0" Padding="0" Content="更多登录方式" Click="ShowMoreLoginWays"/>
-                        <StackPanel x:Name="loginWays" Orientation="Horizontal" Margin="0, 16, 0, 0"
-                                    Visibility="Collapsed">
-                            <Button x:Name="mailCodeLogin" Height="40" Width="40" Padding="0" Click="SendLoginCode"
-                                    ToolTipService.ToolTip="邮件验证码">
-                                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE715;"/>
-                            </Button>
-                            <Button x:Name="windowsHelloLogin" Height="40" Width="40" Padding="0" Margin="16, 0, 0, 0"
-                                    ToolTipService.ToolTip="Windows Hello" Click="WindowsHelloLogin">
-                                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xEB68;"
-                                          FontSize="24" Margin="0, 3, 0, 0"/>
-                            </Button>
-                            <Button x:Name="msgCodeLogin" Height="40" Width="40" Padding="0" Margin="16, 0, 0, 0"
-                                    ToolTipService.ToolTip="短信验证码">
-                                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE75F;"/>
-                            </Button>
-                        </StackPanel>
-                        <HyperlinkButton x:Name="forgetPwd" Margin="0, 16, 0, 0" Padding="0" Content="立即重置密码"
-                                         Click="SendResetCode"/>
-                        <Button FontSize="16" FontWeight="Bold" Width="436" Height="48" Background="#005FB8"
-                                HorizontalAlignment="Center" Content="登  录" CharacterSpacing="50" Margin="0, 32, 0, 0"
-                                Style="{StaticResource AccentButtonStyle}" Foreground="White" Click="Login"/>
+                <StackPanel Orientation="Vertical" Margin="48" MaxWidth="436">
+                    <TextBlock FontSize="40" FontWeight="Bold" Text="输入密码"/>
+                    <StackPanel Orientation="Horizontal" Margin="0, 12, 0, 0">
+                        <HyperlinkButton Padding="0" Margin="0, 3, 0, 0" Click="BackPrevPage" >
+                            <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" FontSize="16" Glyph="&#xE760;"/>
+                        </HyperlinkButton>
+                        <TextBlock x:Name="userMailBlock" FontSize="16" Margin="8, 0, 0, 0"
+                                   Text="someone@example.com"/>
                     </StackPanel>
+                    <TextBlock FontSize="16" Margin="0, 12, 0, 0" TextWrapping="Wrap"
+                               Text="由于你正在访问敏感信息，因此需要验证密码。"/>
+                    <TextBlock FontSize="16" Margin="0, 32, 0, 0" Text="帐户密码：" Width="436"/>
+                    <PasswordBox x:Name="userPwdInput" FontSize="16" Margin="0, 8, 0, 0" Height="40" MaxLength="255"
+                                 HorizontalAlignment="Stretch" VerticalContentAlignment="Center" GotFocus="ClearAlertMsg"/>
+                    <muxc:ProgressBar x:Name="statusBar" IsIndeterminate="False" Opacity="0"
+                                      Margin="0, 8, 0, 0"/>
+                    <TextBlock x:Name="alertMsg" FontSize="16" Margin="0, 8, 0, 0" TextWrapping="Wrap"
+                               Text="请输入你的 Cactus 帐户密码" Foreground="#E00000" Visibility="Collapsed"/>
+                    <HyperlinkButton Margin="0, 20, 0, 0" Padding="0" Content="更多登录方式" Click="ShowMoreLoginWays"/>
+                    <StackPanel x:Name="loginWays" Orientation="Horizontal" Margin="0, 16, 0, 0"
+                                Visibility="Collapsed" Spacing="20">
+                        <Button x:Name="mailCodeLogin" Height="40" Width="40" Padding="0" Click="SendLoginCode"
+                                ToolTipService.ToolTip="邮件验证码">
+                            <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE715;"/>
+                        </Button>
+                        <Button x:Name="windowsHelloLogin" Height="40" Width="40" Padding="0"
+                                ToolTipService.ToolTip="Windows Hello" Click="WindowsHelloLogin">
+                            <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xEB68;"
+                                      FontSize="24" Margin="0, 3, 0, 0"/>
+                        </Button>
+                        <Button x:Name="msgCodeLogin" Height="40" Width="40" Padding="0"
+                                ToolTipService.ToolTip="短信验证码">
+                            <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE75F;"/>
+                        </Button>
+                    </StackPanel>
+                    <HyperlinkButton x:Name="forgetPwd" Margin="0, 16, 0, 0" Padding="0" Content="立即重置密码"
+                                     Click="SendResetCode"/>
+                    <Button FontSize="16" FontWeight="Bold" Height="48" Margin="0, 32, 0, 0"
+                            Style="{StaticResource AccentButtonStyle}" Foreground="White" Background="#005FB8"
+                            HorizontalAlignment="Stretch" Content="登  录" CharacterSpacing="50" Click="Login"/>
                 </StackPanel>
             </Border>
         </Frame>

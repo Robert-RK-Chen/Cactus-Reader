@@ -2,6 +2,7 @@
 using Cactus_Reader.Sources.AppPages.Register;
 using Cactus_Reader.Sources.ToolKits;
 using System;
+using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -42,13 +43,14 @@ namespace Cactus_Reader.Sources.AppPages.Login
             }
         }
 
-        private void ContinueLogin(object sender, RoutedEventArgs e)
+        private async void ContinueLogin(object sender, RoutedEventArgs e)
         {
             string email = accountInput.Text;
-            // 检查网络未连接异常
+
             try
             {
-                currentUser = freeSql.Select<User>().Where(user => user.Email == email).ToOne();
+                ControllerVisibility.ShowProgressBar(statusBar);
+                currentUser = await Task.Factory.StartNew(() => freeSql.Select<User>().Where(user => user.Email == email).ToOne());
 
                 // 输入的用户帐号是存在的，则要求用户输入密码
                 if (null != currentUser)
@@ -62,13 +64,13 @@ namespace Cactus_Reader.Sources.AppPages.Login
                 {
                     alertMsg.Text = "请输入有效的电子邮件地址或帐户信息。";
                 }
-                alertMsg.Visibility = Visibility.Visible;
             }
             catch (Exception)
             {
                 alertMsg.Text = "未连接，请检查网络开关是否已打开。";
-                alertMsg.Visibility = Visibility.Visible;
             }
+            ControllerVisibility.HideProgressBar(statusBar);
+            alertMsg.Visibility = Visibility.Visible;
         }
 
         private async void SkipLogin(object sender, RoutedEventArgs e)

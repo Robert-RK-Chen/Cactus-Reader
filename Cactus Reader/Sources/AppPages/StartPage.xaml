@@ -41,14 +41,16 @@
                                 <NavigationThemeTransition/>
                             </TransitionCollection>
                         </Frame.ContentTransitions>
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock FontSize="40" FontWeight="Light" Text="欢迎使用 Cactus Reader"
-                                       CharacterSpacing="32" HorizontalAlignment="Center"/>
-                            <Image Source="/Sources/Images/Searching.png" MaxHeight="400" Margin="0, 48, 0, 0"/>
-                            <TextBlock FontSize="18" FontWeight="Light" CharacterSpacing="50" Margin="0, 48, 0, 0"
-                                       Text="一款为 Windows 打造的现代化的、高效的文档阅读器" HorizontalAlignment="Center"/>
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                    Spacing="48">
+                            <TextBlock FontSize="40" FontWeight="Light" Text="欢迎使用 Cactus Reader" TextWrapping="Wrap"
+                                       CharacterSpacing="32" HorizontalAlignment="Center" TextAlignment="Center"/>
+                            <Image Source="/Sources/Images/Searching.png" MaxHeight="400"/>
+                            <TextBlock FontSize="18" FontWeight="Light" CharacterSpacing="50" HorizontalAlignment="Center"
+                                       Text="一款为 Windows 打造的现代化的、高效的文档阅读器" TextWrapping="Wrap"
+                                       TextAlignment="Center"/>
                             <Button FontSize="18" FontWeight="Bold" Width="480" Height="48" Background="#005FB8"
-                                    HorizontalAlignment="Center" Margin="0, 40, 0, 0"
+                                    HorizontalAlignment="Center"
                                     Content="开启 Cactus 之旅" CharacterSpacing="50" Foreground="White"
                                     Style="{StaticResource AccentButtonStyle}" Click="ContinueLogin"/>
                         </StackPanel>
