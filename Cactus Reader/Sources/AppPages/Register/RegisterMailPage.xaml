@@ -46,7 +46,7 @@
                         <StackPanel Orientation="Horizontal" Margin="0, -2, 0, 0">
                             <TextBlock Text="我已阅读并同意" VerticalAlignment="Center" FontSize="16"/>
                             <HyperlinkButton Padding="0" Content="服务条款及隐私政策" VerticalAlignment="Bottom"
-                                             FontSize="16" Click="OpenServiceWindow"/>
+                                             FontSize="16" Click="ReadServiceAndRivacy"/>
                         </StackPanel>
                     </CheckBox>
                     <Button x:Name="continueButton" FontSize="16" FontWeight="Bold" Height="48" IsEnabled="False"

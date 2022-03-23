@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
+using Windows.Storage;
+using Windows.Storage.Streams;
+using Windows.UI.Text;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
@@ -25,6 +17,19 @@ namespace Cactus_Reader.Sources.AppPages
         public ServiceAndPrivacy()
         {
             this.InitializeComponent();
+        }
+
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            StorageFile service = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/服务协议.rtf"));
+            StorageFile privacy = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/隐私政策.rtf"));
+
+            IRandomAccessStream serviceStream = await service.OpenAsync(FileAccessMode.Read);
+            IRandomAccessStream privacyStream = await privacy.OpenAsync(FileAccessMode.Read);
+
+            ServiceTips.Document.LoadFromStream(TextSetOptions.FormatRtf, serviceStream);
+            PrivacyTips.Document.LoadFromStream(TextSetOptions.FormatRtf, privacyStream);
         }
     }
 }

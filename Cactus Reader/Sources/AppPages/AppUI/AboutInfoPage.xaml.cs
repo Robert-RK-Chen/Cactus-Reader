@@ -1,6 +1,11 @@
 ﻿using System;
+using Windows.ApplicationModel.Core;
 using Windows.Storage;
+using Windows.UI.Core;
+using Windows.UI.ViewManagement;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
@@ -25,10 +30,25 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
             if (Guid.TryParse(UID, out _))
             {
-                email.Text = localSettings.Values["Email"].ToString();
-                renewTime.Text = localSettings.Values["RegistDate"].ToString();
+                email.Text = localSettings.Values["email"].ToString();
+                renewTime.Text = localSettings.Values["registDate"].ToString();
                 supportID.Text = UID;
             }
+        }
+
+        private async void ReadServiceAndRivacy(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            CoreApplicationView newView = CoreApplication.CreateNewView();
+            int newViewId = 0;
+            await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                Frame frame = new Frame();
+                frame.Navigate(typeof(ServiceAndPrivacy), null, new DrillInNavigationTransitionInfo());
+                Window.Current.Content = frame;
+                Window.Current.Activate();
+                newViewId = ApplicationView.GetForCurrentView().Id;
+            });
+            bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
         }
     }
 }

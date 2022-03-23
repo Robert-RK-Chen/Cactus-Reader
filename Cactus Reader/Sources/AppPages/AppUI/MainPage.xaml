@@ -76,9 +76,24 @@
                             </muxc:NavigationViewItem.Icon>
                         </muxc:NavigationViewItem>
                     </muxc:NavigationView.FooterMenuItems>
+
                     <Grid>
-                        <Frame x:Name="contentFrame">
-                        </Frame>
+                        <!--<muxc:InfoBar x:Name="syncInfo" Grid.Row="0" IsOpen="True" Title="请稍等" IsClosable="False"
+                                      Message="我们正在同步你的数据。" Margin="12" Width="320" HorizontalAlignment="Right"
+                                      Background="#E2F1FF">
+                            <muxc:InfoBar.IconSource>
+                                <muxc:SymbolIconSource Symbol="Sync" />
+                            </muxc:InfoBar.IconSource>
+                            <muxc:InfoBar.Content>
+                                <muxc:ProgressBar IsIndeterminate="True" Margin="0, -8, 8, 8"/>
+                            </muxc:InfoBar.Content>
+                            <muxc:InfoBar.Transitions>
+                                <TransitionCollection>
+                                    <EdgeUIThemeTransition Edge="Top"/>
+                                </TransitionCollection>
+                            </muxc:InfoBar.Transitions>
+                        </muxc:InfoBar>-->
+                        <Frame x:Name="contentFrame" />
                     </Grid>
                 </muxc:NavigationView>
             </Grid>

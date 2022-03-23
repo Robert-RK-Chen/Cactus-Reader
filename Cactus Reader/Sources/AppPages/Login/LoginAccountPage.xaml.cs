@@ -28,7 +28,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
             Object oUID = localSettings.Values["UID"];
             if (null != oUID && Guid.TryParse(oUID.ToString(), out _))
             {
-                accountInput.Text = localSettings.Values["Email"].ToString();
+                accountInput.Text = localSettings.Values["email"].ToString();
             }
         }
 
@@ -91,8 +91,8 @@ namespace Cactus_Reader.Sources.AppPages.Login
             {
                 localSettings.Values["isLogin"] = "true";
                 localSettings.Values["UID"] = "Temp User";
-                localSettings.Values["Email"] = "你将使用 Cactus Reader 的有限功能";
-                localSettings.Values["Name"] = "未登录用户";
+                localSettings.Values["email"] = "你将使用 Cactus Reader 的有限功能";
+                localSettings.Values["name"] = "未登录用户";
                 StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
             }
         }

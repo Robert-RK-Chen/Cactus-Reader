@@ -13,6 +13,7 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.Storage.Pickers;
 using Cactus_Reader.Sources.ToolKits;
+using System.Threading.Tasks;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -45,18 +46,9 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             base.OnNavigatedTo(e);
             string UID = localSettings.Values["UID"].ToString();
 
-            // TODO: Load User Profile Image
-            try
-            {
-                StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
-                BitmapImage image = new BitmapImage(new Uri(storageFolder.Path + "\\ProfilePicture.PNG"));
-                userProfileImage.ProfilePicture = image;
-            }
-            catch (Exception) { }
-
             // TODO: Load User Information
-            name.Text = localSettings.Values["Name"].ToString();
-            email.Text = localSettings.Values["Email"].ToString();
+            name.Text = localSettings.Values["name"].ToString();
+            email.Text = localSettings.Values["email"].ToString();
 
             // TODO: Load App Settings
             appThemeCombo.SelectedValue = localSettings.Values["appTheme"].ToString();
@@ -66,6 +58,21 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             voiceCombo.SelectedValue = localSettings.Values["voice"].ToString();
             speedSlider.Value = (double)localSettings.Values["speed"];
             tuneSlider.Value = (double)localSettings.Values["tune"];
+
+            // TODO: Load User Profile Image
+            try
+            {
+                StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
+                BitmapImage image = new BitmapImage(new Uri(storageFolder.Path + "\\ProfilePicture.PNG"));
+                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    userProfileImage.ProfilePicture = image;
+                });
+            }
+            catch (Exception)
+            {
+                userProfileImage.DisplayName = localSettings.Values["name"].ToString();
+            }
 
             // TODO: 恢复后台传输列表
             uploadTool.RecoveryBackgroundTransfer();
@@ -235,21 +242,28 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             {
                 SuggestedStartLocation = PickerLocationId.ComputerFolder
             };
+            picker.FileTypeFilter.Add(".bmp");
             picker.FileTypeFilter.Add(".png");
-            picker.FileTypeFilter.Add(".PNG");
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpge");
             StorageFile imageFile = await picker.PickSingleFileAsync();
+
             if (imageFile != null)
             {
-                // 本地留存以及立即替换用户头像
+                BitmapImage image = new BitmapImage(new Uri(imageFile.Path));
+
+                // 本地留存
                 StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
                 await imageFile.CopyAsync(storageFolder, "ProfilePicture.PNG", NameCollisionOption.ReplaceExisting);
 
-                // 优化：直接将选择的图片设置为头像
-                BitmapImage image = new BitmapImage(new Uri(storageFolder.Path + "\\ProfilePicture.PNG"));
-                userProfileImage.ProfilePicture = image;
-
                 // 向服务器上传用户头像
                 uploadTool.UploadProfileImg(imageFile, UID, "/upload-profile-image");
+
+                // 直接将选择的图片设置为头像
+                await userProfileImage.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    userProfileImage.ProfilePicture = image;
+                });
             }
         }
     }

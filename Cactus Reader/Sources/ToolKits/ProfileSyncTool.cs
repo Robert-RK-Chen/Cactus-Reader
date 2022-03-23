@@ -28,15 +28,58 @@ namespace Cactus_Reader.Sources.ToolKits
             {
                 localSettings.Values["isLogin"] = true;
                 localSettings.Values["UID"] = currentUser.UID;
-                localSettings.Values["Email"] = currentUser.Email;
-                localSettings.Values["Name"] = currentUser.Name;
-                localSettings.Values["Mobile"] = currentUser.Mobile;
-                localSettings.Values["RegistDate"] = currentUser.RegistDate.ToString("yyyy' 年 'MM' 月 'dd' 日'");
+                localSettings.Values["email"] = currentUser.Email;
+                localSettings.Values["name"] = currentUser.Name;
+                localSettings.Values["mobile"] = currentUser.Mobile;
+                localSettings.Values["registDate"] = currentUser.RegistDate.ToString("yyyy' 年 'MM' 月 'dd' 日'");
                 return true;
             }
             catch (Exception)
             {
                 return false;
+            }
+        }
+
+        private async void SetDownload(DownloadOperation opr, bool starting)
+        {
+            // 当上传进度更新时能收到报告
+            Progress<DownloadOperation> progressReporter = new Progress<DownloadOperation>(OnProgressHandler);
+            // 启动或附加任务
+            try
+            {
+                if (starting)
+                {
+                    await opr.StartAsync().AsTask(progressReporter);
+                }
+                else
+                {
+                    await opr.AttachAsync().AsTask(progressReporter);
+                }
+            }
+            catch (Exception ex)
+            {
+                var state = BackgroundTransferError.GetStatus(ex.HResult);
+                System.Diagnostics.Debug.WriteLine("错误：" + state);
+            }
+        }
+
+        private void OnProgressHandler(DownloadOperation p)
+        {
+            BackgroundDownloadProgress progress = p.Progress;
+            switch (progress.Status)
+            {
+                case BackgroundTransferStatus.Canceled:
+                    System.Diagnostics.Debug.WriteLine("任务已取消。");
+                    break;
+                case BackgroundTransferStatus.Completed:
+                    System.Diagnostics.Debug.WriteLine("任务已完成。");
+                    break;
+                case BackgroundTransferStatus.Error:
+                    System.Diagnostics.Debug.WriteLine("发生了错误。");
+                    break;
+                case BackgroundTransferStatus.Running:
+                    System.Diagnostics.Debug.WriteLine("任务执行中。");
+                    break;
             }
         }
 
@@ -56,8 +99,7 @@ namespace Cactus_Reader.Sources.ToolKits
                     // 下载服务器资源
                     BackgroundDownloader downloader = new BackgroundDownloader();
                     DownloadOperation download = downloader.CreateDownload(source, userImageFile);
-                    await download.StartAsync();
-                    System.Diagnostics.Debug.WriteLine("同步完成！");
+                    SetDownload(download, true);
                 }
             }
             catch (Exception)

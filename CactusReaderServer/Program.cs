@@ -63,6 +63,11 @@ namespace CactusReaderService
                 string imgPath = profilePath + UID + @"\";
                 string newFilePath = Path.Combine(imgPath, "ProfilePicture.PNG");
 
+                if (!Directory.Exists(imgPath))
+                {
+                    Directory.CreateDirectory(imgPath);
+                }
+
                 // 如果文件存在，将其删除
                 if (File.Exists(newFilePath))
                 {

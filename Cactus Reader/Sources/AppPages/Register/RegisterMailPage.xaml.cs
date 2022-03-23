@@ -3,6 +3,9 @@ using Cactus_Reader.Sources.AppPages.Login;
 using Cactus_Reader.Sources.ToolKits;
 using System;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
@@ -98,8 +101,19 @@ namespace Cactus_Reader.Sources.AppPages.Register
             alertMsg.Visibility = Visibility.Collapsed;
         }
 
-        private void OpenServiceWindow(object sender, RoutedEventArgs e)
+        private async void ReadServiceAndRivacy(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
+            CoreApplicationView newView = CoreApplication.CreateNewView();
+            int newViewId = 0;
+            await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                Frame frame = new Frame();
+                frame.Navigate(typeof(ServiceAndPrivacy), null, new DrillInNavigationTransitionInfo());
+                Window.Current.Content = frame;
+                Window.Current.Activate();
+                newViewId = ApplicationView.GetForCurrentView().Id;
+            });
+            bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
         }
     }
 }

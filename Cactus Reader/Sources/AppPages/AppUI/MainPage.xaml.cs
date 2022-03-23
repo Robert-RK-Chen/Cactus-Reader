@@ -28,7 +28,6 @@ namespace Cactus_Reader
         public static MainPage mainPage;
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         ProfileSyncTool syncTool = ProfileSyncTool.Instance;
-        readonly IFreeSql freeSql = IFreeSqlService.Instance;
 
         public MainPage()
         {
@@ -278,6 +277,7 @@ namespace Cactus_Reader
         {
             string UID = localSettings.Values["UID"].ToString();
             syncTool.SyncUserImage(UID);
+            // 三秒后让同步提示框收起。
         }
     }
 }
