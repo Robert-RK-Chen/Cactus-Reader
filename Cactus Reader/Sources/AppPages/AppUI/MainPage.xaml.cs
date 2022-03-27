@@ -108,7 +108,7 @@ namespace Cactus_Reader
         {
             ("library", typeof(LibraryPage)),
             ("favorite", typeof(FavoritePage)),
-            ("notes", typeof(NotesPage)),
+            ("sticky", typeof(StickyPage)),
             ("plugins", typeof(PluginsPage)),
             ("recycle", typeof(RecyclePage)),
             ("about", typeof(AboutInfoPage))
@@ -273,11 +273,17 @@ namespace Cactus_Reader
         /// 同步的类型：用户配置文件；加载时间：登陆完成后；
         /// 在用户的应用端创建一个 UID 的文件夹保存用户数据。
         /// </summary>
-        private void AsyncUserProfile()
+        private async void AsyncUserProfile()
         {
             string UID = localSettings.Values["UID"].ToString();
             syncTool.SyncUserImage(UID);
+
             // 三秒后让同步提示框收起。
+            await Task.Delay(3200);
+            await syncInfo.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                syncInfo.IsOpen = false;
+            });
         }
     }
 }

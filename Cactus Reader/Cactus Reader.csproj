@@ -18,8 +18,9 @@
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-    <PackageCertificateThumbprint>0FA8AA04055E70CE76698E89442B0B364D9DD4F5</PackageCertificateThumbprint>
-    <PackageCertificateKeyFile />
+    <PackageCertificateThumbprint>7B8776C2828D8B3D7D2E1857EDB4CB9003033D89</PackageCertificateThumbprint>
+    <PackageCertificateKeyFile>
+    </PackageCertificateKeyFile>
     <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
@@ -154,9 +155,6 @@
     <Compile Include="Sources\AppPages\AppUI\NewStickyPage.xaml.cs">
       <DependentUpon>NewStickyPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Sources\AppPages\AppUI\NotesPage.xaml.cs">
-      <DependentUpon>NotesPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Sources\AppPages\AppUI\PluginsPage.xaml.cs">
       <DependentUpon>PluginsPage.xaml</DependentUpon>
     </Compile>
@@ -165,6 +163,9 @@
     </Compile>
     <Compile Include="Sources\AppPages\AppUI\SettingPage.xaml.cs">
       <DependentUpon>SettingPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sources\AppPages\AppUI\StickyPage.xaml.cs">
+      <DependentUpon>StickyPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Sources\AppPages\Login\ForgetPassword.xaml.cs">
       <DependentUpon>ForgetPassword.xaml</DependentUpon>
@@ -215,7 +216,7 @@
     <Compile Include="Sources\WindowsHello\MicrosoftPassportHelper.cs" />
     <Compile Include="Sources\ToolKits\MailCodeSender.cs" />
     <Compile Include="Sources\WindowsHello\PassportDevice.cs" />
-    <Compile Include="Sources\ToolKits\StickyQuickView.cs" />
+    <Compile Include="Sources\StickyNotes\StickyQuickView.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -312,10 +313,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Sources\AppPages\AppUI\NotesPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Sources\AppPages\AppUI\PluginsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -325,6 +322,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Sources\AppPages\AppUI\SettingPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sources\AppPages\AppUI\StickyPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -395,10 +396,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FreeSql">
-      <Version>3.0.100</Version>
+      <Version>3.2.100</Version>
     </PackageReference>
     <PackageReference Include="FreeSql.Provider.MySql">
-      <Version>3.0.100</Version>
+      <Version>3.2.100</Version>
     </PackageReference>
     <PackageReference Include="MailKit">
       <Version>3.1.1</Version>

@@ -7,15 +7,15 @@ namespace Cactus_Reader.Sources.ToolKits
     {
         readonly static string DB_PROPERTY = @"
         {
-            'Server=': 'sh-cdb-0q4l9dac.sql.tencentcdb.com',
-            ';Port=': '59121',
-            ';User ID=': 'RobertChen',
-            ';Password=': '#TSLover1213',
-            ';Database=': 'cactus_reader',
-            ';Charset=': 'GBK',
-            ';SslMode=': 'none',
-            ';Min Pool Size=': '1',
-            ';Max Pool Size=': '5'
+            'Server=': 'sh-cdb-0q4l9dac.sql.tencentcdb.com;',
+            'Port=': '59121;',
+            'User ID=': 'RobertChen;',
+            'Password=': '#TSLover1213;',
+            'Database=': 'cactus_reader;',
+            'Charset=': 'GBK;',
+            'SslMode=': 'none;',
+            'Min Pool Size=': '1;',
+            'Max Pool Size=': '5;'
         }";
 
         public static string GetDatabase()

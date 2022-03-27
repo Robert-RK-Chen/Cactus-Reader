@@ -6,7 +6,14 @@ namespace Cactus_Reader.Sources.StickyNotes
 {
     public class ThemeColorBrushTool
     {
-        private ThemeColorBrush colorBrush = new ThemeColorBrush();
+        readonly ThemeColorBrush colorBrush = ThemeColorBrush.Instance;
+
+        private static ThemeColorBrushTool instance;
+
+        public static ThemeColorBrushTool Instance
+        {
+            get { return instance ?? (instance = new ThemeColorBrushTool()); }
+        }
 
         public ThemeColorBrush GetThemeColorBrush(string theme, bool isFoucus)
         {

@@ -23,7 +23,7 @@
                             <Image Source="/Assets/StoreLogo.png" Stretch="Uniform"/>
                             <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="16, 0, 0, 0">
                                 <TextBlock Text="Cactus Reader" FontWeight="SemiBold" FontSize="16"/>
-                                <TextBlock Text="Version 1.0.0.0 内部测试" Foreground="#9A9A9A" Margin="0, 4, 0, 0"/>
+                                <TextBlock Text="Version 1.0.1.0 内部测试" Foreground="#9A9A9A" Margin="0, 4, 0, 0"/>
                             </StackPanel>
                         </StackPanel>
                         <Button Grid.Row="1" Content="立即检查更新" HorizontalAlignment="Right"
@@ -61,8 +61,8 @@
                     <StackPanel Orientation="Vertical" Margin="0, 12, 0, 0" Spacing="12">
                         <HyperlinkButton Content="unDraw, Open-source illustrations" Padding="0"
                                      NavigateUri="https://undraw.co"/>
-                        <HyperlinkButton Content="Cactus Reader 服务协议" Padding="0" Click="ReadServiceAndRivacy"/>
-                        <HyperlinkButton Content="Cactus Reader 隐私声明" Padding="0" Click="ReadServiceAndRivacy"/>
+                        <HyperlinkButton Content="Cactus Reader 服务协议" Padding="0" Click="ReadServiceAndPrivacy"/>
+                        <HyperlinkButton Content="Cactus Reader 隐私声明" Padding="0" Click="ReadServiceAndPrivacy"/>
                     </StackPanel>
 
                     <TextBlock Text="应用" FontSize="20" FontWeight="SemiBold" Margin="0, 20, 0, 0"/>

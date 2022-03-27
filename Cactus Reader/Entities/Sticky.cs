@@ -12,6 +12,6 @@ namespace Cactus_Reader.Entities
 
         public string StickySerial { get; set; }
 
-        public string QuickView { get; set; }
+        public string QuickViewText { get; set; }
     }
 }

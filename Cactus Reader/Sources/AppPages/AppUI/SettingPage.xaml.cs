@@ -13,7 +13,6 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.Storage.Pickers;
 using Cactus_Reader.Sources.ToolKits;
-using System.Threading.Tasks;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -200,7 +199,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             {
                 using (var synthesizer = new SpeechSynthesizer(config, null))
                 {
-                    string exampleText = "欢迎使用 Cactus Reader。我是讲述人：" + voiceCombo.SelectedItem;
+                    string exampleText = "你好，我是讲述人：" + voiceCombo.SelectedItem + "，欢迎使用 Cactus Reader。";
                     using (var result = await synthesizer.SpeakTextAsync(exampleText).ConfigureAwait(false))
                     {
                         if (result.Reason == ResultReason.SynthesizingAudioCompleted)

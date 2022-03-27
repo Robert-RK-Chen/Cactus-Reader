@@ -53,7 +53,7 @@
                                 <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE728;"/>
                             </muxc:NavigationViewItem.Icon>
                         </muxc:NavigationViewItem>
-                        <muxc:NavigationViewItem Tag="notes" Content="便签本" Height="44">
+                        <muxc:NavigationViewItem Tag="sticky" Content="便签本" Height="44">
                             <muxc:NavigationViewItem.Icon>
                                 <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE70B;"/>
                             </muxc:NavigationViewItem.Icon>
@@ -78,9 +78,9 @@
                     </muxc:NavigationView.FooterMenuItems>
 
                     <Grid>
-                        <!--<muxc:InfoBar x:Name="syncInfo" Grid.Row="0" IsOpen="True" Title="请稍等" IsClosable="False"
+                        <muxc:InfoBar x:Name="syncInfo" Grid.Row="0" IsOpen="True" Title="请稍等" IsClosable="False"
                                       Message="我们正在同步你的数据。" Margin="12" Width="320" HorizontalAlignment="Right"
-                                      Background="#E2F1FF">
+                                      Background="#E2F1FF" Opacity="1">
                             <muxc:InfoBar.IconSource>
                                 <muxc:SymbolIconSource Symbol="Sync" />
                             </muxc:InfoBar.IconSource>
@@ -92,7 +92,7 @@
                                     <EdgeUIThemeTransition Edge="Top"/>
                                 </TransitionCollection>
                             </muxc:InfoBar.Transitions>
-                        </muxc:InfoBar>-->
+                        </muxc:InfoBar>
                         <Frame x:Name="contentFrame" />
                     </Grid>
                 </muxc:NavigationView>

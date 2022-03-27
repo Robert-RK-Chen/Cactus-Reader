@@ -10,7 +10,7 @@
   <Identity
     Name="cactus.reader.robertch.cn"
     Publisher="CN=Robert Chen"
-    Version="1.0.0.0" />
+    Version="1.0.1.0" />
 
   <mp:PhoneIdentity PhoneProductId="47624d53-0175-4f5b-a487-ce1018ca6487" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 

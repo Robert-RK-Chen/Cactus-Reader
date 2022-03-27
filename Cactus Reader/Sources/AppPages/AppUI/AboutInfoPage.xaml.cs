@@ -36,7 +36,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             }
         }
 
-        private async void ReadServiceAndRivacy(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        private async void ReadServiceAndPrivacy(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
             CoreApplicationView newView = CoreApplication.CreateNewView();
             int newViewId = 0;
