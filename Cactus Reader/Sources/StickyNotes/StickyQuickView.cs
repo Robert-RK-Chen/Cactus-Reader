@@ -1,6 +1,8 @@
 ﻿using Cactus_Reader.Sources.AppPages.AppUI;
 using System;
+using System.Collections.Generic;
 using Windows.ApplicationModel.Core;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Core;
@@ -85,6 +87,7 @@ typeof(string), typeof(StickyQuickView), new PropertyMetadata(Guid.Empty));
         {
             base.OnApplyTemplate();
             MenuFlyoutItem addItem = GetTemplateChild("OpenSticky") as MenuFlyoutItem;
+            MenuFlyoutItem shareItem = GetTemplateChild("ShareSticky") as MenuFlyoutItem;
             MenuFlyoutItem deleteItem = GetTemplateChild("DeleteSticky") as MenuFlyoutItem;
 
             // 解除事件
@@ -93,6 +96,7 @@ typeof(string), typeof(StickyQuickView), new PropertyMetadata(Guid.Empty));
             PointerExited -= QuickViewPointExited;
             DoubleTapped -= QuickViewDoubleTapped;
             addItem.Click -= QuickViewDoubleTapped;
+            shareItem.Click -= ShareSticky;            
             deleteItem.Click -= DeleteSticky;
 
             // 注册事件
@@ -101,6 +105,7 @@ typeof(string), typeof(StickyQuickView), new PropertyMetadata(Guid.Empty));
             PointerExited += QuickViewPointExited;
             DoubleTapped += QuickViewDoubleTapped;
             addItem.Click += QuickViewDoubleTapped;
+            shareItem.Click += ShareSticky;            
             deleteItem.Click += DeleteSticky;
         }
 
@@ -108,6 +113,8 @@ typeof(string), typeof(StickyQuickView), new PropertyMetadata(Guid.Empty));
         {
             TitleBackground = brushTool.GetThemeColorBrush(ThemeKind, false).TitleBrush;
             ViewBackground = brushTool.GetThemeColorBrush(ThemeKind, false).BackgroundBrush;
+            DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
+            dataTransferManager.DataRequested += DataTransferManagerDataRequested;
         }
 
         private void QuickViewPointEntered(object sender, PointerRoutedEventArgs e)
@@ -153,6 +160,25 @@ typeof(string), typeof(StickyQuickView), new PropertyMetadata(Guid.Empty));
             stickyFolder = await stickyFolder.GetFolderAsync("Sticky");
             StorageFile stickyFile = await stickyFolder.GetFileAsync(StickySerial + ".json");
             await stickyFile.DeleteAsync();
+        }
+
+        private async void DataTransferManagerDataRequested(DataTransferManager sender, DataRequestedEventArgs args)
+        {
+            string UID = localSettings.Values["UID"].ToString();
+            StorageFolder stickyFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
+            stickyFolder = await stickyFolder.GetFolderAsync("Sticky");
+            StorageFile stickyFile = await stickyFolder.GetFileAsync(StickySerial + ".json");
+
+            DataRequest request = args.Request;
+            request.Data.SetStorageItems(new List<StorageFile> { stickyFile });
+            request.Data.SetText("我最近读了一篇好文章，把感想分享给你！");
+            request.Data.Properties.Title = localSettings.Values["name"].ToString();
+            request.Data.Properties.Description = "Cactus Notes 分享";
+        }
+        
+        private void ShareSticky(object sender, RoutedEventArgs e)
+        {
+            DataTransferManager.ShowShareUI();
         }
     }
 }

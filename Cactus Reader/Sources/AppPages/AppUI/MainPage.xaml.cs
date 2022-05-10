@@ -136,12 +136,12 @@ namespace Cactus_Reader
         {
             if (args.IsSettingsInvoked == true)
             {
-                NavViewControlNavigate("settings", args.RecommendedNavigationTransitionInfo);
+                NavViewControlNavigate("settings", new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight });
             }
             else if (args.InvokedItemContainer != null)
             {
                 var navItemTag = args.InvokedItemContainer.Tag.ToString();
-                NavViewControlNavigate(navItemTag, args.RecommendedNavigationTransitionInfo);
+                NavViewControlNavigate(navItemTag, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight });
             }
         }
 

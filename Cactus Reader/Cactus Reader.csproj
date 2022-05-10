@@ -18,7 +18,7 @@
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-    <PackageCertificateThumbprint>7B8776C2828D8B3D7D2E1857EDB4CB9003033D89</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>22E6AC5F68105203AD6F01678A5361420CDD8A02</PackageCertificateThumbprint>
     <PackageCertificateKeyFile>
     </PackageCertificateKeyFile>
     <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
@@ -135,6 +135,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Entities\Code.cs" />
+    <Compile Include="Entities\Privatekey.cs" />
     <Compile Include="Entities\Sticky.cs" />
     <Compile Include="Entities\ThemeColorBrush.cs" />
     <Compile Include="Entities\User.cs" />
@@ -234,6 +235,7 @@
     <Content Include="Assets\LargeTile.scale-150.png" />
     <Content Include="Assets\LargeTile.scale-200.png" />
     <Content Include="Assets\LargeTile.scale-400.png" />
+    <Content Include="Assets\None.png" />
     <Content Include="Assets\SmallTile.scale-100.png" />
     <Content Include="Assets\SmallTile.scale-125.png" />
     <Content Include="Assets\SmallTile.scale-150.png" />
@@ -396,16 +398,16 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FreeSql">
-      <Version>3.2.100</Version>
+      <Version>3.2.610</Version>
     </PackageReference>
     <PackageReference Include="FreeSql.Provider.MySql">
-      <Version>3.2.100</Version>
+      <Version>3.2.610</Version>
     </PackageReference>
     <PackageReference Include="MailKit">
-      <Version>3.1.1</Version>
+      <Version>3.2.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CognitiveServices.Speech">
-      <Version>1.20.0</Version>
+      <Version>1.21.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.13</Version>
@@ -430,7 +432,8 @@
     <None Include="Assets\隐私政策.rtf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Content Include="Sources\Fonts\HARMONYOS_SANS_SC_REGULAR.TTF" />
+    <Content Include="Sources\Fonts\MiSans-Bold.ttf" />
+    <Content Include="Sources\Fonts\MiSans-Regular.ttf" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

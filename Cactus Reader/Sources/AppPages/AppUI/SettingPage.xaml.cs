@@ -1,18 +1,23 @@
-﻿using Microsoft.CognitiveServices.Speech;
+﻿using Cactus_Reader.Entities;
+using Cactus_Reader.Sources.ToolKits;
+using Cactus_Reader.Sources.WindowsHello;
+using Microsoft.CognitiveServices.Speech;
+using Microsoft.Toolkit.Uwp.Notifications;
 using System;
+using System.IO;
+using System.Threading.Tasks;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
+using Windows.Storage.Pickers;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
-using Windows.UI.Xaml.Navigation;
-using System.IO;
-using Microsoft.Toolkit.Uwp.Notifications;
 using Windows.UI.Xaml.Media.Imaging;
-using Windows.Storage.Pickers;
-using Cactus_Reader.Sources.ToolKits;
+using Windows.UI.Xaml.Navigation;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -24,19 +29,33 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
     public sealed partial class SettingPage : Page
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        private MediaPlayer mediaPlayer;
+        readonly IFreeSql freeSql = IFreeSqlService.Instance;
         readonly ProfileUploadTool uploadTool = ProfileUploadTool.Instance;
+        private MediaPlayer mediaPlayer;
 
         public SettingPage()
         {
             InitializeComponent();
-            if (localSettings.Values["appTheme"] == null) { localSettings.Values["appTheme"] = "跟随系统主题"; }
-            if (localSettings.Values["font"] == null) { localSettings.Values["font"] = "宋体"; }
-            if (localSettings.Values["fontSize"] == null) { localSettings.Values["fontSize"] = 15; }
-            if (localSettings.Values["lang"] == null) { localSettings.Values["lang"] = "中文（简体中文）"; }
-            if (localSettings.Values["voice"] == null) { localSettings.Values["voice"] = "Azure TTS - 晓晓"; }
-            if (localSettings.Values["speed"] == null) { localSettings.Values["speed"] = 1.0; }
-            if (localSettings.Values["tune"] == null) { localSettings.Values["tune"] = 1.0; }
+
+            if (localSettings.Values["appThemeIndex"] == null) { 
+                localSettings.Values["appThemeIndex"] = 2; }
+            if (localSettings.Values["fontIndex"] == null) { 
+                localSettings.Values["fontIndex"] = 0; }
+            if (localSettings.Values["fontSize"] == null) { 
+                localSettings.Values["fontSize"] = 15; }
+            if (localSettings.Values["voiceIndex"] == null) { 
+                localSettings.Values["voiceIndex"] = 0; }
+            if (localSettings.Values["voiceName"] == null) {
+                localSettings.Values["voiceName"] = "zh-CN-XiaoxiaoNeural"; }
+            if (localSettings.Values["voiceLang"] == null) {
+                localSettings.Values["voiceLang"] = "Chinese"; }
+            if (localSettings.Values["speed"] == null) { 
+                localSettings.Values["speed"] = 1.0; }
+            if (localSettings.Values["tune"] == null) { 
+                localSettings.Values["tune"] = 1.0; }
+            if (localSettings.Values["useWindowsHello"] == null) { 
+                localSettings.Values["useWindowsHello"] = false; }
+
             mediaPlayer = new MediaPlayer();
         }
 
@@ -50,11 +69,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             email.Text = localSettings.Values["email"].ToString();
 
             // TODO: Load App Settings
-            appThemeCombo.SelectedValue = localSettings.Values["appTheme"].ToString();
-            fontsCombo.SelectedValue = localSettings.Values["font"].ToString();
             previewText.FontSize = (int)localSettings.Values["fontSize"];
-            langCombo.SelectedValue = localSettings.Values["lang"].ToString();
-            voiceCombo.SelectedValue = localSettings.Values["voice"].ToString();
             speedSlider.Value = (double)localSettings.Values["speed"];
             tuneSlider.Value = (double)localSettings.Values["tune"];
 
@@ -63,7 +78,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             {
                 StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
                 BitmapImage image = new BitmapImage(new Uri(storageFolder.Path + "\\ProfilePicture.PNG"));
-                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
                     userProfileImage.ProfilePicture = image;
                 });
@@ -95,40 +110,78 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             MainPage.mainPage.mainContent.Navigate(typeof(StartPage), null, new DrillInNavigationTransitionInfo());
         }
 
+        private async void ChangeProfileImg(object sender, RoutedEventArgs e)
+        {
+            string UID = localSettings.Values["UID"].ToString();
+
+            FileOpenPicker picker = new FileOpenPicker
+            {
+                SuggestedStartLocation = PickerLocationId.ComputerFolder
+            };
+            picker.FileTypeFilter.Add(".bmp");
+            picker.FileTypeFilter.Add(".png");
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpge");
+            StorageFile imageFile = await picker.PickSingleFileAsync();
+
+            if (imageFile != null)
+            {
+                BitmapImage image = new BitmapImage(new Uri(imageFile.Path));
+
+                // 本地留存
+                StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
+                await imageFile.CopyAsync(storageFolder, "ProfilePicture.PNG", NameCollisionOption.ReplaceExisting);
+
+                // 直接将选择的图片设置为头像
+                await userProfileImage.ProfilePicture.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    userProfileImage.ProfilePicture = image;
+                });
+
+                System.Diagnostics.Debug.WriteLine(userProfileImage.ProfilePicture.ToString());
+
+                // 向服务器上传用户头像
+                uploadTool.UploadProfileImg(imageFile, UID, "/upload-profile-image");
+            }
+            Frame.Navigate(typeof(SettingPage));
+        }
+        
+        private void LoadAppTheme(object sender, RoutedEventArgs e)
+        {
+            appThemeCombo.SelectedIndex = (int)localSettings.Values["appThemeIndex"];
+        }
+        
         private void ChangeAppTheme(object sender, SelectionChangedEventArgs e)
         {
-            string appTheme = appThemeCombo.SelectedValue.ToString();
-            localSettings.Values["appTheme"] = appTheme;
-            switch (appTheme)
+            int appThemeIndex = appThemeCombo.SelectedIndex;
+            localSettings.Values["appThemeIndex"] = appThemeIndex;
+            switch (appThemeIndex)
             {
-                case "使用浅色主题":
-                    {
-                        ((Frame)Window.Current.Content).RequestedTheme = ElementTheme.Light;
-                        break;
-                    }
-                case "使用深色主题":
-                    {
-                        ((Frame)Window.Current.Content).RequestedTheme = ElementTheme.Dark;
-                        break;
-                    }
-                case "跟随系统主题":
-                    {
-                        ((Frame)Window.Current.Content).RequestedTheme = ElementTheme.Default;
-                        break;
-                    }
+                case 0:
+                    (Window.Current.Content as Frame).RequestedTheme = ElementTheme.Light;
+                    break;
+                case 1:
+                    (Window.Current.Content as Frame).RequestedTheme = ElementTheme.Dark;
+                    break;
+                case 2:
+                    (Window.Current.Content as Frame).RequestedTheme = ElementTheme.Default;
+                    break;
                 default:
-                    {
-                        ((Frame)Window.Current.Content).RequestedTheme = ElementTheme.Default;
-                        break;
-                    }
+                    (Window.Current.Content as Frame).RequestedTheme = ElementTheme.Default;
+                    break;
             }
+        }
+
+        private void LoadAppFont(object sender, RoutedEventArgs e)
+        {
+            fontsCombo.SelectedIndex = (int)localSettings.Values["fontIndex"];
         }
 
         private void ChangeAppFont(object sender, SelectionChangedEventArgs e)
         {
-            string currentFont = fontsCombo.SelectedValue.ToString();
-            localSettings.Values["font"] = currentFont;
-            previewText.FontFamily = new FontFamily(currentFont);
+            int currentFontIndex = fontsCombo.SelectedIndex;
+            localSettings.Values["fontIndex"] = currentFontIndex;
+            previewText.FontFamily = new FontFamily(fontsCombo.SelectedValue.ToString());
         }
 
         private void DeceaseFontSize(object sender, RoutedEventArgs e)
@@ -153,53 +206,86 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             }
         }
 
-        private void ChangeSpeechLang(object sender, SelectionChangedEventArgs e)
+        private void LoadSpeechVoice(object sender, RoutedEventArgs e)
         {
-            string speecLang = langCombo.SelectedValue.ToString();
-            localSettings.Values["lang"] = langCombo.SelectedValue.ToString();
+            voiceCombo.SelectedIndex = (int)localSettings.Values["voiceIndex"];
         }
-
+        
         private void ChangeSpeechVoice(object sender, SelectionChangedEventArgs e)
         {
-            string speecVoice = voiceCombo.SelectedValue.ToString();
-            localSettings.Values["voice"] = speecVoice;
+            localSettings.Values["voiceIndex"] = voiceCombo.SelectedIndex;
+            switch (voiceCombo.SelectedIndex)
+            {
+                case 0:
+                    localSettings.Values["voiceName"] = "zh-CN-XiaoxiaoNeural";
+                    localSettings.Values["voiceLang"] = "Chinese";
+                    break;
+                case 1:
+                    localSettings.Values["voiceName"] = "zh-CN-YunxiNeural";
+                    localSettings.Values["voiceLang"] = "Chinese";
+                    break;
+                case 2:
+                    localSettings.Values["voiceName"] = "zh-CN-XiaoxuanNeural";
+                    localSettings.Values["voiceLang"] = "Chinese";
+                    break;
+                case 3:
+                    localSettings.Values["voiceName"] = "zh-CN-YunyangNeural";
+                    localSettings.Values["voiceLang"] = "Chinese";
+                    break;
+                case 4:
+                    localSettings.Values["voiceName"] = "en-US-AshleyNeural";
+                    localSettings.Values["voiceLang"] = "English";
+                    break;
+                case 5:
+                    localSettings.Values["voiceName"] = "en-US-JennyNeural";
+                    localSettings.Values["voiceLang"] = "English";
+                    break;
+                case 6:
+                    localSettings.Values["voiceName"] = "en-US-BrandonNeural";
+                    localSettings.Values["voiceLang"] = "English";
+                    break;
+                case 7:
+                    localSettings.Values["voiceName"] = "en-US-ChristopherNeural";
+                    localSettings.Values["voiceLang"] = "English";
+                    break;
+                default:
+                    localSettings.Values["voiceName"] = "zh-CN-XiaoxiaoNeural";
+                    localSettings.Values["voiceLang"] = "Chinese";
+                    break;
+            }
         }
 
-        private void ChangeSpeechSpeed(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        private void ChangeSpeechSpeed(object sender, RangeBaseValueChangedEventArgs e)
         {
             double speechSpeed = speedSlider.Value;
             localSettings.Values["speed"] = speechSpeed;
         }
 
-        private void ChangeSpeechTune(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        private void ChangeSpeechTune(object sender, RangeBaseValueChangedEventArgs e)
         {
-            double speechTune = tuneSlider.Value;
-            localSettings.Values["tune"] = speechTune;
+            double voiceName = tuneSlider.Value;
+            localSettings.Values["tune"] = voiceName;
         }
 
         private async void PlaySpeechTextExample(object sender, RoutedEventArgs e)
         {
             // 语速与语调暂不可用
             var config = SpeechConfig.FromSubscription("4c28aeca36ba4709a5c52a2ec64193e6", "eastasia");
-            switch (localSettings.Values["voice"].ToString())
+            config.SpeechSynthesisVoiceName = localSettings.Values["voiceName"].ToString();
+            string exampleText;
+            if (localSettings.Values["voiceLang"].ToString().Equals("Chinese"))
             {
-                case "Azure TTS - 晓晓":
-                    config.SpeechSynthesisVoiceName = "zh-CN-XiaoxiaoNeural"; break;
-                case "Azure TTS - 云希":
-                    config.SpeechSynthesisVoiceName = "zh-CN-YunxiNeural"; break;
-                case "Azure TTS - 晓萱":
-                    config.SpeechSynthesisVoiceName = "zh-CN-XiaoxuanNeural"; break;
-                case "Azure TTS - 云杨":
-                    config.SpeechSynthesisVoiceName = "zh-CN-YunyangNeural"; break;
-                default:
-                    config.SpeechSynthesisVoiceName = "zh-CN-XiaoxiaoNeural"; break;
+                exampleText = "你好，我是讲述人：" + voiceCombo.SelectedItem + ", 欢迎使用 Cactus Reader。";
             }
-
+            else
+            {
+                exampleText = "Nice to meet you, this is " + voiceCombo.SelectedItem + ". Welcome to Cactus Reader.";
+            }
+            
             try
             {
                 using (var synthesizer = new SpeechSynthesizer(config, null))
                 {
-                    string exampleText = "你好，我是讲述人：" + voiceCombo.SelectedItem + "，欢迎使用 Cactus Reader。";
                     using (var result = await synthesizer.SpeakTextAsync(exampleText).ConfigureAwait(false))
                     {
                         if (result.Reason == ResultReason.SynthesizingAudioCompleted)
@@ -233,36 +319,75 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             }
         }
 
-        private async void ChangeProfileImg(object sender, RoutedEventArgs e)
+        private async void SetPrivateKey(object sender, RoutedEventArgs e)
         {
-            string UID = localSettings.Values["UID"].ToString();
-
-            FileOpenPicker picker = new FileOpenPicker
+            PasswordBox passwordBox = new PasswordBox
             {
-                SuggestedStartLocation = PickerLocationId.ComputerFolder
+                Width = 360,
+                PlaceholderText = "密码长度至少为 6 位",
+                VerticalAlignment = VerticalAlignment.Bottom,
+                VerticalContentAlignment = VerticalAlignment.Center,
+                Header = "需要输入个人密码才能查看便签本中的内容。",
             };
-            picker.FileTypeFilter.Add(".bmp");
-            picker.FileTypeFilter.Add(".png");
-            picker.FileTypeFilter.Add(".jpg");
-            picker.FileTypeFilter.Add(".jpge");
-            StorageFile imageFile = await picker.PickSingleFileAsync();
 
-            if (imageFile != null)
+            ContentDialog setPrivateKeyDialog = new ContentDialog
             {
-                BitmapImage image = new BitmapImage(new Uri(imageFile.Path));
-
-                // 本地留存
-                StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
-                await imageFile.CopyAsync(storageFolder, "ProfilePicture.PNG", NameCollisionOption.ReplaceExisting);
-
-                // 向服务器上传用户头像
-                uploadTool.UploadProfileImg(imageFile, UID, "/upload-profile-image");
-
-                // 直接将选择的图片设置为头像
-                await userProfileImage.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                Title = "设置个人密码",
+                Content = passwordBox,
+                CloseButtonText = "取消",
+                PrimaryButtonText = "确定",
+                DefaultButton = ContentDialogButton.Primary
+            };
+            ContentDialogResult result = await setPrivateKeyDialog.ShowAsync();
+            
+            while (result == ContentDialogResult.Primary)
+            {
+                string password = passwordBox.Password;
+                if(password.Length >= 6)
                 {
-                    userProfileImage.ProfilePicture = image;
-                });
+                    localSettings.Values.Add("privateKey", passwordBox.Password);
+                    Privatekey privatekey = new Privatekey
+                    {
+                        UID = localSettings.Values["UID"].ToString(),
+                        Key = passwordBox.Password
+                    };
+                    await Task.Factory.StartNew(() => freeSql.Insert(privatekey).ExecuteAffrows());
+                    break;
+                }
+                else
+                {
+                    result = await setPrivateKeyDialog.ShowAsync();
+                }
+            }
+        }
+
+        private void LoadedWindowsHello(object sender, object args)
+        {
+            windowsHelloSwitch.IsOn = (bool)localSettings.Values["useWindowsHello"];
+        }
+        
+        private async void OpenWindowsHello(object sender, RoutedEventArgs e)
+        {            
+            string UID = localSettings.Values["UID"].ToString();
+            string name = localSettings.Values["name"].ToString();
+
+            localSettings.Values["useWindowsHello"] = windowsHelloSwitch.IsOn;
+            if(windowsHelloSwitch.IsOn)
+            {
+                windowsHelloSwitch.IsEnabled = false;
+                bool isSuccessful = await MicrosoftPassportHelper.CreatePassportKeyAsync(UID, name);
+                if (isSuccessful)
+                {
+                    ContentDialog contentDialog = new ContentDialog
+                    {
+                        Title = "Windows Hello 验证成功",
+                        Content = "你现在可以使用 Windows Hello 来查看和管理锁定的便签。",
+                        PrimaryButtonText = "确定",
+                        DefaultButton = ContentDialogButton.Primary
+                    };
+                    await contentDialog.ShowAsync();
+                    windowsHelloSwitch.IsEnabled = true;
+                }
             }
         }
     }

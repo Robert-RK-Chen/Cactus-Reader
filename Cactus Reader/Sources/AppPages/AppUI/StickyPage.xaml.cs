@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Windows.ApplicationModel.Core;
+using Windows.Foundation;
 using Windows.Storage;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
@@ -66,7 +67,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             {
                 localSettings.Values["EmptyPlaceholderOpacity"] = 1;
             }
-            EmptyPlaceholder.Opacity = int.Parse(localSettings.Values["EmptyPlaceholderOpacity"].ToString());
+            EmptyPlaceholder.Opacity = (int)localSettings.Values["EmptyPlaceholderOpacity"];
         }
 
         private async void CreateNewSticky(object sender, Windows.UI.Xaml.RoutedEventArgs e)
@@ -98,6 +99,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 Window.Current.Activate();
                 newViewId = ApplicationView.GetForCurrentView().Id;
             });
+            ApplicationView.PreferredLaunchViewSize = new Size(300, 300);
             bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
         }
     }

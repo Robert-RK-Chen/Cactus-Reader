@@ -80,7 +80,7 @@
                     <Grid>
                         <muxc:InfoBar x:Name="syncInfo" Grid.Row="0" IsOpen="True" Title="请稍等" IsClosable="False"
                                       Message="我们正在同步你的数据。" Margin="12" Width="320" HorizontalAlignment="Right"
-                                      Background="#E2F1FF" Opacity="1">
+                                      Background="{StaticResource SystemControlAcrylicElementBrush}" Canvas.ZIndex="2">
                             <muxc:InfoBar.IconSource>
                                 <muxc:SymbolIconSource Symbol="Sync" />
                             </muxc:InfoBar.IconSource>
@@ -93,7 +93,7 @@
                                 </TransitionCollection>
                             </muxc:InfoBar.Transitions>
                         </muxc:InfoBar>
-                        <Frame x:Name="contentFrame" />
+                        <Frame x:Name="contentFrame"/>
                     </Grid>
                 </muxc:NavigationView>
             </Grid>

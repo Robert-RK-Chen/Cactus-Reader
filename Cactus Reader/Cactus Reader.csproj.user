@@ -16,10 +16,10 @@
     <PackageOptionalProjectsInIdeBuilds>False</PackageOptionalProjectsInIdeBuilds>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <AllowLocalNetworkLoopback>false</AllowLocalNetworkLoopback>
+    <AllowLocalNetworkLoopback>true</AllowLocalNetworkLoopback>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <AllowLocalNetworkLoopback>false</AllowLocalNetworkLoopback>
+    <AllowLocalNetworkLoopback>true</AllowLocalNetworkLoopback>
     <UseEmulator>false</UseEmulator>
     <DeviceId>30f105c9-681e-420b-a277-7c086ead8a4e</DeviceId>
     <CommandLineArguments />

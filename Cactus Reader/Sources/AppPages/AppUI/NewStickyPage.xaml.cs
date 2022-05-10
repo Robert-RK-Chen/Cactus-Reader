@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using Windows.ApplicationModel.Core;
+using Windows.Foundation;
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Core;
@@ -45,9 +46,12 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             titleBar.ButtonPressedBackgroundColor = Colors.Transparent;
             titleBar.ButtonPressedBackgroundColor = Colors.Transparent;
             Window.Current.SetTitleBar(StickyTitle);
+        }
 
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            base.OnNavigatingFrom(e);
             SystemNavigationManagerPreview.GetForCurrentView().CloseRequested -= StickyPageCloseRequested;
-            SystemNavigationManagerPreview.GetForCurrentView().CloseRequested += StickyPageCloseRequested;
         }
 
         protected async override void OnNavigatedTo(NavigationEventArgs e)
@@ -55,6 +59,8 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             // 便签界面接受便签序列号参数，序列号的来源为新建便签与打开的便签
             // 拿到序列号后检索便签文件，如果文件存在则读取，不存在则新建
             base.OnNavigatedTo(e);
+            SystemNavigationManagerPreview.GetForCurrentView().CloseRequested += StickyPageCloseRequested;
+
             quickView = (StickyQuickView)e.Parameter;
             string serial = string.Empty;
             await quickView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>

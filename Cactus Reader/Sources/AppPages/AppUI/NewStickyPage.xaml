@@ -9,7 +9,8 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
     
     <Page.Resources>
-        <FontFamily x:Key="HarmonyOSSans">/Sources/Fonts/HARMONYOS_SANS_SC_REGULAR.TTF#HarmonyOS Sans SC</FontFamily>
+        <FontFamily x:Key="MiSans">/Sources/Fonts/MiSans-Regular.ttf#MiSans</FontFamily>
+        <FontFamily x:Key="MiSansBold">/Sources/Fonts/MiSans-Bold.ttf#MiSansBold</FontFamily>
         <FontFamily x:Key="SegoeFluentIcons">/Sources/Fonts/Segoe Fluent Icons.ttf#Segoe Fluent Icons</FontFamily>
     </Page.Resources>
 
@@ -24,7 +25,7 @@
         </Border>
         <RichEditBox Style="{StaticResource StickyEditBoxStyle}" x:Name="StickyEditBox" Grid.Row="1" BorderThickness="0"
                      CornerRadius="0" BorderBrush="Transparent" Background="Transparent" Padding="12" FontSize="15"
-                     PlaceholderText="记笔记......" FontFamily="{StaticResource HarmonyOSSans}" VerticalAlignment="Stretch"
+                     PlaceholderText="记笔记......" FontFamily="{StaticResource MiSans}" VerticalAlignment="Stretch"
                      Foreground="Black" TextChanged="StickyEditTextChanged"/>
         <Border x:Name="StickyTools" IsHitTestVisible="True" VerticalAlignment="Top" Height="40" Canvas.ZIndex="1"
                 Grid.Row="2" BorderThickness="0, 0.5, 0, 0" BorderBrush="#C5C5C5">
@@ -132,7 +133,7 @@
                                 </MenuFlyoutSubItem.Icon>
                                 <MenuFlyoutItem Text="宋体" Click="ChangeStickyFont"/>
                                 <MenuFlyoutItem Text="微软雅黑" Click="ChangeStickyFont"/>
-                                <MenuFlyoutItem Text="HarmonyOS Sans SC" Click="ChangeStickyFont"/>
+                                <MenuFlyoutItem Text="MiSans" Click="ChangeStickyFont"/>
                             </MenuFlyoutSubItem>
                             <MenuFlyoutSubItem Text="切换主题">
                                 <MenuFlyoutSubItem.Icon>

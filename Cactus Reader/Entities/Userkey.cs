@@ -15,5 +15,7 @@ namespace Cactus_Reader.Entities
         public string DeviceID { get; set; }
 
         public DateTime LastLogonTime { get; set; }
+
+        public virtual User UidNavigation { get; set; }
     }
 }

@@ -31,7 +31,7 @@
                         <Image x:Name="appFontIcon" HorizontalAlignment="Left" VerticalAlignment="Center"
                                Source="/Assets/Square44x44Logo.png" Width="16" Height="16"/>
                         <TextBlock x:Name="appTitle" Text="Cactus Reader" VerticalAlignment="Center"
-                                   Margin="12, 0, 0, 0" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                   Margin="8, 0, 0, 0" Style="{ThemeResource CaptionTextBlockStyle}"/>
                     </StackPanel>
                 </Border>
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">

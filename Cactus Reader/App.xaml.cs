@@ -75,6 +75,30 @@ namespace Cactus_Reader
                     {
                         rootFrame.Navigate(typeof(StartPage), e.Arguments);
                     }
+
+                    Object oAppThemeIndex = localSettings.Values["appThemeIndex"];
+                    if (null != oAppThemeIndex)
+                    {
+                        switch ((int)oAppThemeIndex)
+                        {
+                            case 0:
+                                rootFrame.RequestedTheme = ElementTheme.Light;
+                                break;
+                            case 1:
+                                rootFrame.RequestedTheme = ElementTheme.Dark;
+                                break;
+                            case 2:
+                                rootFrame.RequestedTheme = ElementTheme.Default;
+                                break;
+                            default:
+                                rootFrame.RequestedTheme = ElementTheme.Default;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        rootFrame.RequestedTheme = ElementTheme.Default;
+                    }
                 }
 
                 // 确保当前窗口处于活动状态
