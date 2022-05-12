@@ -5,6 +5,7 @@ using Microsoft.CognitiveServices.Speech;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.Core;
 using Windows.Media.Playback;
@@ -37,25 +38,27 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         {
             InitializeComponent();
 
+            // Initialize App Settings
             if (localSettings.Values["appThemeIndex"] == null) { 
-                localSettings.Values["appThemeIndex"] = 2; }
-            if (localSettings.Values["fontIndex"] == null) { 
-                localSettings.Values["fontIndex"] = 0; }
+                localSettings.Values.Add("appThemeIndex", 2); }
+            if (localSettings.Values["font"] == null) { 
+                localSettings.Values.Add("font", "宋体"); }
             if (localSettings.Values["fontSize"] == null) { 
-                localSettings.Values["fontSize"] = 15; }
-            if (localSettings.Values["voiceIndex"] == null) { 
-                localSettings.Values["voiceIndex"] = 0; }
+                localSettings.Values.Add("fontSize", 15.0); }
+            if (localSettings.Values["voiceIndex"] == null) {
+                localSettings.Values.Add("voiceIndex", 0); }
             if (localSettings.Values["voiceName"] == null) {
-                localSettings.Values["voiceName"] = "zh-CN-XiaoxiaoNeural"; }
+                localSettings.Values.Add("voiceName", "zh-CN-XiaoxiaoNeural"); }
             if (localSettings.Values["voiceLang"] == null) {
-                localSettings.Values["voiceLang"] = "Chinese"; }
-            if (localSettings.Values["speed"] == null) { 
-                localSettings.Values["speed"] = 1.0; }
-            if (localSettings.Values["tune"] == null) { 
-                localSettings.Values["tune"] = 1.0; }
-            if (localSettings.Values["useWindowsHello"] == null) { 
-                localSettings.Values["useWindowsHello"] = false; }
+                localSettings.Values.Add("voiceLang", "Chinese"); }
+            if (localSettings.Values["speed"] == null) {
+                localSettings.Values.Add("speed", 1.0); }
+            if (localSettings.Values["tune"] == null) {
+                localSettings.Values.Add("tune", 1.0); }
+            if (localSettings.Values["alreadySetWindowsHello"] == null) {
+                localSettings.Values.Add("alreadySetWindowsHello", false); }
 
+            // Add a global Media Player Element
             mediaPlayer = new MediaPlayer();
         }
 
@@ -69,10 +72,21 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             email.Text = localSettings.Values["email"].ToString();
 
             // TODO: Load App Settings
-            previewText.FontSize = (int)localSettings.Values["fontSize"];
+            previewText.FontSize = (double)localSettings.Values["fontSize"];
             speedSlider.Value = (double)localSettings.Values["speed"];
             tuneSlider.Value = (double)localSettings.Values["tune"];
 
+            if (localSettings.Values.Keys.Contains("privateKey"))
+            {
+                setKeyButton.Visibility = Visibility.Collapsed;
+                closeKeyButton.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                setKeyButton.Visibility = Visibility.Visible;
+                closeKeyButton.Visibility = Visibility.Collapsed;
+            }
+            
             // TODO: Load User Profile Image
             try
             {
@@ -145,12 +159,12 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             }
             Frame.Navigate(typeof(SettingPage));
         }
-        
+
         private void LoadAppTheme(object sender, RoutedEventArgs e)
         {
             appThemeCombo.SelectedIndex = (int)localSettings.Values["appThemeIndex"];
         }
-        
+
         private void ChangeAppTheme(object sender, SelectionChangedEventArgs e)
         {
             int appThemeIndex = appThemeCombo.SelectedIndex;
@@ -174,13 +188,12 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
         private void LoadAppFont(object sender, RoutedEventArgs e)
         {
-            fontsCombo.SelectedIndex = (int)localSettings.Values["fontIndex"];
+            fontsCombo.SelectedValue = localSettings.Values["font"];
         }
 
         private void ChangeAppFont(object sender, SelectionChangedEventArgs e)
         {
-            int currentFontIndex = fontsCombo.SelectedIndex;
-            localSettings.Values["fontIndex"] = currentFontIndex;
+            localSettings.Values["font"] = fontsCombo.SelectedValue;
             previewText.FontFamily = new FontFamily(fontsCombo.SelectedValue.ToString());
         }
 
@@ -210,7 +223,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         {
             voiceCombo.SelectedIndex = (int)localSettings.Values["voiceIndex"];
         }
-        
+
         private void ChangeSpeechVoice(object sender, SelectionChangedEventArgs e)
         {
             localSettings.Values["voiceIndex"] = voiceCombo.SelectedIndex;
@@ -281,7 +294,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             {
                 exampleText = "Nice to meet you, this is " + voiceCombo.SelectedItem + ". Welcome to Cactus Reader.";
             }
-            
+
             try
             {
                 using (var synthesizer = new SpeechSynthesizer(config, null))
@@ -321,6 +334,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
         private async void SetPrivateKey(object sender, RoutedEventArgs e)
         {
+            // Show a password input UI
             PasswordBox passwordBox = new PasswordBox
             {
                 Width = 360,
@@ -339,19 +353,67 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 DefaultButton = ContentDialogButton.Primary
             };
             ContentDialogResult result = await setPrivateKeyDialog.ShowAsync();
-            
+
+            while (result == ContentDialogResult.Primary)
+            {
+                // Get password and check it's correct
+                string password = passwordBox.Password;
+                if (password.Length >= 6)
+                {
+                    // Encrypt private key
+                    localSettings.Values.Add("privateKey", MD5EncryptTool.GetEncryptedPassword(password));
+
+                    // then allow user use Windows Hello
+                    windowsHelloSwitch.IsEnabled = true;
+
+                    // hide the button and show another button
+                    setKeyButton.Visibility = Visibility.Collapsed;
+                    closeKeyButton.Visibility = Visibility.Visible;
+                    
+                    break;
+                }
+                else
+                {
+                    result = await setPrivateKeyDialog.ShowAsync();
+                }
+            }
+        }
+
+        private async void ClosePrivateKey(object sender, RoutedEventArgs e)
+        {
+            PasswordBox passwordBox = new PasswordBox
+            {
+                Width = 360,
+                PlaceholderText = "请输入你的个人密码",
+                VerticalAlignment = VerticalAlignment.Bottom,
+                VerticalContentAlignment = VerticalAlignment.Center,
+                Header = "我们需要验证你的密码，然后为你关闭密码。",
+            };
+
+            ContentDialog setPrivateKeyDialog = new ContentDialog
+            {
+                Title = "关闭个人密码",
+                Content = passwordBox,
+                CloseButtonText = "取消",
+                PrimaryButtonText = "确定",
+                DefaultButton = ContentDialogButton.Primary
+            };
+            ContentDialogResult result = await setPrivateKeyDialog.ShowAsync();
+
             while (result == ContentDialogResult.Primary)
             {
                 string password = passwordBox.Password;
-                if(password.Length >= 6)
+                byte[] privateKey = (byte[])localSettings.Values["privateKey"];
+                byte[] calibrateKey = MD5EncryptTool.GetEncryptedPassword(password);
+                if (BitConverter.ToString(privateKey) == BitConverter.ToString(calibrateKey))
                 {
-                    localSettings.Values.Add("privateKey", passwordBox.Password);
-                    Privatekey privatekey = new Privatekey
-                    {
-                        UID = localSettings.Values["UID"].ToString(),
-                        Key = passwordBox.Password
-                    };
-                    await Task.Factory.StartNew(() => freeSql.Insert(privatekey).ExecuteAffrows());
+                    localSettings.Values.Remove("privateKey");
+                    windowsHelloSwitch.IsOn = false;
+                    windowsHelloSwitch.IsEnabled = false;
+                    localSettings.Values["alreadySetWindowsHello"] = false;
+
+                    setKeyButton.Visibility = Visibility.Visible;
+                    closeKeyButton.Visibility = Visibility.Collapsed;
                     break;
                 }
                 else
@@ -363,17 +425,22 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
         private void LoadedWindowsHello(object sender, object args)
         {
-            windowsHelloSwitch.IsOn = (bool)localSettings.Values["useWindowsHello"];
-        }
-        
-        private async void OpenWindowsHello(object sender, RoutedEventArgs e)
-        {            
-            string UID = localSettings.Values["UID"].ToString();
-            string name = localSettings.Values["name"].ToString();
-
-            localSettings.Values["useWindowsHello"] = windowsHelloSwitch.IsOn;
-            if(windowsHelloSwitch.IsOn)
+            if (localSettings.Values.Keys.Contains("privateKey"))
             {
+                windowsHelloSwitch.IsEnabled = true;
+                windowsHelloSwitch.IsOn = (bool)localSettings.Values["alreadySetWindowsHello"];
+            }
+        }
+
+        private async void OpenWindowsHello(object sender, RoutedEventArgs e)
+        {
+            // 当 Windows Hello 打开时判断用户是否设置过 Windows Hello 加密
+            // 没有设置过则开始设置 Windows Hello
+            if ((bool)localSettings.Values["alreadySetWindowsHello"] == false)
+            {
+                string UID = localSettings.Values["UID"].ToString();
+                string name = localSettings.Values["name"].ToString();
+
                 windowsHelloSwitch.IsEnabled = false;
                 bool isSuccessful = await MicrosoftPassportHelper.CreatePassportKeyAsync(UID, name);
                 if (isSuccessful)
@@ -386,8 +453,20 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                         DefaultButton = ContentDialogButton.Primary
                     };
                     await contentDialog.ShowAsync();
-                    windowsHelloSwitch.IsEnabled = true;
+                    localSettings.Values["alreadySetWindowsHello"] = true;
                 }
+                else
+                {                    
+                    localSettings.Values["alreadySetWindowsHello"] = false;
+                    windowsHelloSwitch.IsOn = false;
+                }
+                windowsHelloSwitch.IsEnabled = true;
+            }
+
+            // 当用户关闭 Windows Hello 时，同时关闭密码
+            if (windowsHelloSwitch.IsOn == false)
+            {
+                localSettings.Values["alreadySetWindowsHello"] = false;
             }
         }
     }

@@ -224,8 +224,10 @@
                             <TextBlock Grid.Column="1" Text="加密个人内容" Margin="16, 0, 0, 0"
                                             VerticalAlignment="Center"/>
                         </StackPanel>
-                        <Button Content="设置密码" HorizontalAlignment="Right" Width="200" Height="40"
-                                    Click="SetPrivateKey"/>
+                        <Button x:Name="setKeyButton" Content="设置密码" HorizontalAlignment="Right" Width="200"
+                                Height="40" Click="SetPrivateKey"/>
+                        <Button x:Name="closeKeyButton" Content="关闭密码" HorizontalAlignment="Right" Width="200"
+                                Height="40" Click="ClosePrivateKey"/>
                     </Grid>
                 </Border>
 
@@ -240,7 +242,7 @@
                                             VerticalAlignment="Center"/>
                         </StackPanel>
                         <ToggleSwitch x:Name="windowsHelloSwitch" HorizontalAlignment="Right" Width="20"
-                                            HorizontalContentAlignment="Right" Padding="0"
+                                            HorizontalContentAlignment="Right" Padding="0" IsEnabled="False"
                                             OffContent="" OnContent="" Margin="0,0,-108,0"
                                             Toggled="OpenWindowsHello" Loading="LoadedWindowsHello"/>
                     </Grid>
@@ -254,13 +256,13 @@
                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                     <Grid Margin="16">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
-                            <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xEB68;"
+                            <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE975;"
                                         FontSize="20"/>
                             <TextBlock Text="跨设备同步" Margin="16, 0, 0, 0"
                                             VerticalAlignment="Center"/>
                         </StackPanel>
-                        <ToggleSwitch HorizontalAlignment="Right" Width="20" OffContent="" OnContent=""
-                                            HorizontalContentAlignment="Right" Padding="0" Margin="0,0,-108,0"/>
+                        <ToggleSwitch HorizontalAlignment="Right" Width="20" OffContent="" OnContent="" IsEnabled="False"
+                                      HorizontalContentAlignment="Right" Padding="0" Margin="0,0,-108,0"/>
                     </Grid>
                 </Border>
 
@@ -270,11 +272,11 @@
                     <Grid Margin="16">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
                             <FontIcon Grid.Column="0" FontFamily="{StaticResource SegoeFluentIcons}"
-                                            Glyph="&#xE75F;" FontSize="20"/>
+                                            Glyph="&#xE81E;" FontSize="20"/>
                             <TextBlock Grid.Column="1" Text="备份资源库" Margin="16, 0, 0, 0"
                                             VerticalAlignment="Center"/>
                         </StackPanel>
-                        <Button Content="立即备份" HorizontalAlignment="Right" Width="200" Height="40"/>
+                        <Button Content="立即备份" HorizontalAlignment="Right" Width="200" Height="40" IsEnabled="False"/>
                     </Grid>
                 </Border>
             </StackPanel>

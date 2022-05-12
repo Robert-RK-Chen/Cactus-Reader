@@ -30,7 +30,8 @@
                     <TextBlock FontSize="28" FontWeight="SemiBold" Text="这里空空如也，什么也没有。" TextWrapping="Wrap"/>
                     <TextBlock Margin="0, 8, 0, 0" Foreground="#9A9A9A" TextWrapping="Wrap"
                                Text="开始使用 Cactus Reader 打开你的文档，并进行阅读与标注。"/>
-                    <muxc:SplitButton x:Name="explorFileButton" Margin="0, 12, 0, 0" Height="36" Width="160">
+                    <muxc:SplitButton x:Name="explorFileButton" Margin="0, 12, 0, 0" Height="36" Width="160"
+                                      Click="OpenDocumentFile">
                         <muxc:SplitButton.Content>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE838;" FontSize="16"/>
@@ -40,7 +41,7 @@
                         <muxc:SplitButton.Flyout>
                             <MenuFlyout Placement="Bottom">
                                 <MenuFlyoutItem Tag="openDocument" Text="打开文件" Width="200"
-                                                HorizontalAlignment="Left" Height="40">
+                                                HorizontalAlignment="Left" Height="40" Click="OpenDocumentFile">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE8E5;"/>
                                     </MenuFlyoutItem.Icon>
@@ -52,7 +53,7 @@
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutItem Tag="openFromInternet" Text="打开网络文档" Width="200"
-                                                HorizontalAlignment="Left" Height="40">
+                                                Click="OpenWebDocument" HorizontalAlignment="Left" Height="40">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE774;"/>
                                     </MenuFlyoutItem.Icon>

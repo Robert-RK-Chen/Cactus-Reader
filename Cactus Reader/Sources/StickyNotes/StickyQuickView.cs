@@ -1,6 +1,10 @@
-﻿using Cactus_Reader.Sources.AppPages.AppUI;
+﻿using Cactus_Reader.Entities;
+using Cactus_Reader.Sources.AppPages.AppUI;
+using Cactus_Reader.Sources.ToolKits;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
@@ -88,7 +92,12 @@ typeof(string), typeof(StickyQuickView), new PropertyMetadata(Guid.Empty));
             base.OnApplyTemplate();
             MenuFlyoutItem addItem = GetTemplateChild("OpenSticky") as MenuFlyoutItem;
             MenuFlyoutItem shareItem = GetTemplateChild("ShareSticky") as MenuFlyoutItem;
+            MenuFlyoutItem lockItem = GetTemplateChild("LockSticky") as MenuFlyoutItem;
             MenuFlyoutItem deleteItem = GetTemplateChild("DeleteSticky") as MenuFlyoutItem;
+            addItem.Text = "打开便签";
+            shareItem.Text = "分享便签";
+            lockItem.Text = "锁定便签";
+            deleteItem.Text = "删除便签";
 
             // 解除事件
             Loaded -= QuickViewLoaded;
@@ -96,7 +105,8 @@ typeof(string), typeof(StickyQuickView), new PropertyMetadata(Guid.Empty));
             PointerExited -= QuickViewPointExited;
             DoubleTapped -= QuickViewDoubleTapped;
             addItem.Click -= QuickViewDoubleTapped;
-            shareItem.Click -= ShareSticky;            
+            shareItem.Click -= ShareSticky;
+            lockItem.Click -= LockSticky;
             deleteItem.Click -= DeleteSticky;
 
             // 注册事件
@@ -107,6 +117,7 @@ typeof(string), typeof(StickyQuickView), new PropertyMetadata(Guid.Empty));
             addItem.Click += QuickViewDoubleTapped;
             shareItem.Click += ShareSticky;            
             deleteItem.Click += DeleteSticky;
+            lockItem.Click += LockSticky;
         }
 
         private void QuickViewLoaded(object sender, RoutedEventArgs e)
@@ -179,6 +190,32 @@ typeof(string), typeof(StickyQuickView), new PropertyMetadata(Guid.Empty));
         private void ShareSticky(object sender, RoutedEventArgs e)
         {
             DataTransferManager.ShowShareUI();
+        }
+
+        private async void LockSticky(object sender, RoutedEventArgs e)
+        {
+            if (localSettings.Values.Keys.Contains("privateKey"))
+            {
+                string UID = localSettings.Values["UID"].ToString();
+                StorageFolder stickyFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
+                stickyFolder = await stickyFolder.GetFolderAsync("Sticky");
+                StorageFile stickyFile = await stickyFolder.GetFileAsync(StickySerial + ".json");
+                Sticky sticky = JsonConvert.DeserializeObject<Sticky>(File.ReadAllText(stickyFile.Path));
+                sticky.QuickViewText = BitConverter.ToString(AESEncryptTool.EncryptStringToBytesAes(sticky.QuickViewText, (byte[])localSettings.Values["privateKey"], (byte[])localSettings.Values["privateKey"]));
+                sticky.StickyDocument = BitConverter.ToString(AESEncryptTool.EncryptStringToBytesAes(sticky.StickyDocument, (byte[])localSettings.Values["privateKey"], (byte[])localSettings.Values["privateKey"]));
+                File.WriteAllText(stickyFile.Path, JsonConvert.SerializeObject(sticky));
+            }
+            else
+            {
+                ContentDialog contentDialog = new ContentDialog
+                {
+                    Title = "Cactus Notes",
+                    Content = "若要锁定你的便签，你需要设置个人密码。",
+                    PrimaryButtonText = "确定",
+                    DefaultButton = ContentDialogButton.Primary
+                };
+                await contentDialog.ShowAsync();
+            }
         }
     }
 }

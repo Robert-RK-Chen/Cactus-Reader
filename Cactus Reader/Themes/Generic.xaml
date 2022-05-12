@@ -17,21 +17,26 @@
                           DoubleTapped="QuickViewDoubleTapped" Loaded="QuickViewLoaded">
                         <Grid.ContextFlyout>
                             <MenuFlyout>
-                                <MenuFlyoutItem x:Name="OpenSticky" Text="Open Sticky">
+                                <MenuFlyoutItem x:Name="OpenSticky">
                                     <MenuFlyoutItem.Icon>
-                                        <SymbolIcon Symbol="View"/>
+                                        <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE890;"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem x:Name="ShareSticky">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE72D;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem x:Name="ShareSticky" Text="Share Sticky">
+                                <MenuFlyoutItem x:Name="LockSticky">
                                     <MenuFlyoutItem.Icon>
-                                        <SymbolIcon Symbol="Share"/>
+                                        <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE72E;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem x:Name="DeleteSticky" Text="Delete Sticky">
+                                <MenuFlyoutItem x:Name="DeleteSticky">
                                     <MenuFlyoutItem.Icon>
-                                        <SymbolIcon Symbol="Delete"/>
+                                        <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE74D;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                             </MenuFlyout>

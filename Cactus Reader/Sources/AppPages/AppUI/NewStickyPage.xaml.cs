@@ -148,8 +148,8 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         {
             StickyEditBox.Document.GetText(TextGetOptions.FormatRtf, out string document);
             StickyEditBox.Document.GetText(TextGetOptions.None, out string quickview);
-            sticky.StickyDocument = document.TrimEnd();
-            sticky.QuickViewText = quickview.TrimEnd();
+            sticky.StickyDocument = (document.TrimEnd()).Replace("\r\n", "");
+            sticky.QuickViewText = (quickview.TrimEnd()).Replace("\r\n", "");
 
             string UID = localSettings.Values["UID"].ToString();
             StorageFolder stickyFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(UID, CreationCollisionOption.OpenIfExists);
@@ -243,19 +243,25 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             }
             catch (Exception)
             {
-                await StickyPage.stickyPage.StickyQuickViewList.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-                async () =>
+                try
                 {
-                    await quickView.Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
+                    await StickyPage.stickyPage.StickyQuickViewList.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                    async () =>
                     {
-                        StickyPage.stickyPage.StickyQuickViewList.Items.Remove(quickView);
-                        if(StickyPage.stickyPage.StickyQuickViewList.Items.Count == 0)
+                        await quickView.Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
                         {
-                            StickyPage.stickyPage.EmptyPlaceholder.Opacity = 1;
-                            localSettings.Values["EmptyPlaceholderOpacity"] = 1;
-                        }
+                            StickyPage.stickyPage.StickyQuickViewList.Items.Remove(quickView);
+                            if (StickyPage.stickyPage.StickyQuickViewList.Items.Count == 0)
+                            {
+                                StickyPage.stickyPage.EmptyPlaceholder.Opacity = 1;
+                                localSettings.Values["EmptyPlaceholderOpacity"] = 1;
+                            }
+                        });
                     });
-                });
+                }
+                catch (Exception)
+                {
+                }
             }
         }
 

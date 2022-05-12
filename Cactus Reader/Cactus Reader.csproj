@@ -21,7 +21,7 @@
     <PackageCertificateThumbprint>22E6AC5F68105203AD6F01678A5361420CDD8A02</PackageCertificateThumbprint>
     <PackageCertificateKeyFile>
     </PackageCertificateKeyFile>
-    <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
+    <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
@@ -183,6 +183,12 @@
     <Compile Include="Sources\AppPages\Login\ResetPassword.xaml.cs">
       <DependentUpon>ResetPassword.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Sources\AppPages\Reader\TextFileReadingPage.xaml.cs">
+      <DependentUpon>TextFileReadingPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sources\AppPages\Reader\WebDocumentReadingPage.xaml.cs">
+      <DependentUpon>WebDocumentReadingPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Sources\AppPages\Register\RegisterCodePage.xaml.cs">
       <DependentUpon>RegisterCodePage.xaml</DependentUpon>
     </Compile>
@@ -205,11 +211,13 @@
       <DependentUpon>StartPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Sources\StickyNotes\ThemeColorBrushTool.cs" />
+    <Compile Include="Sources\ToolKits\AESEncryptTool.cs" />
     <Compile Include="Sources\ToolKits\ControllerVisibility.cs" />
     <Compile Include="Sources\ToolKits\DBProperties.cs" />
     <Compile Include="Sources\ToolKits\HashDirectory.cs" />
     <Compile Include="Sources\ToolKits\IFreeSqlService.cs" />
     <Compile Include="Sources\ToolKits\InformationVerify.cs" />
+    <Compile Include="Sources\ToolKits\MD5EncryptTool.cs" />
     <Compile Include="Sources\ToolKits\ProfileSyncTool.cs" />
     <Compile Include="Sources\ToolKits\ProfileUploadTool.cs" />
     <Compile Include="Sources\WindowsHello\AuthService.cs" />
@@ -351,6 +359,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Sources\AppPages\Reader\TextFileReadingPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sources\AppPages\Reader\WebDocumentReadingPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Sources\AppPages\Register\RegisterCodePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -398,10 +414,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FreeSql">
-      <Version>3.2.610</Version>
+      <Version>3.2.630</Version>
     </PackageReference>
     <PackageReference Include="FreeSql.Provider.MySql">
-      <Version>3.2.610</Version>
+      <Version>3.2.630</Version>
     </PackageReference>
     <PackageReference Include="MailKit">
       <Version>3.2.0</Version>
@@ -416,7 +432,10 @@
       <Version>7.1.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
-      <Version>2.7.1</Version>
+      <Version>2.8.0-prerelease.220413001</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Web.WebView2">
+      <Version>1.0.1248-prerelease</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>
