@@ -67,7 +67,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
                 else
                 {
                     user.Email = mailAddress;
-                    codeSender.SendVerifyCode(user.Email, "register");
+                    await Task.Factory.StartNew(() => codeSender.SendVerifyCode(user.Email, "register"));
                     contentFrame.Navigate(typeof(RegisterCodePage), user, new SlideNavigationTransitionInfo()
                     {
                         Effect = SlideNavigationTransitionEffect.FromRight

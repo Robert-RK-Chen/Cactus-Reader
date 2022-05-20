@@ -42,7 +42,8 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             if (localSettings.Values["passageWidth"] == null) { localSettings.Values["passageWidth"] = "normal"; }
             if (localSettings.Values["theme"] == null) { localSettings.Values["theme"] = "straw"; }
             if (localSettings.Values["voiceIndex"] == null) { localSettings.Values["voiceIndex"] = 0; }
-            if (localSettings.Values["voiceName"] == null) {
+            if (localSettings.Values["voiceName"] == null)
+            {
                 localSettings.Values["voiceName"] = "zh-CN-XiaoxiaoNeural";
             }
             if (localSettings.Values["speed"] == null) { localSettings.Values["speed"] = 1.0; }
@@ -85,7 +86,17 @@ namespace Cactus_Reader.Sources.AppPages.Reader
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            StorageFile document = (StorageFile)e.Parameter;
+            
+            string text = string.Empty;
+            var document = e.Parameter;
+            if (document.GetType() == typeof(StorageFile))
+            {
+                text = await FileIO.ReadTextAsync((StorageFile)document);
+            }
+            else if (document.GetType() == typeof(string))
+            {
+                text = (string)document;
+            }
 
             fontSizeSlider.Value = (double)localSettings.Values["fontSize"];
             charSpacingSlider.Value = (double)localSettings.Values["charSpacing"];
@@ -93,8 +104,7 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             passageBlock.FontFamily = new FontFamily(localSettings.Values["font"].ToString());
             ChangeLineWidth(localSettings.Values["passageWidth"].ToString());
             ChangeTheme(localSettings.Values["theme"].ToString());
-
-            string text = await FileIO.ReadTextAsync(document);
+            
             passageBlock.Blocks.Clear();
             Paragraph paragraph = new Paragraph();
             paragraph.Inlines.Add(new Run() { Text = text });

@@ -57,7 +57,7 @@
                             <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE70B;"/>
                         </muxc:NavigationViewItem.Icon>
                     </muxc:NavigationViewItem>
-                    <muxc:NavigationViewItem Tag="plugins" Content="扩展包" Height="44">
+                    <muxc:NavigationViewItem Tag="plugins" Content="实验室" Height="44">
                         <muxc:NavigationViewItem.Icon>
                             <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE74c;"/>
                         </muxc:NavigationViewItem.Icon>

@@ -11,7 +11,7 @@
     <Grid>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Canvas.ZIndex="1" VerticalAlignment="Top"
                     Background="{StaticResource AcrylicInAppFillColorDefaultBrush}" Padding="24, 24, 24, 0" Height="108">
-            <TextBlock Text="扩展包" FontSize="26" FontWeight="SemiBold"/>
+            <TextBlock Text="实验室" FontSize="26" FontWeight="SemiBold"/>
             <TextBlock Text="你看，更多神奇的功能都在这里。" Margin="0, 12, 0, 0"/>
         </StackPanel>
         <ScrollViewer VerticalScrollBarVisibility="Auto" Height="auto" Padding="24, 108, 24, 0">
@@ -20,12 +20,12 @@
                     <ColumnDefinition Width="3*"/>
                     <ColumnDefinition Width="4*"/>
                 </Grid.ColumnDefinitions>
-                <Image Source="/Sources/Images/FavoriteCollection.png" Stretch="Uniform" VerticalAlignment="Center"
+                <Image Source="/Sources/Images/ExperimentFeatures.png" Stretch="Uniform" VerticalAlignment="Center"
                        MaxWidth="300" Grid.Column="0"/>
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="40, 0, 0, 0" Grid.Column="1">
                     <TextBlock FontSize="28" FontWeight="SemiBold" Text="这里空空如也，什么也没有。" TextWrapping="Wrap"/>
                     <TextBlock Margin="0, 8, 0, 0" Foreground="#9A9A9A" TextWrapping="Wrap"
-                               Text="使用 Cactus Reader 阅读文档，摘抄收藏内容将收纳在此处。"/>
+                               Text="Cactus Reader 将不定期添加实验性功能，为你带来更有趣的应用体验。"/>
                 </StackPanel>
             </Grid>
         </ScrollViewer>

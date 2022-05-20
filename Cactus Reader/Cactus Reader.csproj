@@ -186,9 +186,6 @@
     <Compile Include="Sources\AppPages\Reader\TextFileReadingPage.xaml.cs">
       <DependentUpon>TextFileReadingPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Sources\AppPages\Reader\WebDocumentReadingPage.xaml.cs">
-      <DependentUpon>WebDocumentReadingPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Sources\AppPages\Register\RegisterCodePage.xaml.cs">
       <DependentUpon>RegisterCodePage.xaml</DependentUpon>
     </Compile>
@@ -292,6 +289,7 @@
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
     <Content Include="Sources\Images\Cactus Reader.png" />
+    <Content Include="Sources\Images\ExperimentFeatures.png" />
     <Content Include="Sources\Images\FavoriteCollection.png" />
     <Content Include="Sources\Images\LibraryEmpty.png" />
     <Content Include="Sources\Images\NotesEmpty.png" />
@@ -363,10 +361,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Sources\AppPages\Reader\WebDocumentReadingPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Sources\AppPages\Register\RegisterCodePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -432,10 +426,10 @@
       <Version>7.1.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
-      <Version>2.8.0-prerelease.220413001</Version>
+      <Version>2.7.1</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.Web.WebView2">
-      <Version>1.0.1248-prerelease</Version>
+    <PackageReference Include="Microsoft.Xml.SgmlReader">
+      <Version>1.8.25</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>

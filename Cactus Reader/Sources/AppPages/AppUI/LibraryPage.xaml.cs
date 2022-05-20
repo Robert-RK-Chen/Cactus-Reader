@@ -1,6 +1,11 @@
 ﻿using Cactus_Reader.Sources.AppPages.Reader;
+using Sgml;
 using System;
+using System.IO;
+using System.Net;
 using System.Reflection.Metadata;
+using System.Threading.Tasks;
+using System.Xml;
 using Windows.Storage;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
@@ -34,15 +39,15 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         {
             TextBox weblinkBox = new TextBox
             {
-                Width = 360,
+                Width = 400,
                 PlaceholderText = "https://docs.microsoft.com/zh-cn/",
                 VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Bottom,
-                Header = "网络文档地址：",
+                Header = "输入你想阅读的网页，我们将自动为你打开沉浸式阅读器。此功能尚在预览体验阶段，阅读效果视网页内容而定。",
             };
 
             ContentDialog openWebDocumentDialog = new ContentDialog
             {
-                Title = "阅读网络上的文档",
+                Title = "Cactus Web Reader (Preview)",
                 Content = weblinkBox,
                 CloseButtonText = "取消",
                 PrimaryButtonText = "确定",
@@ -53,14 +58,17 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             while (result == ContentDialogResult.Primary)
             {
                 string weblink = weblinkBox.Text;
-                if (weblink.StartsWith("https://") || weblink.StartsWith("http://"))
+                string webContent = GetWebClient(weblink);
+
+                if (webContent != "")
                 {
-                    MainPage.mainPage.mainContent.Navigate(typeof(WebDocumentReadingPage), weblink, new EntranceNavigationTransitionInfo());
+                    XmlDocument document = new XmlDocument();
+                    StringReader strReader = new StringReader(SgmlTranslate(webContent));
+                    document.Load(strReader);
+
+                    string contentText = GetImmersiveText(document);
+                    MainPage.mainPage.mainContent.Navigate(typeof(TextFileReadingPage), contentText, new EntranceNavigationTransitionInfo());
                     break;
-                }
-                else
-                {
-                    result = await openWebDocumentDialog.ShowAsync();
                 }
             }
         }
@@ -92,6 +100,100 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             {
 
             }
+        }
+
+        private string GetWebClient(string url)
+        {
+            try
+            {
+                WebClient webClient = new WebClient
+                {
+                    Encoding = System.Text.Encoding.UTF8
+                };
+                return webClient.DownloadString(url);
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+        }
+
+        private string GetImmersiveText(XmlDocument document)
+        {
+            //获取五类节点：<title>、<h1>、<h2>、<h3>与<p>
+            XmlNodeList titleNodes = document.GetElementsByTagName("title");
+            XmlNodeList pNodes = document.GetElementsByTagName("p");
+            XmlNodeList h1Nodes = document.GetElementsByTagName("h1");
+            XmlNodeList h2Nodes = document.GetElementsByTagName("h2");
+            XmlNodeList h3Nodes = document.GetElementsByTagName("h3");
+
+            string contentText = string.Empty;
+            foreach (XmlElement element in titleNodes)
+            {
+                string text = element.InnerText.TrimStart().TrimEnd();
+                if (text.Length > 0)
+                {
+                    contentText += text + "\n\n";
+                }
+            }
+            foreach (XmlElement element in h1Nodes)
+            {
+                string text = element.InnerText.TrimStart().TrimEnd();
+                if (text.Length > 0)
+                {
+                    contentText += text + "\n\n";
+                }
+            }
+            foreach (XmlElement element in h2Nodes)
+            {
+                string text = element.InnerText.TrimStart().TrimEnd();
+                if (text.Length > 0)
+                {
+                    contentText += text + "\n\n";
+                }
+            }
+            foreach (XmlElement element in h3Nodes)
+            {
+                string text = element.InnerText.TrimStart().TrimEnd();
+                if (text.Length > 0)
+                {
+                    contentText += text + "\n\n";
+                }
+            }
+            foreach (XmlElement element in pNodes)
+            {
+                string text = element.InnerText.TrimStart().TrimEnd();
+                if (text.Length > 0)
+                {
+                    contentText += text + "\n\n";
+                }
+            }
+            return contentText;
+        }
+
+        private string SgmlTranslate(string input)
+        {
+            var reader = new SgmlReader
+            {
+                DocType = "HTML",
+                WhitespaceHandling = WhitespaceHandling.None,
+                CaseFolding = Sgml.CaseFolding.ToLower,
+                InputStream = new StringReader(input)
+            };
+
+            var output = new StringWriter();
+            var writer = new XmlTextWriter(output)
+            {
+                Formatting = Formatting.Indented
+            };
+            while (reader.Read())
+            {
+                if (reader.NodeType != XmlNodeType.Whitespace
+                  && reader.NodeType != XmlNodeType.Comment)
+                    writer.WriteNode(reader, true);
+            }
+            writer.Close();
+            return output.ToString();
         }
     }
 }
