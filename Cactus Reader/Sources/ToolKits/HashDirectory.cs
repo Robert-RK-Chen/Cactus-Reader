@@ -5,7 +5,17 @@ namespace Cactus_Reader.Sources.ToolKits
 {
     public class HashDirectory
     {
-        public static string GetEncryptedPassword(string password)
+        private static HashDirectory instance;
+
+        public static HashDirectory Instance
+        {
+            get
+            {
+                return instance ?? (instance = new HashDirectory());
+            }
+        }
+
+        public string GetEncryptedPassword(string password)
         {
             SHA256 mySHA256 = SHA256.Create();
             byte[] passwordArray = Encoding.Default.GetBytes(password);

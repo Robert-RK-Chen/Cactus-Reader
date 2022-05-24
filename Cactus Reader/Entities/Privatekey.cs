@@ -6,7 +6,7 @@ namespace Cactus_Reader.Entities
     {
         [Column(IsPrimary = true)]
         public string UID { get; set; }
-        
+
         public string Key { get; set; }
 
         public virtual User UidNavigation { get; set; }

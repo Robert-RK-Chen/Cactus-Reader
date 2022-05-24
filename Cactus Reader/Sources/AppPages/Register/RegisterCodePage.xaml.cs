@@ -16,8 +16,9 @@ namespace Cactus_Reader.Sources.AppPages.Register
     /// </summary>
     public sealed partial class RegisterCodePage : Page
     {
-        readonly IFreeSql freeSql = IFreeSqlService.Instance;
-        readonly MailCodeSender codeSender = MailCodeSender.Instance;
+        private readonly IFreeSql freeSql = IFreeSqlService.Instance;
+        private readonly MailCodeSender codeSender = MailCodeSender.Instance;
+        private readonly InformationVerify informationVerify = InformationVerify.Instance;
         User currentUser = null;
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -52,7 +53,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
                 ControllerVisibility.ShowProgressBar(statusBar);
                 Code currentCode = await Task.Factory.StartNew(() => freeSql.Select<Code>().Where(code => code.Email == currentUser.Email).ToOne());
 
-                switch (InformationVerify.MailCodeVerify(codeInput, currentCode))
+                switch (informationVerify.MailCodeVerify(codeInput, currentCode))
                 {
                     case "CODE_INPUT_LENGTH_0":
                         alertMsg.Text = "若要继续，请输入我们刚才发送给你的代码。";

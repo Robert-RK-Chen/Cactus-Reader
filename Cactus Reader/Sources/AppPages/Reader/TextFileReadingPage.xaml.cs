@@ -78,7 +78,7 @@ namespace Cactus_Reader.Sources.AppPages.Reader
         {
             DataRequest request = args.Request;
             request.Data.SetText("我最近读了一篇好文章，分享给你！" + passageBlock.SelectedText);
-            request.Data.SetUri(new Uri("http://106.54.173.192/cactus-reader-repo/demo.txt"));
+            request.Data.SetWebLink(new Uri("http://106.54.173.192/cactus-reader-repo/demo.txt"));
             request.Data.Properties.Title = "Robert Chen";
             request.Data.Properties.Description = "Cactus Reader";
         }
@@ -86,7 +86,7 @@ namespace Cactus_Reader.Sources.AppPages.Reader
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            
+
             string text = string.Empty;
             var document = e.Parameter;
             if (document.GetType() == typeof(StorageFile))
@@ -104,7 +104,7 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             passageBlock.FontFamily = new FontFamily(localSettings.Values["font"].ToString());
             ChangeLineWidth(localSettings.Values["passageWidth"].ToString());
             ChangeTheme(localSettings.Values["theme"].ToString());
-            
+
             passageBlock.Blocks.Clear();
             Paragraph paragraph = new Paragraph();
             paragraph.Inlines.Add(new Run() { Text = text });

@@ -16,7 +16,9 @@ namespace Cactus_Reader.Sources.AppPages.Register
     /// </summary>
     public sealed partial class RegisterWindowsHello : Page
     {
-        readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
+        private readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
+        private readonly MicrosoftPassportHelper microsoftPassportHelper = MicrosoftPassportHelper.Instance;
+
         User currentUser = null;
 
         public RegisterWindowsHello()
@@ -51,7 +53,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
         private async void ContinueRegister(object sender, RoutedEventArgs e)
         {
             ControllerVisibility.ShowProgressBar(statusBar);
-            bool isSuccessful = await MicrosoftPassportHelper.CreatePassportKeyAsync(currentUser.UID, currentUser.Name);
+            bool isSuccessful = await microsoftPassportHelper.CreatePassportKeyAsync(currentUser.UID, currentUser.Name);
             ControllerVisibility.HideProgressBar(statusBar);
 
             if (isSuccessful)

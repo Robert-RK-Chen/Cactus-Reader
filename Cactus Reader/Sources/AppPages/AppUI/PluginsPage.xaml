@@ -14,19 +14,46 @@
             <TextBlock Text="实验室" FontSize="26" FontWeight="SemiBold"/>
             <TextBlock Text="你看，更多神奇的功能都在这里。" Margin="0, 12, 0, 0"/>
         </StackPanel>
-        <ScrollViewer VerticalScrollBarVisibility="Auto" Height="auto" Padding="24, 108, 24, 0">
-            <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0, 0, 0, 16">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="4*"/>
-                </Grid.ColumnDefinitions>
-                <Image Source="/Sources/Images/ExperimentFeatures.png" Stretch="Uniform" VerticalAlignment="Center"
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Height="auto" Padding="24, 120, 24, 0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="0">
+                    <StackPanel Orientation="Vertical" Spacing="8">
+                        <Border HorizontalAlignment="Stretch" VerticalAlignment="Center" CornerRadius="8"
+                            BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                            <Grid Margin="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Stretch">
+                                    <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xebe8;"
+                                            FontSize="20"/>
+                                    <TextBlock Text="进入异常捕获界面" Margin="16, 0, 0, 0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <Button Grid.Column="1" VerticalAlignment="Center" Margin="16, 0, 0, 0"
+                                        Height="40" Width="160" Content="开 始" Click="OpenGetTroublePage"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+                <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0, 0, 0, 16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="4*"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Source="/Sources/Images/ExperimentFeatures.png" Stretch="Uniform" VerticalAlignment="Center"
                        MaxWidth="300" Grid.Column="0"/>
-                <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="40, 0, 0, 0" Grid.Column="1">
-                    <TextBlock FontSize="28" FontWeight="SemiBold" Text="这里空空如也，什么也没有。" TextWrapping="Wrap"/>
-                    <TextBlock Margin="0, 8, 0, 0" Foreground="#9A9A9A" TextWrapping="Wrap"
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="40, 0, 0, 0" Grid.Column="1">
+                        <TextBlock FontSize="28" FontWeight="SemiBold" Text="这里空空如也，什么也没有。" TextWrapping="Wrap"/>
+                        <TextBlock Margin="0, 8, 0, 0" Foreground="#9A9A9A" TextWrapping="Wrap"
                                Text="Cactus Reader 将不定期添加实验性功能，为你带来更有趣的应用体验。"/>
-                </StackPanel>
+                    </StackPanel>
+                </Grid>
             </Grid>
         </ScrollViewer>
     </Grid>

@@ -10,7 +10,7 @@ namespace Cactus_Reader.Entities
         {
             Userkeys = new HashSet<Userkey>();
         }
-        
+
         [Column(IsPrimary = true)]
         public string UID { set; get; }
 
@@ -25,7 +25,7 @@ namespace Cactus_Reader.Entities
         public DateTime RegistDate { set; get; }
 
         public virtual Privatekey Privatekey { get; set; }
-        
+
         public virtual ICollection<Userkey> Userkeys { get; set; }
     }
 }

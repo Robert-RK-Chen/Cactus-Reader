@@ -1,4 +1,5 @@
 ﻿using Cactus_Reader.Sources.AppPages.AppUI;
+using Cactus_Reader.Sources.AppPages.Widget;
 using Cactus_Reader.Sources.ToolKits;
 using System;
 using System.Collections.Generic;
@@ -111,7 +112,7 @@ namespace Cactus_Reader
             ("sticky", typeof(StickyPage)),
             ("plugins", typeof(PluginsPage)),
             ("recycle", typeof(RecyclePage)),
-            ("about", typeof(AboutInfoPage))
+            ("about", typeof(AboutInfoPage)),
         };
 
         private void NavViewControlLoaded(object sender, RoutedEventArgs e)

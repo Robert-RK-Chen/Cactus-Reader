@@ -17,7 +17,7 @@
 
     <Grid>
         <StackPanel Canvas.ZIndex="1" Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Stretch" 
-                    Height="128" VerticalAlignment="Top" Padding="24, 24, 24, 0"
+                    Height="auto" VerticalAlignment="Top" Padding="24, 24, 24, 0"
                     Background="{StaticResource AcrylicInAppFillColorDefaultBrush}">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -70,5 +70,7 @@
                 </ListView>
             </Grid>
         </ScrollViewer>
+        <muxc:InfoBar IsOpen="True" Severity="Informational" Title="Cactus Notes" VerticalAlignment="Bottom"
+                      Margin="24, 0, 24, 12" Message="我们正在调查一个问题，当你使用 Windows Hello 打开便签时，可能会等待较长的时间。" />
     </Grid>
 </Page>

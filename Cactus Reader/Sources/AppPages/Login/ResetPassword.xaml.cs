@@ -17,8 +17,10 @@ namespace Cactus_Reader.Sources.AppPages.Login
     /// </summary>
     public sealed partial class ResetPassword : Page
     {
-        readonly IFreeSql freeSql = IFreeSqlService.Instance;
-        readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
+        private readonly IFreeSql freeSql = IFreeSqlService.Instance;
+        private readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
+        private readonly InformationVerify informationVerify = InformationVerify.Instance;
+        private readonly HashDirectory hashDirectory = HashDirectory.Instance;
         User currentUser = null;
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -52,10 +54,10 @@ namespace Cactus_Reader.Sources.AppPages.Login
                 {
                     alertMsg.Text = "若要继续，请输入一个长度至少为 8 位，并且含有大小写字母、数字或符号组成的密码。";
                 }
-                else if (InformationVerify.IsPassword(password) && string.Equals(password, checkPwd))
+                else if (informationVerify.IsPassword(password) && string.Equals(password, checkPwd))
                 {
                     ControllerVisibility.ShowProgressBar(statusBar);
-                    currentUser.Password = HashDirectory.GetEncryptedPassword(password);
+                    currentUser.Password = hashDirectory.GetEncryptedPassword(password);
                     await Task.Factory.StartNew(() => freeSql.Update<User>(currentUser).ExecuteAffrows());
 
                     ContentDialog signInDialog = new ContentDialog

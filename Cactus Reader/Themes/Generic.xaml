@@ -28,9 +28,14 @@
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem x:Name="LockSticky">
+                                <MenuFlyoutItem x:Name="LockSticky" Visibility="Visible">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE72E;"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem x:Name="UnlockSticky" Visibility="Collapsed">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xe785;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />

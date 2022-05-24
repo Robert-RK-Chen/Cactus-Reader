@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-    
+
     <Page.Resources>
         <FontFamily x:Key="MiSans">/Sources/Fonts/MiSans-Regular.ttf#MiSans</FontFamily>
         <FontFamily x:Key="MiSansBold">/Sources/Fonts/MiSans-Bold.ttf#MiSansBold</FontFamily>

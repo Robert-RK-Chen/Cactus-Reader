@@ -4,9 +4,19 @@ using System.Security.Cryptography;
 
 namespace Cactus_Reader.Sources.ToolKits
 {
-    public static class AESEncryptTool
+    public class AESEncryptTool
     {
-        public static byte[] EncryptStringToBytesAes(string plainText, byte[] Key, byte[] IV)
+        private static AESEncryptTool instance;
+
+        public static AESEncryptTool Instance
+        {
+            get
+            {
+                return instance ?? (instance = new AESEncryptTool());
+            }
+        }
+
+        public string EncryptStringToBytesAes(string plainText, byte[] Key, byte[] IV)
         {
             if (plainText == null || plainText.Length <= 0)
                 throw new ArgumentNullException("plainText");
@@ -32,11 +42,12 @@ namespace Cactus_Reader.Sources.ToolKits
                     }
                 }
             }
-            return encrypted;
+            return Convert.ToBase64String(encrypted);
         }
 
-        public static string DecryptStringFromBytesAes(byte[] cipherText, byte[] Key, byte[] IV)
+        public string DecryptStringFromBytesAes(string ciphertext, byte[] Key, byte[] IV)
         {
+            byte[] cipherText = Convert.FromBase64String(ciphertext);
             if (cipherText == null || cipherText.Length <= 0)
                 throw new ArgumentNullException("cipherText");
             if (Key == null || Key.Length <= 0)

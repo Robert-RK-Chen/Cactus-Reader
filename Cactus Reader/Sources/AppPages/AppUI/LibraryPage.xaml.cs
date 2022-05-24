@@ -1,4 +1,5 @@
 ﻿using Cactus_Reader.Sources.AppPages.Reader;
+using Cactus_Reader.Sources.AppPages.Widget;
 using Sgml;
 using System;
 using System.IO;
@@ -6,6 +7,7 @@ using System.Net;
 using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
 using Windows.Storage;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;

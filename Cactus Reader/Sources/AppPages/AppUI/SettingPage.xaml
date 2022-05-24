@@ -231,9 +231,10 @@
                     </Grid>
                 </Border>
 
-                <Border HorizontalAlignment="Stretch" VerticalAlignment="Center" CornerRadius="8"
-                            BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}"
-                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <Border HorizontalAlignment="Stretch" VerticalAlignment="Center" CornerRadius="8" 
+                        x:Name="windowsHelloPassword" BorderThickness="1"
+                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                     <Grid Margin="16">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
                             <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xEB68;"

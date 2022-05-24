@@ -1,10 +1,11 @@
 ﻿using Cactus_Reader.Entities;
 using Cactus_Reader.Sources.StickyNotes;
+using Cactus_Reader.Sources.ToolKits;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Windows.ApplicationModel.Core;
-using Windows.Foundation;
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Core;
@@ -27,8 +28,10 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
     {
         private Sticky sticky;
         private StickyQuickView quickView;
-        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        readonly ThemeColorBrushTool brushTool = ThemeColorBrushTool.Instance;
+        private readonly AESEncryptTool aesEncryptTool = AESEncryptTool.Instance;
+        private readonly MD5EncryptTool md5EncryptTool = MD5EncryptTool.Instance;
+        private readonly ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+        private readonly ThemeColorBrushTool brushTool = ThemeColorBrushTool.Instance;
 
         public NewStickyPage()
         {
@@ -56,39 +59,56 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
-            // 便签界面接受便签序列号参数，序列号的来源为新建便签与打开的便签
-            // 拿到序列号后检索便签文件，如果文件存在则读取，不存在则新建
+            // 接收传递的参数，若是新建，走新建流程
+            // 若是打开，则先解密
             base.OnNavigatedTo(e);
             SystemNavigationManagerPreview.GetForCurrentView().CloseRequested += StickyPageCloseRequested;
 
-            quickView = (StickyQuickView)e.Parameter;
             string serial = string.Empty;
+            List<object> parameter = (List<object>)e.Parameter;
+            quickView = (StickyQuickView)parameter[1];
             await quickView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 serial = quickView.StickySerial;
             });
 
-            try
+            if ((string)parameter[0] == "new")
             {
-                string UID = localSettings.Values["UID"].ToString();
-                StorageFolder stickyFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
-                stickyFolder = await stickyFolder.GetFolderAsync("Sticky");
-                StorageFile stickyFile = await stickyFolder.GetFileAsync(serial + ".json");
-                sticky = JsonConvert.DeserializeObject<Sticky>(File.ReadAllText(stickyFile.Path));
-            }
-            catch
-            {
-                string theme = localSettings.Values["StickyTheme"].ToString();
                 sticky = new Sticky
                 {
+                    IsLock = false,
                     CreateTime = DateTime.Now,
                     StickyDocument = string.Empty,
-                    StickyTheme = theme,
+                    StickyTheme = localSettings.Values["StickyTheme"].ToString(),
                     StickySerial = serial,
                     QuickViewText = string.Empty,
                 };
             }
-
+            else
+            {
+                try
+                {
+                    string UID = localSettings.Values["UID"].ToString();
+                    StorageFolder stickyFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
+                    stickyFolder = await stickyFolder.GetFolderAsync("Sticky");
+                    StorageFile stickyFile = await stickyFolder.GetFileAsync(serial + ".ctsnote");
+                    string stickyText = aesEncryptTool.DecryptStringFromBytesAes(File.ReadAllText(stickyFile.Path), md5EncryptTool.GetSystemEncryptedKey(), md5EncryptTool.GetSystemEncryptedVector());
+                    sticky = JsonConvert.DeserializeObject<Sticky>(stickyText);
+                }
+                catch
+                {
+                    string theme = localSettings.Values["StickyTheme"].ToString();
+                    sticky = new Sticky
+                    {
+                        IsLock = false,
+                        CreateTime = DateTime.Now,
+                        StickyDocument = string.Empty,
+                        StickyTheme = theme,
+                        StickySerial = sticky.StickySerial,
+                        QuickViewText = string.Empty,
+                    };
+                }
+            }
             SwitchStickyTheme(sticky.StickyTheme);
             StickyEditBox.Document.SetText(TextSetOptions.FormatRtf, sticky.StickyDocument);
             localSettings.Values["isSaved"] = true;
@@ -139,24 +159,20 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         }
 
         // 保存便签
-        private void SaveStickyNote(object sender, RoutedEventArgs e)
-        {
-            SaveStickyNote();
-        }
-
-        private async void SaveStickyNote()
+        private async void SaveStickyNote(object sender, RoutedEventArgs e)
         {
             StickyEditBox.Document.GetText(TextGetOptions.FormatRtf, out string document);
             StickyEditBox.Document.GetText(TextGetOptions.None, out string quickview);
-            sticky.StickyDocument = (document.TrimEnd()).Replace("\r\n", "");
-            sticky.QuickViewText = (quickview.TrimEnd()).Replace("\r\n", "");
+            sticky.StickyDocument = (document.TrimEnd());
+            sticky.QuickViewText = (quickview.TrimEnd());
 
             string UID = localSettings.Values["UID"].ToString();
             StorageFolder stickyFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(UID, CreationCollisionOption.OpenIfExists);
             stickyFolder = await stickyFolder.CreateFolderAsync("Sticky", CreationCollisionOption.OpenIfExists);
-            StorageFile stickyFile = await stickyFolder.CreateFileAsync(sticky.StickySerial + ".json", CreationCollisionOption.OpenIfExists);
+            StorageFile stickyFile = await stickyFolder.CreateFileAsync(sticky.StickySerial + ".ctsnote", CreationCollisionOption.OpenIfExists);
 
-            File.WriteAllText(stickyFile.Path, JsonConvert.SerializeObject(sticky));
+            string encryptSticky = aesEncryptTool.EncryptStringToBytesAes(JsonConvert.SerializeObject(sticky), md5EncryptTool.GetSystemEncryptedKey(), md5EncryptTool.GetSystemEncryptedVector());
+            File.WriteAllText(stickyFile.Path, encryptSticky);
             localSettings.Values["isSaved"] = true;
         }
 
@@ -198,7 +214,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 string UID = localSettings.Values["UID"].ToString();
                 StorageFolder stickyFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
                 stickyFolder = await stickyFolder.CreateFolderAsync("Sticky", CreationCollisionOption.OpenIfExists);
-                StorageFile stickyFile = await stickyFolder.CreateFileAsync(sticky.StickySerial + ".json", CreationCollisionOption.OpenIfExists);
+                StorageFile stickyFile = await stickyFolder.CreateFileAsync(sticky.StickySerial + ".ctsnote", CreationCollisionOption.OpenIfExists);
                 await stickyFile.DeleteAsync();
             }
             catch (Exception) { }
@@ -239,7 +255,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 string UID = localSettings.Values["UID"].ToString();
                 StorageFolder stickyFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
                 stickyFolder = await stickyFolder.GetFolderAsync("Sticky");
-                StorageFile stickyFile = await stickyFolder.GetFileAsync(sticky.StickySerial + ".json");
+                StorageFile stickyFile = await stickyFolder.GetFileAsync(sticky.StickySerial + ".ctsnote");
             }
             catch (Exception)
             {
@@ -270,20 +286,20 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             if (localSettings.Values["isSaved"] is false)
             {
                 var deferral = e.GetDeferral();
-                ContentDialog dialog = new ContentDialog()
+                ContentDialog dialog = new ContentDialog
                 {
                     Title = "便签内容暂未保存",
                     Content = "是否保存便签中编辑的内容？",
                     CloseButtonText = "丢弃",
                     PrimaryButtonText = "保存",
-                    SecondaryButtonText = "返回"
+                    SecondaryButtonText = "返回",
+                    DefaultButton = ContentDialogButton.Primary
                 };
-                dialog.DefaultButton = ContentDialogButton.Primary;
                 var result = await dialog.ShowAsync();
                 switch (result)
                 {
                     case ContentDialogResult.Primary:
-                        SaveStickyNote();
+                        SaveStickyNote(null, null);
                         break;
                     case ContentDialogResult.Secondary:
                         e.Handled = true;

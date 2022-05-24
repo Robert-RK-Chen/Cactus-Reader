@@ -29,9 +29,13 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
     /// </summary>
     public sealed partial class SettingPage : Page
     {
-        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        readonly IFreeSql freeSql = IFreeSqlService.Instance;
-        readonly ProfileUploadTool uploadTool = ProfileUploadTool.Instance;
+        private ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+        private readonly IFreeSql freeSql = IFreeSqlService.Instance;
+        private readonly ProfileUploadTool uploadTool = ProfileUploadTool.Instance;
+        private readonly MD5EncryptTool md5EncryptTool = MD5EncryptTool.Instance;
+        private readonly InformationVerify informationVerify = InformationVerify.Instance;
+        private readonly EncryptStickyTool encryptStickyTool = EncryptStickyTool.Instance;
+        private readonly MicrosoftPassportHelper microsoftPassportHelper = MicrosoftPassportHelper.Instance;
         private MediaPlayer mediaPlayer;
 
         public SettingPage()
@@ -39,24 +43,42 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             InitializeComponent();
 
             // Initialize App Settings
-            if (localSettings.Values["appThemeIndex"] == null) { 
-                localSettings.Values.Add("appThemeIndex", 2); }
-            if (localSettings.Values["font"] == null) { 
-                localSettings.Values.Add("font", "宋体"); }
-            if (localSettings.Values["fontSize"] == null) { 
-                localSettings.Values.Add("fontSize", 15.0); }
-            if (localSettings.Values["voiceIndex"] == null) {
-                localSettings.Values.Add("voiceIndex", 0); }
-            if (localSettings.Values["voiceName"] == null) {
-                localSettings.Values.Add("voiceName", "zh-CN-XiaoxiaoNeural"); }
-            if (localSettings.Values["voiceLang"] == null) {
-                localSettings.Values.Add("voiceLang", "Chinese"); }
-            if (localSettings.Values["speed"] == null) {
-                localSettings.Values.Add("speed", 1.0); }
-            if (localSettings.Values["tune"] == null) {
-                localSettings.Values.Add("tune", 1.0); }
-            if (localSettings.Values["alreadySetWindowsHello"] == null) {
-                localSettings.Values.Add("alreadySetWindowsHello", false); }
+            if (localSettings.Values["appThemeIndex"] == null)
+            {
+                localSettings.Values.Add("appThemeIndex", 2);
+            }
+            if (localSettings.Values["font"] == null)
+            {
+                localSettings.Values.Add("font", "宋体");
+            }
+            if (localSettings.Values["fontSize"] == null)
+            {
+                localSettings.Values.Add("fontSize", 15.0);
+            }
+            if (localSettings.Values["voiceIndex"] == null)
+            {
+                localSettings.Values.Add("voiceIndex", 0);
+            }
+            if (localSettings.Values["voiceName"] == null)
+            {
+                localSettings.Values.Add("voiceName", "zh-CN-XiaoxiaoNeural");
+            }
+            if (localSettings.Values["voiceLang"] == null)
+            {
+                localSettings.Values.Add("voiceLang", "Chinese");
+            }
+            if (localSettings.Values["speed"] == null)
+            {
+                localSettings.Values.Add("speed", 1.0);
+            }
+            if (localSettings.Values["tune"] == null)
+            {
+                localSettings.Values.Add("tune", 1.0);
+            }
+            if (localSettings.Values["alreadySetWindowsHello"] == null)
+            {
+                localSettings.Values.Add("alreadySetWindowsHello", false);
+            }
 
             // Add a global Media Player Element
             mediaPlayer = new MediaPlayer();
@@ -86,7 +108,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 setKeyButton.Visibility = Visibility.Visible;
                 closeKeyButton.Visibility = Visibility.Collapsed;
             }
-            
+
             // TODO: Load User Profile Image
             try
             {
@@ -343,7 +365,6 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 VerticalContentAlignment = VerticalAlignment.Center,
                 Header = "需要输入个人密码才能查看便签本中的内容。",
             };
-
             ContentDialog setPrivateKeyDialog = new ContentDialog
             {
                 Title = "设置个人密码",
@@ -360,16 +381,23 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 string password = passwordBox.Password;
                 if (password.Length >= 6)
                 {
-                    // Encrypt private key
-                    localSettings.Values.Add("privateKey", MD5EncryptTool.GetEncryptedPassword(password));
-
-                    // then allow user use Windows Hello
+                    // Encrypt private key then allow user use Windows Hello
+                    localSettings.Values.Add("privateKey", md5EncryptTool.GetUserEncryptedPassword(password));
                     windowsHelloSwitch.IsEnabled = true;
 
                     // hide the button and show another button
                     setKeyButton.Visibility = Visibility.Collapsed;
                     closeKeyButton.Visibility = Visibility.Visible;
-                    
+
+                    ContentDialog keyAlertDialog = new ContentDialog
+                    {
+                        Title = "请勿忘记便签本密码",
+                        Content = "忘记便签本的密码将导致即使你可以通过 Windows Hello 等方式访问你的便签本，你可能会永久性地失去对你便签本的管理权限。",
+                        CloseButtonText = "取消",
+                        PrimaryButtonText = "确定",
+                        DefaultButton = ContentDialogButton.Primary
+                    };
+                    await keyAlertDialog.ShowAsync();
                     break;
                 }
                 else
@@ -384,15 +412,14 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             PasswordBox passwordBox = new PasswordBox
             {
                 Width = 360,
-                PlaceholderText = "请输入你的个人密码",
+                PlaceholderText = "请输入你用于锁定便签本的密码",
                 VerticalAlignment = VerticalAlignment.Bottom,
                 VerticalContentAlignment = VerticalAlignment.Center,
-                Header = "我们需要验证你的密码，然后为你关闭密码。",
+                Header = "我们需要验证你的密码，然后为你关闭密码，这将解锁你的所有便签。",
             };
-
             ContentDialog setPrivateKeyDialog = new ContentDialog
             {
-                Title = "关闭个人密码",
+                Title = "关闭便签本密码",
                 Content = passwordBox,
                 CloseButtonText = "取消",
                 PrimaryButtonText = "确定",
@@ -403,17 +430,17 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             while (result == ContentDialogResult.Primary)
             {
                 string password = passwordBox.Password;
-                byte[] privateKey = (byte[])localSettings.Values["privateKey"];
-                byte[] calibrateKey = MD5EncryptTool.GetEncryptedPassword(password);
-                if (BitConverter.ToString(privateKey) == BitConverter.ToString(calibrateKey))
+                if (informationVerify.CheckPassword(password))
                 {
                     localSettings.Values.Remove("privateKey");
-                    windowsHelloSwitch.IsOn = false;
-                    windowsHelloSwitch.IsEnabled = false;
                     localSettings.Values["alreadySetWindowsHello"] = false;
 
+                    windowsHelloSwitch.IsOn = false;
+                    windowsHelloSwitch.IsEnabled = false;
                     setKeyButton.Visibility = Visibility.Visible;
                     closeKeyButton.Visibility = Visibility.Collapsed;
+
+                    await Task.Factory.StartNew(() => encryptStickyTool.UnlockAllSticky());
                     break;
                 }
                 else
@@ -442,13 +469,13 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 string name = localSettings.Values["name"].ToString();
 
                 windowsHelloSwitch.IsEnabled = false;
-                bool isSuccessful = await MicrosoftPassportHelper.CreatePassportKeyAsync(UID, name);
+                bool isSuccessful = await microsoftPassportHelper.CreatePassportKeyAsync(UID, name);
                 if (isSuccessful)
                 {
                     ContentDialog contentDialog = new ContentDialog
                     {
                         Title = "Windows Hello 验证成功",
-                        Content = "你现在可以使用 Windows Hello 来查看和管理锁定的便签。",
+                        Content = "你现在可以使用 Windows Hello 来查看和管理锁定的便签本。",
                         PrimaryButtonText = "确定",
                         DefaultButton = ContentDialogButton.Primary
                     };
@@ -456,7 +483,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                     localSettings.Values["alreadySetWindowsHello"] = true;
                 }
                 else
-                {                    
+                {
                     localSettings.Values["alreadySetWindowsHello"] = false;
                     windowsHelloSwitch.IsOn = false;
                 }

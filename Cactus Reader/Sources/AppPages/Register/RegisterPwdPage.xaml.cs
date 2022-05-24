@@ -17,8 +17,12 @@ namespace Cactus_Reader.Sources.AppPages.Register
     /// </summary>
     public sealed partial class RegisterPwdPage : Page
     {
-        readonly IFreeSql freeSql = IFreeSqlService.Instance;
-        readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
+        private readonly IFreeSql freeSql = IFreeSqlService.Instance;
+        private readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
+        private readonly HashDirectory hashDirectory = HashDirectory.Instance;
+        private readonly InformationVerify informationVerify = InformationVerify.Instance;
+        private readonly MicrosoftPassportHelper microsoftPassportHelper = MicrosoftPassportHelper.Instance;
+
         User currentUser = null;
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -52,16 +56,16 @@ namespace Cactus_Reader.Sources.AppPages.Register
                 {
                     alertMsg.Text = "若要继续，请为你的帐户创建一个密码。";
                 }
-                else if (InformationVerify.IsPassword(password) && string.Equals(password, checkPwd))
+                else if (informationVerify.IsPassword(password) && string.Equals(password, checkPwd))
                 {
-                    currentUser.Password = HashDirectory.GetEncryptedPassword(password);
+                    currentUser.Password = hashDirectory.GetEncryptedPassword(password);
                     currentUser.UID = Guid.NewGuid().ToString("D").ToUpper();
                     currentUser.RegistDate = DateTime.Now;
                     currentUser.Mobile = string.Empty;
 
                     ControllerVisibility.ShowProgressBar(statusBar);
                     await Task.Factory.StartNew(() => freeSql.Insert(currentUser).ExecuteAffrows());
-                    bool isTPMEnabled = await MicrosoftPassportHelper.MicrosoftPassportAvailableCheckAsync();
+                    bool isTPMEnabled = await microsoftPassportHelper.MicrosoftPassportAvailableCheckAsync();
 
                     if (isTPMEnabled)
                     {

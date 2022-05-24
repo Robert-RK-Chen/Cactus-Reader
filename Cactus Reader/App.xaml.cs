@@ -1,5 +1,7 @@
 ﻿using Cactus_Reader.Sources.AppPages;
+using Cactus_Reader.Sources.AppPages.Widget;
 using Cactus_Reader.Sources.ToolKits;
+using Cactus_Reader.Sources.WindowsHello;
 using System;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
@@ -31,6 +33,7 @@ namespace Cactus_Reader
             Task.Factory.StartNew(() =>
             {
                 IFreeSql freesql = IFreeSqlService.Instance;
+                MicrosoftPassportHelper microsoftPassportHelper = MicrosoftPassportHelper.Instance;
             });
         }
 
@@ -66,7 +69,7 @@ namespace Cactus_Reader
                     // 当导航堆栈尚未还原时，导航到第一页，并通过将所需信息作为导航参数传入来配置参数
                     // 当用户配置记载当前用户处于登陆状态则无需进行登录过程
 
-                    Object oIsLogin = localSettings.Values["isLogin"];
+                    object oIsLogin = localSettings.Values["isLogin"];
                     if (null != oIsLogin && oIsLogin is true)
                     {
                         rootFrame.Navigate(typeof(MainPage), e.Arguments);
@@ -76,7 +79,7 @@ namespace Cactus_Reader
                         rootFrame.Navigate(typeof(StartPage), e.Arguments);
                     }
 
-                    Object oAppThemeIndex = localSettings.Values["appThemeIndex"];
+                    object oAppThemeIndex = localSettings.Values["appThemeIndex"];
                     if (null != oAppThemeIndex)
                     {
                         switch ((int)oAppThemeIndex)

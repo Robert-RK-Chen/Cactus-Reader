@@ -1,5 +1,6 @@
 ﻿using Cactus_Reader.Entities;
 using Cactus_Reader.Sources.StickyNotes;
+using Cactus_Reader.Sources.ToolKits;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -24,8 +25,10 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
     public sealed partial class StickyPage : Page
     {
         public static StickyPage stickyPage;
-        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        readonly ThemeColorBrushTool brushTool = ThemeColorBrushTool.Instance;
+        private readonly ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+        private readonly ThemeColorBrushTool brushTool = ThemeColorBrushTool.Instance;
+        private readonly AESEncryptTool aesEncryptTool = AESEncryptTool.Instance;
+        private readonly MD5EncryptTool md5EncryptTool = MD5EncryptTool.Instance;
 
         public StickyPage()
         {
@@ -52,14 +55,29 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 {
                     foreach (StorageFile file in fileList)
                     {
-                        Sticky sticky = JsonConvert.DeserializeObject<Sticky>(File.ReadAllText(file.Path));
-                        StickyQuickViewList.Items.Add(new StickyQuickView
+                        string stickyText = aesEncryptTool.DecryptStringFromBytesAes(File.ReadAllText(file.Path), md5EncryptTool.GetSystemEncryptedKey(), md5EncryptTool.GetSystemEncryptedVector());
+                        Sticky sticky = JsonConvert.DeserializeObject<Sticky>(stickyText);
+
+                        if (sticky.IsLock == false)
                         {
-                            CreateTimeText = sticky.CreateTime.ToShortDateString(),
-                            StickySerial = sticky.StickySerial,
-                            ThemeKind = sticky.StickyTheme,
-                            QucikViewText = sticky.QuickViewText,
-                        });
+                            StickyQuickViewList.Items.Add(new StickyQuickView
+                            {
+                                CreateTimeText = sticky.CreateTime.ToShortDateString(),
+                                StickySerial = sticky.StickySerial,
+                                ThemeKind = sticky.StickyTheme,
+                                QucikViewText = sticky.QuickViewText,
+                            });
+                        }
+                        else
+                        {
+                            StickyQuickViewList.Items.Add(new StickyQuickView
+                            {
+                                CreateTimeText = sticky.CreateTime.ToShortDateString(),
+                                StickySerial = sticky.StickySerial,
+                                ThemeKind = sticky.StickyTheme,
+                                QucikViewText = "🔒 该便签已被锁定。",
+                            });
+                        }
                     }
                 });
             }
@@ -72,6 +90,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
         private async void CreateNewSticky(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
+            List<object> parameter = new List<object>();
             string serial = Guid.NewGuid().ToString("D").ToUpper();
             string UID = localSettings.Values["UID"].ToString();
             string theme = localSettings.Values["StickyTheme"].ToString();
@@ -88,13 +107,16 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             };
             StickyQuickViewList.Items.Add(stickyQuickView);
 
+            parameter.Add("new");
+            parameter.Add(stickyQuickView);
+
             // 打开新便签界面
             CoreApplicationView newView = CoreApplication.CreateNewView();
             int newViewId = 0;
             await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 Frame frame = new Frame();
-                frame.Navigate(typeof(NewStickyPage), stickyQuickView, new DrillInNavigationTransitionInfo());
+                frame.Navigate(typeof(NewStickyPage), parameter, new DrillInNavigationTransitionInfo());
                 Window.Current.Content = frame;
                 Window.Current.Activate();
                 newViewId = ApplicationView.GetForCurrentView().Id;

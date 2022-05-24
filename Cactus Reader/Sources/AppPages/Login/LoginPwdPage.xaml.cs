@@ -18,9 +18,12 @@ namespace Cactus_Reader.Sources.AppPages.Login
     /// </summary>
     public sealed partial class LoginPwdPage : Page
     {
-        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
-        readonly MailCodeSender codeSender = MailCodeSender.Instance;
+        private ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+        private readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
+        private readonly MailCodeSender codeSender = MailCodeSender.Instance;
+        private readonly HashDirectory hashDirectory = HashDirectory.Instance;
+        private readonly MicrosoftPassportHelper microsoftPassportHelper = MicrosoftPassportHelper.Instance;
+        
         User currentUser = null;
 
         public LoginPwdPage()
@@ -91,7 +94,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
         private async void WindowsHelloLogin(object sender, RoutedEventArgs e)
         {
             Object oCurrentUID = localSettings.Values["email"];
-            bool isTPMEnabled = await MicrosoftPassportHelper.MicrosoftPassportAvailableCheckAsync();
+            bool isTPMEnabled = await microsoftPassportHelper.MicrosoftPassportAvailableCheckAsync();
 
             if (isTPMEnabled)
             {
@@ -104,7 +107,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
                     else
                     {
                         ControllerVisibility.ShowProgressBar(statusBar);
-                        bool isSuccessful = await MicrosoftPassportHelper.CreatePassportKeyAsync(currentUser.UID, currentUser.Name);
+                        bool isSuccessful = await microsoftPassportHelper.CreatePassportKeyAsync(currentUser.UID, currentUser.Name);
 
                         if (isSuccessful)
                         {
@@ -157,7 +160,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
         {
             try
             {
-                string password = HashDirectory.GetEncryptedPassword(userPwdInput.Password);
+                string password = hashDirectory.GetEncryptedPassword(userPwdInput.Password);
 
                 if (userPwdInput.Password.Length == 0)
                 {

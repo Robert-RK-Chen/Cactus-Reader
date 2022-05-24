@@ -20,7 +20,8 @@ namespace Cactus_Reader.Sources.AppPages.Register
     /// </summary>
     public sealed partial class RegisterMailPage : Page
     {
-        readonly MailCodeSender codeSender = MailCodeSender.Instance;
+        private readonly MailCodeSender codeSender = MailCodeSender.Instance;
+        private readonly InformationVerify informationVerify = InformationVerify.Instance;
         User currentUser = null;
 
         public RegisterMailPage()
@@ -54,9 +55,9 @@ namespace Cactus_Reader.Sources.AppPages.Register
             try
             {
                 ControllerVisibility.ShowProgressBar(statusBar);
-                bool isMailEnabled = await Task.Factory.StartNew(() => InformationVerify.EmailEnabled(mailAddress));
+                bool isMailEnabled = await Task.Factory.StartNew(() => informationVerify.EmailEnabled(mailAddress));
 
-                if (!InformationVerify.IsEmail(mailAddress))
+                if (!informationVerify.IsEmail(mailAddress))
                 {
                     alertMsg.Text = "请输入一个有效的电子邮件地址。";
                 }
