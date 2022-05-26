@@ -41,6 +41,9 @@ namespace CactusReaderService
     {
         [OperationContract, WebInvoke(UriTemplate = "/upload-profile-image")]
         void UploadProfileImage(Stream content);
+
+        [OperationContract, WebInvoke(UriTemplate = "/upload-cactus-notes")]
+        void UploadCactusNotes(Stream content);
     }
 
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
@@ -66,6 +69,51 @@ namespace CactusReaderService
                 if (!Directory.Exists(imgPath))
                 {
                     Directory.CreateDirectory(imgPath);
+                }
+
+                // 如果文件存在，将其删除
+                if (File.Exists(newFilePath))
+                {
+                    File.Delete(newFilePath);
+                }
+
+                using (FileStream fileStream = File.OpenWrite(newFilePath))
+                {
+                    // 从客户端上传的流中将数据复制到文件流中
+                    content.CopyTo(fileStream);
+                }
+
+                Console.WriteLine(string.Format("在{0}成功接收文件。", DateTime.Now.ToLongTimeString()));
+                // 向客户端发送回应消息
+                WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                // 处理错误
+                Console.WriteLine(ex.Message);
+                WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.InternalServerError;
+                WebOperationContext.Current.OutgoingResponse.StatusDescription = ex.Message;
+            }
+        }
+
+        public void UploadCactusNotes(Stream content)
+        {
+            IncomingWebRequestContext request = WebOperationContext.Current.IncomingRequest;
+
+            // 从标头获取用户 UID
+            string UID = request.Headers["UID"];
+            string serial = request.Headers["Serial"];
+
+            // 开始接收文件
+            try
+            {
+                // 获取用户文档库位置
+                string notesPath = profilePath + UID + @"\Notes";
+                string newFilePath = Path.Combine(notesPath, serial);
+
+                if (!Directory.Exists(notesPath))
+                {
+                    Directory.CreateDirectory(notesPath);
                 }
 
                 // 如果文件存在，将其删除

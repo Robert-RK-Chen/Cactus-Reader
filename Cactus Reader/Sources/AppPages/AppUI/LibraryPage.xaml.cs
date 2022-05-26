@@ -1,16 +1,12 @@
-﻿using Cactus_Reader.Sources.AppPages.Reader;
-using Cactus_Reader.Sources.AppPages.Widget;
+﻿using Cactus_Reader.Entities.EpubEntities;
+using Cactus_Reader.Sources.AppPages.Reader;
 using Sgml;
 using System;
 using System.IO;
 using System.Net;
-using System.Reflection.Metadata;
-using System.Threading.Tasks;
 using System.Xml;
-using System.Xml.Linq;
 using Windows.Storage;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media.Animation;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
@@ -95,6 +91,10 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 {
                     case ".txt":
                         MainPage.mainPage.mainContent.Navigate(typeof(TextFileReadingPage), document, new EntranceNavigationTransitionInfo());
+                        break;
+                    case ".epub":
+                        BookInfo bookInfo = new BookInfo(document);
+                        MainPage.mainPage.mainContent.Navigate(typeof(EpubFileReadingPage), bookInfo, new EntranceNavigationTransitionInfo());
                         break;
                 }
             }

@@ -22,7 +22,6 @@ namespace Cactus_Reader.Sources.AppPages.Login
         private readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
         private readonly MailCodeSender codeSender = MailCodeSender.Instance;
         private readonly HashDirectory hashDirectory = HashDirectory.Instance;
-        private readonly MicrosoftPassportHelper microsoftPassportHelper = MicrosoftPassportHelper.Instance;
         
         User currentUser = null;
 
@@ -94,7 +93,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
         private async void WindowsHelloLogin(object sender, RoutedEventArgs e)
         {
             Object oCurrentUID = localSettings.Values["email"];
-            bool isTPMEnabled = await microsoftPassportHelper.MicrosoftPassportAvailableCheckAsync();
+            bool isTPMEnabled = await MicrosoftPassportHelper.MicrosoftPassportAvailableCheckAsync();
 
             if (isTPMEnabled)
             {
@@ -107,7 +106,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
                     else
                     {
                         ControllerVisibility.ShowProgressBar(statusBar);
-                        bool isSuccessful = await microsoftPassportHelper.CreatePassportKeyAsync(currentUser.UID, currentUser.Name);
+                        bool isSuccessful = await MicrosoftPassportHelper.CreatePassportKeyAsync(currentUser.UID, currentUser.Name);
 
                         if (isSuccessful)
                         {

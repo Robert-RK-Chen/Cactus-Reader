@@ -25,7 +25,6 @@ namespace Cactus_Reader.Sources.StickyNotes
         private readonly ThemeColorBrushTool brushTool = ThemeColorBrushTool.Instance;
         private readonly EncryptStickyTool encryptStickyTool = EncryptStickyTool.Instance;
         private readonly InformationVerify informationVerify = InformationVerify.Instance;
-        private readonly MicrosoftPassportHelper microsoftPassportHelper = MicrosoftPassportHelper.Instance;
 
         public StickyQuickView()
         {
@@ -187,7 +186,7 @@ typeof(string), typeof(StickyQuickView), new PropertyMetadata(Guid.Empty));
                     {
                         if ((bool)localSettings.Values["alreadySetWindowsHello"] == true)
                         {
-                            if (await microsoftPassportHelper.CreatePassportKeyAsync(UID, (string)localSettings.Values["name"]))
+                            if (await MicrosoftPassportHelper.CreatePassportKeyAsync(UID, (string)localSettings.Values["name"]))
                             {
                                 OpenSticky();
                                 break;
@@ -309,7 +308,7 @@ typeof(string), typeof(StickyQuickView), new PropertyMetadata(Guid.Empty));
                 {
                     if ((bool)localSettings.Values["alreadySetWindowsHello"] == true)
                     {
-                        if (await microsoftPassportHelper.CreatePassportKeyAsync(UID, (string)localSettings.Values["name"]))
+                        if (await MicrosoftPassportHelper.CreatePassportKeyAsync(UID, (string)localSettings.Values["name"]))
                         {
                             await encryptStickyTool.UnlockStickyAsync(StickySerial);
                             QucikViewText = "🔓 已解锁，刷新页面查看便签内容。";

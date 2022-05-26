@@ -32,6 +32,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         private readonly MD5EncryptTool md5EncryptTool = MD5EncryptTool.Instance;
         private readonly ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         private readonly ThemeColorBrushTool brushTool = ThemeColorBrushTool.Instance;
+        private ProfileUploadTool profileUploadTool = ProfileUploadTool.Instance;
 
         public NewStickyPage()
         {
@@ -174,6 +175,8 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             string encryptSticky = aesEncryptTool.EncryptStringToBytesAes(JsonConvert.SerializeObject(sticky), md5EncryptTool.GetSystemEncryptedKey(), md5EncryptTool.GetSystemEncryptedVector());
             File.WriteAllText(stickyFile.Path, encryptSticky);
             localSettings.Values["isSaved"] = true;
+
+            profileUploadTool.UploadCactusNotes(stickyFile, UID, stickyFile.Name, "/upload-cactus-notes");
         }
 
         private async void ChangeStickyFont(object sender, RoutedEventArgs e)

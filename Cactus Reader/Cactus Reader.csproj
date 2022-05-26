@@ -135,6 +135,9 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Entities\Code.cs" />
+    <Compile Include="Entities\EpubEntities\BookInfo.cs" />
+    <Compile Include="Entities\EpubEntities\BookItem.cs" />
+    <Compile Include="Entities\EpubEntities\Chapter.cs" />
     <Compile Include="Entities\Privatekey.cs" />
     <Compile Include="Entities\Sticky.cs" />
     <Compile Include="Entities\ThemeColorBrush.cs" />
@@ -182,6 +185,12 @@
     </Compile>
     <Compile Include="Sources\AppPages\Login\ResetPassword.xaml.cs">
       <DependentUpon>ResetPassword.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sources\AppPages\Reader\EpubFileReadingPage.xaml.cs">
+      <DependentUpon>EpubFileReadingPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sources\AppPages\Reader\PdfFileReadingPage.xaml.cs">
+      <DependentUpon>PdfFileReadingPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Sources\AppPages\Reader\TextFileReadingPage.xaml.cs">
       <DependentUpon>TextFileReadingPage.xaml</DependentUpon>
@@ -294,6 +303,7 @@
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
     <Content Include="Sources\Images\Bugs.png" />
     <Content Include="Sources\Images\Cactus Reader.png" />
+    <Content Include="Sources\Images\capture.jpeg" />
     <Content Include="Sources\Images\Cloud.png" />
     <Content Include="Sources\Images\ExperimentFeatures.png" />
     <Content Include="Sources\Images\FavoriteCollection.png" />
@@ -360,6 +370,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Sources\AppPages\Login\ResetPassword.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sources\AppPages\Reader\EpubFileReadingPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sources\AppPages\Reader\PdfFileReadingPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -436,13 +454,19 @@
       <Version>7.1.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
-      <Version>2.7.1</Version>
+      <Version>2.8.0-prerelease.220413001</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Web.WebView2">
+      <Version>1.0.1248-prerelease</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Xml.SgmlReader">
       <Version>1.8.25</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="System.IO.Compression.ZipFile">
+      <Version>4.3.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

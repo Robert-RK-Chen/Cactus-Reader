@@ -9,19 +9,9 @@ using Cactus_Reader.Sources.ToolKits;
 
 namespace Cactus_Reader.Sources.WindowsHello
 {
-    public class MicrosoftPassportHelper
+    public static class MicrosoftPassportHelper
     {
-        private static MicrosoftPassportHelper instance;
-
-        public static MicrosoftPassportHelper Instance
-        {
-            get
-            {
-                return instance ?? (instance = new MicrosoftPassportHelper());
-            }
-        }
-
-        public async Task<bool> MicrosoftPassportAvailableCheckAsync()
+        public static async Task<bool> MicrosoftPassportAvailableCheckAsync()
         {
             bool keyCredentialAvailable = await KeyCredentialManager.IsSupportedAsync();
             if (keyCredentialAvailable == false)
@@ -31,7 +21,7 @@ namespace Cactus_Reader.Sources.WindowsHello
             return true;
         }
 
-        public async Task<bool> CreatePassportKeyAsync(string UID, string Name)
+        public static async Task<bool> CreatePassportKeyAsync(string UID, string Name)
         {
             KeyCredentialRetrievalResult keyCreationResult = await KeyCredentialManager.RequestCreateAsync(Name, KeyCredentialCreationOption.ReplaceExisting);
 
@@ -53,7 +43,7 @@ namespace Cactus_Reader.Sources.WindowsHello
             return false;
         }
 
-        public async void RemovePassportAccountAsync(User user)
+        public static async void RemovePassportAccountAsync(User user)
         {
             KeyCredentialRetrievalResult keyOpenResult = await KeyCredentialManager.OpenAsync(user.Name);
             if (keyOpenResult.Status == KeyCredentialStatus.Success)
@@ -63,12 +53,12 @@ namespace Cactus_Reader.Sources.WindowsHello
             await KeyCredentialManager.DeleteAsync(user.Name);
         }
 
-        public void RemovePassportDevice(User user, string deviceId)
+        public static void RemovePassportDevice(User user, string deviceId)
         {
             AuthService.Instance.PassportRemoveDevice(user.UID, deviceId);
         }
 
-        private async Task GetKeyAttestationAsync(string UID, KeyCredentialRetrievalResult keyCreationResult)
+        private static async Task GetKeyAttestationAsync(string UID, KeyCredentialRetrievalResult keyCreationResult)
         {
             KeyCredential userKey = keyCreationResult.Credential;
             IBuffer publicKey = userKey.RetrievePublicKey();
@@ -103,13 +93,13 @@ namespace Cactus_Reader.Sources.WindowsHello
             UpdatePassportDetails(UID, deviceId, publicKey.ToArray(), keyAttestationResult);
         }
 
-        public bool UpdatePassportDetails(string UID, string deviceId, byte[] publicKey, KeyCredentialAttestationResult keyAttestationResult)
+        public static bool UpdatePassportDetails(string UID, string deviceId, byte[] publicKey, KeyCredentialAttestationResult keyAttestationResult)
         {
             AuthService.Instance.PassportUpdateDetails(UID, deviceId, publicKey, keyAttestationResult);
             return true;
         }
 
-        private async Task<bool> RequestSignAsync(string UID, KeyCredentialRetrievalResult openKeyResult)
+        private static async Task<bool> RequestSignAsync(string UID, KeyCredentialRetrievalResult openKeyResult)
         {
             IBuffer challengeMessage = AuthService.Instance.PassportRequestChallenge();
             KeyCredential userKey = openKeyResult.Credential;
@@ -135,7 +125,7 @@ namespace Cactus_Reader.Sources.WindowsHello
             return false;
         }
 
-        public async Task<bool> GetPassportAuthenticationMessageAsync(User user)
+        public static async Task<bool> GetPassportAuthenticationMessageAsync(User user)
         {
             KeyCredentialRetrievalResult openKeyResult = await KeyCredentialManager.OpenAsync(user.Name);
             var consentResult = await Windows.Security.Credentials.UI.UserConsentVerifier.RequestVerificationAsync(user.Name);

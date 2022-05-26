@@ -21,7 +21,6 @@ namespace Cactus_Reader.Sources.AppPages.Register
         private readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
         private readonly HashDirectory hashDirectory = HashDirectory.Instance;
         private readonly InformationVerify informationVerify = InformationVerify.Instance;
-        private readonly MicrosoftPassportHelper microsoftPassportHelper = MicrosoftPassportHelper.Instance;
 
         User currentUser = null;
 
@@ -65,7 +64,7 @@ namespace Cactus_Reader.Sources.AppPages.Register
 
                     ControllerVisibility.ShowProgressBar(statusBar);
                     await Task.Factory.StartNew(() => freeSql.Insert(currentUser).ExecuteAffrows());
-                    bool isTPMEnabled = await microsoftPassportHelper.MicrosoftPassportAvailableCheckAsync();
+                    bool isTPMEnabled = await MicrosoftPassportHelper.MicrosoftPassportAvailableCheckAsync();
 
                     if (isTPMEnabled)
                     {

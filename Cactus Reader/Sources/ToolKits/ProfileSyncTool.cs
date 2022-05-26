@@ -107,5 +107,30 @@ namespace Cactus_Reader.Sources.ToolKits
                 System.Diagnostics.Debug.Write("未连接，无法同步或无法访问资源。");
             }
         }
+
+        public async void SyncUserSticky(string UID)
+        {
+            try
+            {
+                if (Guid.TryParse(UID, out _))
+                {
+                    // 获取服务器资源路径
+                    Uri source = new Uri(SERVER_ADDRESS + UID + "/ProfilePicture.PNG");
+
+                    // 本地保存位置
+                    StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(UID, CreationCollisionOption.OpenIfExists);
+                    StorageFile userImageFile = await storageFolder.CreateFileAsync("ProfilePicture.PNG", CreationCollisionOption.OpenIfExists);
+
+                    // 下载服务器资源
+                    BackgroundDownloader downloader = new BackgroundDownloader();
+                    DownloadOperation download = downloader.CreateDownload(source, userImageFile);
+                    SetDownload(download, true);
+                }
+            }
+            catch(Exception)
+            {
+                
+            }
+        }
     }
 }

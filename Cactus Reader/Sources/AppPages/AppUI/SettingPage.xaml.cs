@@ -35,7 +35,6 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         private readonly MD5EncryptTool md5EncryptTool = MD5EncryptTool.Instance;
         private readonly InformationVerify informationVerify = InformationVerify.Instance;
         private readonly EncryptStickyTool encryptStickyTool = EncryptStickyTool.Instance;
-        private readonly MicrosoftPassportHelper microsoftPassportHelper = MicrosoftPassportHelper.Instance;
         private MediaPlayer mediaPlayer;
 
         public SettingPage()
@@ -469,7 +468,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 string name = localSettings.Values["name"].ToString();
 
                 windowsHelloSwitch.IsEnabled = false;
-                bool isSuccessful = await microsoftPassportHelper.CreatePassportKeyAsync(UID, name);
+                bool isSuccessful = await MicrosoftPassportHelper.CreatePassportKeyAsync(UID, name);
                 if (isSuccessful)
                 {
                     ContentDialog contentDialog = new ContentDialog

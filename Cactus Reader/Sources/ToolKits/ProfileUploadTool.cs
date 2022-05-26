@@ -89,5 +89,23 @@ namespace Cactus_Reader.Sources.ToolKits
             UploadOperation uploadOpt = uploader.CreateUpload(new Uri(SERVER_IP_ADDRESS + method), file);
             SetUpLoad(uploadOpt, true);
         }
+
+        public async void UploadCactusNotes(StorageFile file, string UID, string serial, string method)
+        {
+            int n = (await BackgroundUploader.GetCurrentUploadsAsync()).Count;
+            if (n > 200)
+            {
+                return;
+            }
+
+            BackgroundUploader uploader = new BackgroundUploader();
+            uploader.SetRequestHeader("UID", UID);
+            uploader.SetRequestHeader("Serial", serial);
+            uploader.Method = "POST";
+
+            // 创建上传任务
+            UploadOperation uploadOpt = uploader.CreateUpload(new Uri(SERVER_IP_ADDRESS + method), file);
+            SetUpLoad(uploadOpt, true);
+        }
     }
 }

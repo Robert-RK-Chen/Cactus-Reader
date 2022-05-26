@@ -33,7 +33,6 @@ namespace Cactus_Reader
             Task.Factory.StartNew(() =>
             {
                 IFreeSql freesql = IFreeSqlService.Instance;
-                MicrosoftPassportHelper microsoftPassportHelper = MicrosoftPassportHelper.Instance;
             });
         }
 
