@@ -3,6 +3,7 @@ using Cactus_Reader.Sources.StickyNotes;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.DataTransfer;
@@ -35,7 +36,6 @@ namespace Cactus_Reader.Sources.AppPages.Reader
         {
             this.InitializeComponent();
 
-            if (localSettings.Values["StickyTheme"] == null) { localSettings.Values["StickyTheme"] = "GingkoYellow"; }
             if (localSettings.Values["fontSize"] == null) { localSettings.Values["fontSize"] = 20.0; }
             if (localSettings.Values["charSpacing"] == null) { localSettings.Values["charSpacing"] = 20.0; }
             if (localSettings.Values["lineHeight"] == null) { localSettings.Values["lineHeight"] = 2.0; }
@@ -421,6 +421,7 @@ namespace Cactus_Reader.Sources.AppPages.Reader
 
         private async void CreateNewSticky(object sender, RoutedEventArgs e)
         {
+            List<object> parameter = new List<object>();
             string serial = Guid.NewGuid().ToString("D").ToUpper();
             string UID = localSettings.Values["UID"].ToString();
             string theme = localSettings.Values["StickyTheme"].ToString();
@@ -434,13 +435,16 @@ namespace Cactus_Reader.Sources.AppPages.Reader
                 Background = brushTool.GetThemeColorBrush(theme, false).BackgroundBrush,
             };
 
+            parameter.Add("new");
+            parameter.Add(stickyQuickView);
+
             // 打开新便签界面
             CoreApplicationView newView = CoreApplication.CreateNewView();
             int newViewId = 0;
             await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 Frame frame = new Frame();
-                frame.Navigate(typeof(NewStickyPage), stickyQuickView, new DrillInNavigationTransitionInfo());
+                frame.Navigate(typeof(NewStickyPage), parameter, new DrillInNavigationTransitionInfo());
                 Window.Current.Content = frame;
                 Window.Current.Activate();
                 newViewId = ApplicationView.GetForCurrentView().Id;

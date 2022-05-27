@@ -117,9 +117,9 @@
                 </Border>
                 <ScrollViewer x:Name="canvasContainer" HorizontalScrollMode="Enabled" ViewChanged="UpdateScaleMulti"
                           HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
-                          ZoomMode="Enabled" MinZoomFactor="0.1" MaxZoomFactor="10"  Padding="0, 60, 0, 0">
-                    <Grid Height="auto">
-                        <Canvas x:Name="selectionCanvas">
+                          ZoomMode="Enabled" MinZoomFactor="0.1" MaxZoomFactor="10" >
+                    <Grid Height="auto" Padding="0, 60, 0, 60">
+                        <Canvas x:Name="selectionCanvas" Width="1600">
                             <Canvas.Background>
                                 <ImageBrush ImageSource="/Sources/Images/capture.jpeg" Stretch="Uniform"/>
                             </Canvas.Background>

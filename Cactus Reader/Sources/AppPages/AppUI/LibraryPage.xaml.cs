@@ -68,6 +68,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                     MainPage.mainPage.mainContent.Navigate(typeof(TextFileReadingPage), contentText, new EntranceNavigationTransitionInfo());
                     break;
                 }
+                result = await openWebDocumentDialog.ShowAsync();
             }
         }
 
