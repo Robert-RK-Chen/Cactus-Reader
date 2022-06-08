@@ -145,13 +145,14 @@
                             </AppBarButton>
                             <AppBarSeparator />
                             <AppBarButton Label="Cactus Notes" ToolTipService.ToolTip="Cactus Notes" 
-                                          LabelPosition="Default">
+                                          LabelPosition="Default" Click="CreateNewSticky">
                                 <AppBarButton.Icon>
                                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70B;" />
                                 </AppBarButton.Icon>
                             </AppBarButton>
                             <AppBarSeparator />
-                            <AppBarButton Label="分享内容" LabelPosition="Default" ToolTipService.ToolTip="分享">
+                            <AppBarButton Label="分享内容" LabelPosition="Default" ToolTipService.ToolTip="分享"
+                                          Click="ShareNearBy">
                                 <AppBarButton.Icon>
                                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE72D;" />
                                 </AppBarButton.Icon>

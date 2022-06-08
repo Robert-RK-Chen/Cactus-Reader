@@ -1,12 +1,18 @@
 ﻿using Cactus_Reader.Entities.EpubEntities;
+using Cactus_Reader.Sources.AppPages.AppUI;
+using Cactus_Reader.Sources.StickyNotes;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Data.Xml.Dom;
+using Windows.Foundation;
 using Windows.Storage;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -24,12 +30,16 @@ namespace Cactus_Reader.Sources.AppPages.Reader
     {
         public ObservableCollection<Chapter> Chapters { get; private set; }
         BookInfo bookInfo = null;
-        private string readerStyle = "<body style=\"font-family: MiSans; line-height: 2; font-size: 18px; margin: 36px; letter-spacing: 2px; background-color: #fbf7f0; font-weight: SemiBold;\"";
+        private string readerStyle = "<body style=\"font-family: MiSans; line-height: 2; font-size: 18px; margin: 36px; letter-spacing: 2px; background-color: #fbf7f0; font-weight: SemiBold;\" ";
+
+        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+        readonly ThemeColorBrushTool brushTool = ThemeColorBrushTool.Instance;
 
         public EpubFileReadingPage()
         {
             Chapters = new ObservableCollection<Chapter>();
             this.InitializeComponent();
+            if (localSettings.Values["StickyTheme"] == null) { localSettings.Values["StickyTheme"] = "GingkoYellow"; }
 
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;
             titleBar.ButtonBackgroundColor = Colors.Transparent;
@@ -50,6 +60,23 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             // Register a handler for when the title bar visibility changes.
             // For example, when the title bar is invoked in full screen mode.
             coreTitleBar.IsVisibleChanged += CoreTitleBarIsVisibleChanged;
+
+            DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
+            dataTransferManager.DataRequested += DataTransferManagerDataRequested;
+        }
+
+        private void DataTransferManagerDataRequested(DataTransferManager sender, DataRequestedEventArgs args)
+        {
+            var chapter = ChapterPivot.SelectedItem as Chapter;
+            DataRequest request = args.Request;
+            request.Data.SetWebLink(chapter.Uri);
+            request.Data.Properties.Title = "Robert Chen";
+            request.Data.Properties.Description = "Cactus Reader";
+        }
+
+        private void ShareNearBy(object sender, RoutedEventArgs e)
+        {
+            DataTransferManager.ShowShareUI();
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -151,6 +178,9 @@ namespace Cactus_Reader.Sources.AppPages.Reader
                 var contentFolderShortPath = StripLocalFileStructureFromPath(contentFolder.Path);
                 var uri = new Uri($"ms-appdata:///temp/{contentFolderShortPath}/{chapterFilePath}");
                 var chapterFile = await StorageFile.GetFileFromApplicationUriAsync(uri);
+                string bookFileText = File.ReadAllText(chapterFile.Path);
+                bookFileText = bookFileText.Replace("<body", readerStyle);
+                File.WriteAllText(chapterFile.Path, bookFileText);
                 Chapters.Add(new Chapter((index + 1).ToString(), uri, chapterFile));
             }
         }
@@ -208,11 +238,6 @@ namespace Cactus_Reader.Sources.AppPages.Reader
 
             if (chapter?.BookFile == null) return;
 
-            string bookFileText = File.ReadAllText(chapter.BookFile.Path);
-            bookFileText = bookFileText.Replace("<body", readerStyle);
-
-            File.WriteAllText(chapter.BookFile.Path, bookFileText);
-
             Uri fileLink = new Uri(chapter.BookFile.Path);
             PivotItemWebView.Source = fileLink;
         }
@@ -242,7 +267,40 @@ namespace Cactus_Reader.Sources.AppPages.Reader
 
         private void ChangeFont(object sender, RoutedEventArgs e)
         {
+        }
 
+        private async void CreateNewSticky(object sender, RoutedEventArgs e)
+        {
+            List<object> parameter = new List<object>();
+            string serial = Guid.NewGuid().ToString("D").ToUpper();
+            string UID = localSettings.Values["UID"].ToString();
+            string theme = localSettings.Values["StickyTheme"].ToString();
+
+            StickyQuickView stickyQuickView = new StickyQuickView
+            {
+                CreateTimeText = DateTime.Now.ToShortDateString(),
+                StickySerial = serial,
+                ThemeKind = theme,
+                TitleBackground = brushTool.GetThemeColorBrush(theme, false).TitleBrush,
+                Background = brushTool.GetThemeColorBrush(theme, false).BackgroundBrush,
+            };
+
+            parameter.Add("new");
+            parameter.Add(stickyQuickView);
+
+            // 打开新便签界面
+            CoreApplicationView newView = CoreApplication.CreateNewView();
+            int newViewId = 0;
+            await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                Frame frame = new Frame();
+                frame.Navigate(typeof(NewStickyPage), parameter, new DrillInNavigationTransitionInfo());
+                Window.Current.Content = frame;
+                Window.Current.Activate();
+                newViewId = ApplicationView.GetForCurrentView().Id;
+            });
+            ApplicationView.PreferredLaunchViewSize = new Size(300, 300);
+            bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
         }
     }
 }

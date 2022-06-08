@@ -31,7 +31,7 @@ namespace Cactus_Reader.Sources.ToolKits
                 localSettings.Values["email"] = currentUser.Email;
                 localSettings.Values["name"] = currentUser.Name;
                 localSettings.Values["mobile"] = currentUser.Mobile;
-                localSettings.Values["registDate"] = currentUser.RegistDate.ToString("yyyy' 年 'MM' 月 'dd' 日'");
+                localSettings.Values["renewDate"] = currentUser.RegistDate.AddYears(1).ToString("yyyy' 年 'MM' 月 'dd' 日'");
                 return true;
             }
             catch (Exception)

@@ -23,7 +23,7 @@ namespace Cactus_Reader.Sources.ToolKits
 
         public bool IsEmail(string input)
         {
-            string matchRule = @"^\w+@[\da-z\.-]+\.([a-z]{2,}|[\u2E80-\u9FFF]{2,3})$";
+            string matchRule = @"^\w+([-+.]\w+)*@[\da-z\.-]+\.([a-z]{2,}|[\u2E80-\u9FFF]{2,3})$";
             return Regex.IsMatch(input, matchRule, RegexOptions.IgnoreCase);
         }
 

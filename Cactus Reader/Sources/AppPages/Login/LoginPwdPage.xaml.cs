@@ -92,7 +92,7 @@ namespace Cactus_Reader.Sources.AppPages.Login
         /// <param name="e"></param>
         private async void WindowsHelloLogin(object sender, RoutedEventArgs e)
         {
-            Object oCurrentUID = localSettings.Values["email"];
+            object oCurrentUID = localSettings.Values["email"];
             bool isTPMEnabled = await MicrosoftPassportHelper.MicrosoftPassportAvailableCheckAsync();
 
             if (isTPMEnabled)

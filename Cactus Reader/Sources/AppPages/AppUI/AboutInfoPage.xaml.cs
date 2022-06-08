@@ -31,7 +31,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             if (Guid.TryParse(UID, out _))
             {
                 email.Text = localSettings.Values["email"].ToString();
-                renewTime.Text = localSettings.Values["registDate"].ToString();
+                renewTime.Text = localSettings.Values["renewDate"].ToString();
                 supportID.Text = UID;
             }
         }

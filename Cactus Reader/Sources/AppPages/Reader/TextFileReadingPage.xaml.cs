@@ -35,7 +35,7 @@ namespace Cactus_Reader.Sources.AppPages.Reader
         public TextFileReadingPage()
         {
             this.InitializeComponent();
-
+            if (localSettings.Values["StickyTheme"] == null) { localSettings.Values["StickyTheme"] = "GingkoYellow"; }
             if (localSettings.Values["fontSize"] == null) { localSettings.Values["fontSize"] = 20.0; }
             if (localSettings.Values["charSpacing"] == null) { localSettings.Values["charSpacing"] = 20.0; }
             if (localSettings.Values["lineHeight"] == null) { localSettings.Values["lineHeight"] = 2.0; }

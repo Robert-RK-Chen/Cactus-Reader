@@ -180,7 +180,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             {
                 DocType = "HTML",
                 WhitespaceHandling = WhitespaceHandling.None,
-                CaseFolding = Sgml.CaseFolding.ToLower,
+                CaseFolding = CaseFolding.ToLower,
                 InputStream = new StringReader(input)
             };
 
