@@ -2,7 +2,7 @@
 
 > @Robert Chen 更新日期：2022年2月27日
 
-- 阅读 Cactus Reader 的开发文档，请访问：[Cactus Reader 开发文档](https://www.notion.so/Cactus-Reader-93e5d471876f4bcbb78c0d7500a69631) ，开发文档被托管在 Notion 上。
+- 阅读 Cactus Reader 的开发文档，请访问：[Cactus Reader 开发文档](https://www.notion.so/robertchen13/Cactus-Reader-93e5d471876f4bcbb78c0d7500a69631?source=copy_link) ，开发文档被托管在 Notion 上。
 - 访问 Cactus Reader 的 [GitHub 开源库](https://github.com/Robert-RK-Chen/Cactus-Reader) ，代码被托管在 GitHub 上
 
 ---
