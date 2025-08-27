@@ -304,7 +304,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         private async void PlaySpeechTextExample(object sender, RoutedEventArgs e)
         {
             // 语速与语调暂不可用
-            var config = SpeechConfig.FromSubscription("4c28aeca36ba4709a5c52a2ec64193e6", "eastasia");
+            var config = SpeechConfig.FromSubscription("{subscriptionkey}", "{region}");
             config.SpeechSynthesisVoiceName = localSettings.Values["voiceName"].ToString();
             string exampleText;
             if (localSettings.Values["voiceLang"].ToString().Equals("Chinese"))

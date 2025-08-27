@@ -6,7 +6,7 @@ namespace Cactus_Reader.Sources.ToolKits
 {
     public class ProfileUploadTool
     {
-        readonly static string SERVER_IP_ADDRESS = "http://106.54.173.192:9527";
+        readonly static string SERVER_IP_ADDRESS = "http://127.0.0.1:9527";
 
         private static ProfileUploadTool instance;
 

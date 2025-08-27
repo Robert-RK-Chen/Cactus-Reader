@@ -9,7 +9,7 @@ namespace CactusReaderService
     {
         static void Main(string[] args)
         {
-            Uri localUri = new Uri("http://106.54.173.192:9527");
+            Uri localUri = new Uri("http://127.0.0.1:9527");
             // 开始运行WCF服务
             using (WebServiceHost host = new WebServiceHost(typeof(Service), localUri))
             {
@@ -50,7 +50,7 @@ namespace CactusReaderService
     public class Service : IService
     {
         readonly static string profilePath =
-            @"C:\Storages\Environment\apache-tomcat-10.0.17\webapps\cactus-reader-repo\";
+            @"C:\Storages\Environment\apache-tomcat-10.1.44\webapps\cactus-reader-repo\";
 
         public void UploadProfileImage(Stream content)
         {

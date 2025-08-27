@@ -8,7 +8,7 @@ namespace Cactus_Reader.Sources.ToolKits
     public class ProfileSyncTool
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        readonly static string SERVER_ADDRESS = "http://106.54.173.192/cactus-reader-repo/";
+        readonly static string SERVER_ADDRESS = "http://127.0.0.1/cactus-reader-repo/";
 
         private static ProfileSyncTool instance;
 

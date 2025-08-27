@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("R.S.Software Studio")]
 [assembly: AssemblyProduct("Cactus Reader")]
-[assembly: AssemblyCopyright("Copyright © 2022, Robert Chen.")]
+[assembly: AssemblyCopyright("Copyright © 2022-2025, Robert Chen.")]
 [assembly: AssemblyTrademark("Cactus Reader")]
 [assembly: AssemblyCulture("")]
 

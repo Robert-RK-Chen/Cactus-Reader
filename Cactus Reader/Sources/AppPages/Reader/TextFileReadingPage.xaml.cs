@@ -79,7 +79,7 @@ namespace Cactus_Reader.Sources.AppPages.Reader
         {
             DataRequest request = args.Request;
             request.Data.SetText("我最近读了一篇好文章，分享给你！" + passageBlock.SelectedText);
-            request.Data.SetWebLink(new Uri("http://106.54.173.192/cactus-reader-repo/demo.txt"));
+            request.Data.SetWebLink(new Uri("http://127.0.0.1/cactus-reader-repo/demo.txt"));
             request.Data.Properties.Title = "Robert Chen";
             request.Data.Properties.Description = "Cactus Reader";
         }
@@ -150,7 +150,7 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             passageBlock.SelectAll();
             string text = passageBlock.SelectedText;
             passageBlock.Select(passageBlock.ContentStart, passageBlock.ContentEnd);
-            var config = SpeechConfig.FromSubscription("4c28aeca36ba4709a5c52a2ec64193e6", "eastasia");
+            var config = SpeechConfig.FromSubscription("{subscriptionkey}", "{region}");
             config.SpeechSynthesisVoiceName = localSettings.Values["voiceName"].ToString();
             new ToastContentBuilder().AddArgument("action", "viewConversation")
                 .AddArgument("conversationId", 9527)
