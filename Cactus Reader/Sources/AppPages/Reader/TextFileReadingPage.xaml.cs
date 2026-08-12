@@ -79,7 +79,6 @@ namespace Cactus_Reader.Sources.AppPages.Reader
         {
             DataRequest request = args.Request;
             request.Data.SetText("我最近读了一篇好文章，分享给你！" + passageBlock.SelectedText);
-            request.Data.SetWebLink(new Uri("http://127.0.0.1/cactus-reader-repo/demo.txt"));
             request.Data.Properties.Title = "Robert Chen";
             request.Data.Properties.Description = "Cactus Reader";
         }

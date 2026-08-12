@@ -12,53 +12,51 @@
         <FontFamily x:Key="SegoeFluentIcons">/Sources/Fonts/Segoe Fluent Icons.ttf#Segoe Fluent Icons</FontFamily>
     </Page.Resources>
 
-    <Grid>
-        <Frame x:Name="mainContent" x:FieldModifier="Public">
-            <Frame.ContentTransitions>
-                <TransitionCollection>
-                    <NavigationThemeTransition/>
-                </TransitionCollection>
-            </Frame.ContentTransitions>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="32"/>
-                    <RowDefinition />
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-                <Border x:Name="appTitleBar" Grid.Row="0" IsHitTestVisible="True" VerticalAlignment="Top"
-                        Background="Transparent" Height="32">
-                    <StackPanel Orientation="Horizontal" Margin="16, 0, 0, 0">
-                        <Image x:Name="appFontIcon" HorizontalAlignment="Left" VerticalAlignment="Center"
-                               Source="/Assets/Square44x44Logo.png" Width="16" Height="16"/>
-                        <TextBlock x:Name="appTitle" Text="Cactus Reader" VerticalAlignment="Center"
-                                   Margin="8, 0, 0, 0" Style="{ThemeResource CaptionTextBlockStyle}"/>
+    <Frame x:Name="mainContent" x:FieldModifier="Public">
+        <Frame.ContentTransitions>
+            <TransitionCollection>
+                <NavigationThemeTransition/>
+            </TransitionCollection>
+        </Frame.ContentTransitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32"/>
+                <RowDefinition />
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <Border x:Name="appTitleBar" Grid.Row="0" IsHitTestVisible="True" VerticalAlignment="Top"
+                    Background="Transparent" Height="32">
+                <StackPanel Orientation="Horizontal" Margin="16, 0, 0, 0">
+                    <Image x:Name="appFontIcon" HorizontalAlignment="Left" VerticalAlignment="Center"
+                           Source="/Assets/Square44x44Logo.png" Width="16" Height="16"/>
+                    <TextBlock x:Name="appTitle" Text="Cactus Reader" VerticalAlignment="Center"
+                               Margin="8, 0, 0, 0" Style="{ThemeResource CaptionTextBlockStyle}"/>
+                </StackPanel>
+            </Border>
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <Frame x:Name="contentFrame">
+                    <Frame.ContentTransitions>
+                        <TransitionCollection>
+                            <NavigationThemeTransition/>
+                        </TransitionCollection>
+                    </Frame.ContentTransitions>
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Spacing="48">
+                        <TextBlock FontSize="40" FontWeight="Light" Text="欢迎使用 Cactus Reader" TextWrapping="Wrap"
+                                   CharacterSpacing="32" HorizontalAlignment="Center" TextAlignment="Center"/>
+                        <Image Source="/Sources/Images/Searching.png" MaxHeight="400"/>
+                        <TextBlock FontSize="18" FontWeight="Light" CharacterSpacing="50" HorizontalAlignment="Center"
+                                   Text="一款为 Windows 打造的现代化的、高效的文档阅读器" TextWrapping="Wrap"
+                                   TextAlignment="Center"/>
+                        <Button FontSize="18" FontWeight="Bold" Width="480" Height="48" Background="#005FB8"
+                                HorizontalAlignment="Center"
+                                Content="开启 Cactus 之旅" CharacterSpacing="50" Foreground="White"
+                                Style="{StaticResource AccentButtonStyle}" Click="ContinueSignIn"/>
                     </StackPanel>
-                </Border>
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <Frame x:Name="contentFrame">
-                        <Frame.ContentTransitions>
-                            <TransitionCollection>
-                                <NavigationThemeTransition/>
-                            </TransitionCollection>
-                        </Frame.ContentTransitions>
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                    Spacing="48">
-                            <TextBlock FontSize="40" FontWeight="Light" Text="欢迎使用 Cactus Reader" TextWrapping="Wrap"
-                                       CharacterSpacing="32" HorizontalAlignment="Center" TextAlignment="Center"/>
-                            <Image Source="/Sources/Images/Searching.png" MaxHeight="400"/>
-                            <TextBlock FontSize="18" FontWeight="Light" CharacterSpacing="50" HorizontalAlignment="Center"
-                                       Text="一款为 Windows 打造的现代化的、高效的文档阅读器" TextWrapping="Wrap"
-                                       TextAlignment="Center"/>
-                            <Button FontSize="18" FontWeight="Bold" Width="480" Height="48" Background="#005FB8"
-                                    HorizontalAlignment="Center"
-                                    Content="开启 Cactus 之旅" CharacterSpacing="50" Foreground="White"
-                                    Style="{StaticResource AccentButtonStyle}" Click="ContinueLogin"/>
-                        </StackPanel>
-                    </Frame>
-                </ScrollViewer>
-                <Image Grid.Row="3" Source="/Sources/Images/RCSoftware.png" Height="32" Margin="0, 12, 0, 12"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Grid>
-        </Frame>
-    </Grid>
+                </Frame>
+            </ScrollViewer>
+            <Image Grid.Row="3" Source="/Sources/Images/RCSoftware.png" Height="32" Margin="0, 12, 0, 12"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Grid>
+    </Frame>
 </Page>

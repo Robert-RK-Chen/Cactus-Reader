@@ -1,11 +1,11 @@
 ﻿using Cactus_Reader.Entities;
 using System;
 using System.Diagnostics;
+using Windows.Security.Credentials;
+using Windows.Security.Cryptography;
 using Windows.Storage.Streams;
 using System.Threading.Tasks;
-using Windows.Security.Credentials;
 using System.Runtime.InteropServices.WindowsRuntime;
-using Cactus_Reader.Sources.ToolKits;
 
 namespace Cactus_Reader.Sources.WindowsHello
 {
@@ -48,14 +48,14 @@ namespace Cactus_Reader.Sources.WindowsHello
             KeyCredentialRetrievalResult keyOpenResult = await KeyCredentialManager.OpenAsync(user.Name);
             if (keyOpenResult.Status == KeyCredentialStatus.Success)
             {
-                AuthService.Instance.PassportRemoveUser(user.UID);
+                await AuthService.Instance.PassportRemoveUserAsync(user.UID);
             }
             await KeyCredentialManager.DeleteAsync(user.Name);
         }
 
-        public static void RemovePassportDevice(User user, string deviceId)
+        public static async void RemovePassportDevice(User user, string deviceId)
         {
-            AuthService.Instance.PassportRemoveDevice(user.UID, deviceId);
+            await AuthService.Instance.PassportRemoveDeviceAsync(user.UID, deviceId);
         }
 
         private static async Task GetKeyAttestationAsync(string UID, KeyCredentialRetrievalResult keyCreationResult)
@@ -63,83 +63,72 @@ namespace Cactus_Reader.Sources.WindowsHello
             KeyCredential userKey = keyCreationResult.Credential;
             IBuffer publicKey = userKey.RetrievePublicKey();
             KeyCredentialAttestationResult keyAttestationResult = await userKey.GetAttestationAsync();
-            IBuffer keyAttestation = null;
-            IBuffer certificateChain = null;
-            bool keyAttestationIncluded = false;
-            bool keyAttestationCanBeRetrievedLater = false;
-            KeyCredentialAttestationStatus keyAttestationRetryType = 0;
 
             if (keyAttestationResult.Status == KeyCredentialAttestationStatus.Success)
             {
-                keyAttestationIncluded = true;
-                keyAttestation = keyAttestationResult.AttestationBuffer;
-                certificateChain = keyAttestationResult.CertificateChainBuffer;
                 Debug.WriteLine("Successfully made key and attestation");
             }
             else if (keyAttestationResult.Status == KeyCredentialAttestationStatus.TemporaryFailure)
             {
-                keyAttestationRetryType = KeyCredentialAttestationStatus.TemporaryFailure;
-                keyAttestationCanBeRetrievedLater = true;
                 Debug.WriteLine("Successfully made key but not attestation");
             }
             else if (keyAttestationResult.Status == KeyCredentialAttestationStatus.NotSupported)
             {
-                keyAttestationRetryType = KeyCredentialAttestationStatus.NotSupported;
-                keyAttestationCanBeRetrievedLater = false;
                 Debug.WriteLine("Key created, but key attestation not supported");
             }
 
             string deviceId = DeviceHelper.GetDeviceId();
-            UpdatePassportDetails(UID, deviceId, publicKey.ToArray(), keyAttestationResult);
+            // 取证数据在 TemporaryFailure/NotSupported 时可能为空，Base64 存储
+            byte[] attestation = keyAttestationResult.AttestationBuffer?.ToArray();
+            await UpdatePassportDetailsAsync(UID, deviceId, publicKey.ToArray(), attestation);
         }
 
-        public static bool UpdatePassportDetails(string UID, string deviceId, byte[] publicKey, KeyCredentialAttestationResult keyAttestationResult)
+        public static async Task<bool> UpdatePassportDetailsAsync(string UID, string deviceId, byte[] publicKey, byte[] attestation)
         {
-            AuthService.Instance.PassportUpdateDetails(UID, deviceId, publicKey, keyAttestationResult);
-            return true;
+            return await AuthService.Instance.PassportUpdateDetailsAsync(UID, deviceId, publicKey, attestation);
         }
 
+        /// <summary>
+        /// 挑战-响应签名：向服务端申请一次性随机挑战，本地 TPM 密钥签名，
+        /// 服务端用注册公钥验证签名。
+        /// </summary>
         private static async Task<bool> RequestSignAsync(string UID, KeyCredentialRetrievalResult openKeyResult)
         {
-            IBuffer challengeMessage = AuthService.Instance.PassportRequestChallenge();
+            string challengeBase64 = await AuthService.Instance.PassportRequestChallengeAsync();
+            IBuffer challengeMessage = CryptographicBuffer.DecodeFromBase64String(challengeBase64);
+
             KeyCredential userKey = openKeyResult.Credential;
             KeyCredentialOperationResult signResult = await userKey.RequestSignAsync(challengeMessage);
 
             if (signResult.Status == KeyCredentialStatus.Success)
             {
-                return AuthService.Instance.SendServerSignedChallenge(
-                    UID, DeviceHelper.GetDeviceId(), signResult.Result.ToArray());
-            }
-            else if (signResult.Status == KeyCredentialStatus.UserCanceled)
-            {
-            }
-            else if (signResult.Status == KeyCredentialStatus.NotFound)
-            {
-            }
-            else if (signResult.Status == KeyCredentialStatus.SecurityDeviceLocked)
-            {
-            }
-            else if (signResult.Status == KeyCredentialStatus.UnknownError)
-            {
+                return await AuthService.Instance.SendServerSignedChallengeAsync(
+                    UID, DeviceHelper.GetDeviceId(), challengeBase64, signResult.Result.ToArray());
             }
             return false;
         }
 
+        /// <summary>
+        /// Windows Hello 登录验证（真实流程）：
+        /// 打开已注册密钥 → 用户 PIN/生物识别确认 → 服务端挑战签名验证。
+        /// 密钥不存在时返回 false（登录不重建密钥）。
+        /// </summary>
         public static async Task<bool> GetPassportAuthenticationMessageAsync(User user)
         {
             KeyCredentialRetrievalResult openKeyResult = await KeyCredentialManager.OpenAsync(user.Name);
-            var consentResult = await Windows.Security.Credentials.UI.UserConsentVerifier.RequestVerificationAsync(user.Name);
 
             if (openKeyResult.Status == KeyCredentialStatus.Success)
             {
+                var consentResult = await Windows.Security.Credentials.UI.UserConsentVerifier.RequestVerificationAsync(user.Name);
+                if (consentResult != Windows.Security.Credentials.UI.UserConsentVerificationResult.Verified)
+                {
+                    return false;
+                }
                 return await RequestSignAsync(user.UID, openKeyResult);
             }
             else if (openKeyResult.Status == KeyCredentialStatus.NotFound)
             {
-                if (await CreatePassportKeyAsync(user.UID, user.Name))
-                {
-                    return await GetPassportAuthenticationMessageAsync(user);
-                }
+                Debug.WriteLine("该设备未注册 Windows Hello 密钥，无法登录。");
             }
             return false;
         }

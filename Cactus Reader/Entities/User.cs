@@ -1,17 +1,14 @@
-﻿using FreeSql.DataAnnotations;
-using System;
-using System.Collections.Generic;
+﻿using System;
 
 namespace Cactus_Reader.Entities
 {
+    /// <summary>
+    /// 用户实体（客户端纯 POCO）。
+    /// 数据库操作已迁移至 CactusReaderServer，客户端不再依赖 FreeSql；
+    /// Password 字段仅用于页面间传参，服务端 API 返回的 User 不含该字段。
+    /// </summary>
     public class User
     {
-        public User()
-        {
-            Userkeys = new HashSet<Userkey>();
-        }
-
-        [Column(IsPrimary = true)]
         public string UID { set; get; }
 
         public string Email { set; get; }
@@ -23,9 +20,5 @@ namespace Cactus_Reader.Entities
         public string Password { set; get; }
 
         public DateTime RegistDate { set; get; }
-
-        public virtual Privatekey Privatekey { get; set; }
-
-        public virtual ICollection<Userkey> Userkeys { get; set; }
     }
 }

@@ -28,12 +28,6 @@ namespace Cactus_Reader
         {
             InitializeComponent();
             Suspending += OnSuspending;
-
-            // 应用加载时处理 IfreeSql 单例的加载，避免等待时间过长
-            Task.Factory.StartNew(() =>
-            {
-                IFreeSql freesql = IFreeSqlService.Instance;
-            });
         }
 
         /// <summary>

@@ -1,85 +1,109 @@
 ﻿using System;
-using System.IO;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace Cactus_Reader.Sources.ToolKits
 {
+    /// <summary>
+    /// 基于 AES-256-GCM 的认证加密工具。
+    /// 加密输出格式：Base64(nonce[12] || ciphertext || tag[16])。
+    /// nonce 每次加密随机生成，认证标签保证密文完整性，任何篡改都会导致解密失败。
+    /// </summary>
     public class AESEncryptTool
     {
-        private static AESEncryptTool instance;
+        private const int KeySizeBytes = 32;    // AES-256
+        private const int NonceSizeBytes = 12;  // GCM 推荐 nonce 长度
+        private const int TagSizeBytes = 16;    // GCM 认证标签长度
 
-        public static AESEncryptTool Instance
+        private static readonly Lazy<AESEncryptTool> LazyInstance =
+            new Lazy<AESEncryptTool>(() => new AESEncryptTool());
+
+        public static AESEncryptTool Instance => LazyInstance.Value;
+
+        private AESEncryptTool()
         {
-            get
-            {
-                return instance ?? (instance = new AESEncryptTool());
-            }
         }
 
-        public string EncryptStringToBytesAes(string plainText, byte[] Key, byte[] IV)
+        /// <summary>
+        /// 生成一个安全随机的高强度密钥（AES-256）。
+        /// </summary>
+        public byte[] CreateKey()
         {
-            if (plainText == null || plainText.Length <= 0)
-                throw new ArgumentNullException("plainText");
-            if (Key == null || Key.Length <= 0)
-                throw new ArgumentNullException("Key");
-            if (IV == null || IV.Length <= 0)
-                throw new ArgumentNullException("IV");
-            byte[] encrypted;
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = Key;
-                aesAlg.IV = IV;
-                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-                using (MemoryStream msEncrypt = new MemoryStream())
-                {
-                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
-                        {
-                            swEncrypt.Write(plainText);
-                        }
-                        encrypted = msEncrypt.ToArray();
-                    }
-                }
-            }
-            return Convert.ToBase64String(encrypted);
+            return RandomNumberGenerator.GetBytes(KeySizeBytes);
         }
 
-        public string DecryptStringFromBytesAes(string ciphertext, byte[] Key, byte[] IV)
+        /// <summary>
+        /// 使用 PBKDF2（SHA-256）从口令派生 AES-256 密钥，用于密钥不落盘的场景。
+        /// </summary>
+        public static byte[] DeriveKey(string password, byte[] salt, int iterations = 600_000)
         {
-            byte[] cipherText = Convert.FromBase64String(ciphertext);
-            if (cipherText == null || cipherText.Length <= 0)
-                throw new ArgumentNullException("cipherText");
-            if (Key == null || Key.Length <= 0)
-                throw new ArgumentNullException("Key");
-            if (IV == null || IV.Length <= 0)
-                throw new ArgumentNullException("IV");
+            if (string.IsNullOrEmpty(password))
+                throw new ArgumentNullException(nameof(password));
+            if (salt == null || salt.Length == 0)
+                throw new ArgumentNullException(nameof(salt));
 
-            string plaintext = null;
+            return Rfc2898DeriveBytes.Pbkdf2(
+                password, salt, iterations, HashAlgorithmName.SHA256, KeySizeBytes);
+        }
 
-            using (Aes aesAlg = Aes.Create())
+        /// <summary>
+        /// 加密字符串，返回 Base64(nonce || ciphertext || tag)。
+        /// </summary>
+        public string EncryptString(string plainText, byte[] key)
+        {
+            if (plainText == null)
+                throw new ArgumentNullException(nameof(plainText));
+            ValidateKey(key);
+
+            byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
+            byte[] nonce = RandomNumberGenerator.GetBytes(NonceSizeBytes);
+            byte[] ciphertext = new byte[plainBytes.Length];
+            byte[] tag = new byte[TagSizeBytes];
+
+            using (var aes = new AesGcm(key, TagSizeBytes))
             {
-                aesAlg.Key = Key;
-                aesAlg.IV = IV;
-
-                // Create a decryptor to perform the stream transform.
-                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-
-                // Create the streams used for decryption.
-                using (MemoryStream msDecrypt = new MemoryStream(cipherText))
-                {
-                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-                    {
-                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
-                        {
-                            // Read the decrypted bytes from the decrypting stream
-                            // and place them in a string.
-                            plaintext = srDecrypt.ReadToEnd();
-                        }
-                    }
-                }
+                aes.Encrypt(nonce, plainBytes, ciphertext, tag);
             }
-            return plaintext;
+
+            byte[] result = new byte[NonceSizeBytes + ciphertext.Length + tag.Length];
+            Buffer.BlockCopy(nonce, 0, result, 0, NonceSizeBytes);
+            Buffer.BlockCopy(ciphertext, 0, result, NonceSizeBytes, ciphertext.Length);
+            Buffer.BlockCopy(tag, 0, result, NonceSizeBytes + ciphertext.Length, tag.Length);
+            return Convert.ToBase64String(result);
+        }
+
+        /// <summary>
+        /// 解密 Base64(nonce || ciphertext || tag)。认证失败（密钥错误或数据被篡改）时抛出
+        /// <see cref="CryptographicException"/>。
+        /// </summary>
+        public string DecryptString(string encryptedData, byte[] key)
+        {
+            if (string.IsNullOrEmpty(encryptedData))
+                throw new ArgumentNullException(nameof(encryptedData));
+            ValidateKey(key);
+
+            byte[] full = Convert.FromBase64String(encryptedData);
+            int ciphertextLength = full.Length - NonceSizeBytes - TagSizeBytes;
+            if (ciphertextLength < 0)
+                throw new CryptographicException("密文长度无效，数据可能已损坏。");
+
+            byte[] nonce = full.AsSpan(0, NonceSizeBytes).ToArray();
+            byte[] ciphertext = full.AsSpan(NonceSizeBytes, ciphertextLength).ToArray();
+            byte[] tag = full.AsSpan(NonceSizeBytes + ciphertextLength, TagSizeBytes).ToArray();
+            byte[] plainBytes = new byte[ciphertextLength];
+
+            using (var aes = new AesGcm(key, TagSizeBytes))
+            {
+                aes.Decrypt(nonce, ciphertext, tag, plainBytes);
+            }
+
+            return Encoding.UTF8.GetString(plainBytes);
+        }
+
+        private static void ValidateKey(byte[] key)
+        {
+            if (key == null || key.Length != KeySizeBytes)
+                throw new ArgumentException($"密钥长度必须为 {KeySizeBytes} 字节（AES-256）。", nameof(key));
         }
     }
 }

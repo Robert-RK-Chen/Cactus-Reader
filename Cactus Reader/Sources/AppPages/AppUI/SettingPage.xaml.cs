@@ -11,6 +11,7 @@ using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using Windows.Storage.Streams;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -30,9 +31,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
     public sealed partial class SettingPage : Page
     {
         private ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        private readonly IFreeSql freeSql = IFreeSqlService.Instance;
         private readonly ProfileUploadTool uploadTool = ProfileUploadTool.Instance;
-        private readonly MD5EncryptTool md5EncryptTool = MD5EncryptTool.Instance;
         private readonly InformationVerify informationVerify = InformationVerify.Instance;
         private readonly EncryptStickyTool encryptStickyTool = EncryptStickyTool.Instance;
         private MediaPlayer mediaPlayer;
@@ -156,27 +155,30 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             picker.FileTypeFilter.Add(".bmp");
             picker.FileTypeFilter.Add(".png");
             picker.FileTypeFilter.Add(".jpg");
-            picker.FileTypeFilter.Add(".jpge");
+            picker.FileTypeFilter.Add(".jpeg");
             StorageFile imageFile = await picker.PickSingleFileAsync();
 
             if (imageFile != null)
             {
-                BitmapImage image = new BitmapImage(new Uri(imageFile.Path));
-
                 // 本地留存
                 StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
                 await imageFile.CopyAsync(storageFolder, "ProfilePicture.PNG", NameCollisionOption.ReplaceExisting);
 
-                // 直接将选择的图片设置为头像
-                await userProfileImage.ProfilePicture.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                // 从本地副本读取并显示头像（不依赖选择器的临时缓存文件，确保立即显示）
+                StorageFile localFile = await storageFolder.GetFileAsync("ProfilePicture.PNG");
+                BitmapImage image = new BitmapImage();
+                using (IRandomAccessStream stream = await localFile.OpenReadAsync())
+                {
+                    await image.SetSourceAsync(stream);
+                }
+
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
                     userProfileImage.ProfilePicture = image;
                 });
 
-                System.Diagnostics.Debug.WriteLine(userProfileImage.ProfilePicture.ToString());
-
-                // 向服务器上传用户头像
-                uploadTool.UploadProfileImg(imageFile, UID, "/upload-profile-image");
+                // 向服务器上传用户头像（上传本地副本，避免临时文件失效）
+                uploadTool.UploadProfileImg(localFile, UID, "/upload-profile-image");
             }
             Frame.Navigate(typeof(SettingPage));
         }
@@ -380,9 +382,12 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 string password = passwordBox.Password;
                 if (password.Length >= 6)
                 {
-                    // Encrypt private key then allow user use Windows Hello
-                    localSettings.Values.Add("privateKey", md5EncryptTool.GetUserEncryptedPassword(password));
+                    // 使用 PBKDF2 加盐哈希存储个人密码，不再使用 MD5
+                    localSettings.Values["privateKey"] = PasswordHashTool.Instance.HashPassword(password);
                     windowsHelloSwitch.IsEnabled = true;
+
+                    // 用新密码包裹便签加密密钥并上传服务端（换设备时可凭密码找回密钥）
+                    bool vaultSynced = await encryptStickyTool.SetupVaultAsync(password);
 
                     // hide the button and show another button
                     setKeyButton.Visibility = Visibility.Collapsed;
@@ -391,7 +396,9 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                     ContentDialog keyAlertDialog = new ContentDialog
                     {
                         Title = "请勿忘记便签本密码",
-                        Content = "忘记便签本的密码将导致即使你可以通过 Windows Hello 等方式访问你的便签本，你可能会永久性地失去对你便签本的管理权限。",
+                        Content = vaultSynced
+                            ? "忘记便签本的密码将导致即使你可以通过 Windows Hello 等方式访问你的便签本，你可能会永久性地失去对你便签本的管理权限。"
+                            : "密码已设置（本机可用）。但密钥云同步失败，更换设备时将无法凭密码找回便签，请检查网络后重新设置。",
                         CloseButtonText = "取消",
                         PrimaryButtonText = "确定",
                         DefaultButton = ContentDialogButton.Primary
@@ -431,6 +438,19 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 string password = passwordBox.Password;
                 if (informationVerify.CheckPassword(password))
                 {
+                    // 删除服务端包裹密钥：本机仍可继续使用，但更换设备后将无法找回便签
+                    bool vaultRemoved = await encryptStickyTool.RemoveVaultAsync();
+                    if (!vaultRemoved)
+                    {
+                        ContentDialog removeFailDialog = new ContentDialog
+                        {
+                            Title = "云端密钥删除失败",
+                            Content = "关闭密码后本机仍可正常使用，但云端密钥未能删除，更换设备时仍可凭此密码找回便签。请检查网络后再试。",
+                            CloseButtonText = "确定"
+                        };
+                        await removeFailDialog.ShowAsync();
+                    }
+
                     localSettings.Values.Remove("privateKey");
                     localSettings.Values["alreadySetWindowsHello"] = false;
 

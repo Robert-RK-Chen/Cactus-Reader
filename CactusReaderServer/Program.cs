@@ -1,144 +1,84 @@
 ﻿using System;
 using System.IO;
-using System.ServiceModel;
-using System.ServiceModel.Web;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using CactusReaderService.Endpoints;
+using CactusReaderService.Services;
 
 namespace CactusReaderService
 {
-    class Program
+    /// <summary>
+    /// CactusReaderServer —— ASP.NET Core Minimal API 版。
+    /// 由 WCF WebServiceHost 迁移而来，URL / Header / 返回格式与旧版完全一致，
+    /// 客户端（BackgroundUploader / BackgroundDownloader）无需任何改动。
+    ///
+    /// 2026-08 扩展：承担数据库访问（用户/验证码/Windows Hello 密钥）与验证码邮件发送，
+    /// 客户端不再直连 MySQL、不再携带 SMTP 凭据。
+    ///
+    /// 本文件为组合根（Composition Root），只负责：
+    ///   1. 加载配置
+    ///   2. 构建 WebApplication
+    ///   3. 装配服务（FileStorageService / DbService / MailService / PassportService）
+    ///   4. 注册端点（ProfileEndpoints / NotesEndpoints / AuthEndpoints）
+    ///   5. 启动
+    /// </summary>
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            Uri localUri = new Uri("http://127.0.0.1:9527");
-            // 开始运行WCF服务
-            using (WebServiceHost host = new WebServiceHost(typeof(Service), localUri))
-            {
-                // 配置缓冲区的最大值
-                WebHttpBinding binding = new WebHttpBinding
-                {
-                    MaxReceivedMessageSize = 500 * 1024 * 1024
-                };
-                host.AddServiceEndpoint(typeof(IService), binding, "");
+            // 显式以程序所在目录为配置基准，避免依赖启动时的工作目录（双击 exe / 服务方式启动均稳定）
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                .Build();
 
-                host.Opened += (a, b) => Console.WriteLine("服务已启动。");
-                host.Closed += (a, b) => Console.WriteLine("服务已关闭。");
-                try
-                {
-                    // 打开服务
-                    host.Open();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                Console.ReadKey();
-            }
-        }
-    }
+            var builder = WebApplication.CreateBuilder(args);
+            builder.Configuration.AddConfiguration(configuration);
+            // 本地开发凭据：dotnet user-secrets 存储于用户目录（%APPDATA%\Microsoft\UserSecrets），不入库
+            builder.Configuration.AddUserSecrets<Program>();
+            // 环境变量可覆盖 appsettings.json（占位符）与 user-secrets，例如：
+            //   ConnectionStrings__MySql、GraphMail__ClientSecret、DataRoot
+            builder.Configuration.AddEnvironmentVariables();
 
-    [ServiceContract]
-    public interface IService
-    {
-        [OperationContract, WebInvoke(UriTemplate = "/upload-profile-image")]
-        void UploadProfileImage(Stream content);
+            // 与旧版一致：仅监听本机回环地址 9527 端口
+            builder.WebHost.UseUrls("http://127.0.0.1:9527");
 
-        [OperationContract, WebInvoke(UriTemplate = "/upload-cactus-notes")]
-        void UploadCactusNotes(Stream content);
-    }
+            var app = builder.Build();
 
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
-    public class Service : IService
-    {
-        readonly static string profilePath =
-            @"C:\Storages\Environment\apache-tomcat-10.1.44\webapps\cactus-reader-repo\";
+            // 解析数据存储根目录（默认回退到程序目录下 cactus-data）
+            string configured = configuration["DataRoot"] ?? "";
+            string dataRoot = string.IsNullOrWhiteSpace(configured)
+                ? Path.Combine(AppContext.BaseDirectory, "cactus-data")
+                : Path.IsPathRooted(configured)
+                    ? configured
+                    : Path.Combine(AppContext.BaseDirectory, configured);
 
-        public void UploadProfileImage(Stream content)
-        {
-            IncomingWebRequestContext request = WebOperationContext.Current.IncomingRequest;
+            // 文件存储服务（单一职责：文件存储原子操作）
+            FileStorageService storage = new FileStorageService(dataRoot);
+            storage.EnsureRoot();
 
-            // 从标头获取用户 UID
-            string UID = request.Headers["UID"];
+            // 数据库服务（连接串来自 appsettings.json ConnectionStrings:MySql）
+            DbService db = new DbService(configuration.GetConnectionString("MySql") ?? "");
 
-            // 开始接收文件
-            try
-            {
-                // 获取用户文档库位置
-                string imgPath = profilePath + UID + @"\";
-                string newFilePath = Path.Combine(imgPath, "ProfilePicture.PNG");
+            // 验证码邮件服务（Microsoft Graph 凭据仅存于服务端配置）
+            MailService mail = new MailService(configuration);
 
-                if (!Directory.Exists(imgPath))
-                {
-                    Directory.CreateDirectory(imgPath);
-                }
+            // Windows Hello 挑战-响应验证服务
+            PassportService passport = new PassportService();
 
-                // 如果文件存在，将其删除
-                if (File.Exists(newFilePath))
-                {
-                    File.Delete(newFilePath);
-                }
+            // 端点映射（单一职责：HTTP 层）
+            app.MapProfileEndpoints(storage);
+            app.MapNotesEndpoints(storage);
+            app.MapAuthEndpoints(db, mail, passport, app.Logger);
+            app.MapVaultEndpoints(db);
 
-                using (FileStream fileStream = File.OpenWrite(newFilePath))
-                {
-                    // 从客户端上传的流中将数据复制到文件流中
-                    content.CopyTo(fileStream);
-                }
-
-                Console.WriteLine(string.Format("在{0}成功接收文件。", DateTime.Now.ToLongTimeString()));
-                // 向客户端发送回应消息
-                WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
-            }
-            catch (Exception ex)
-            {
-                // 处理错误
-                Console.WriteLine(ex.Message);
-                WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.InternalServerError;
-                WebOperationContext.Current.OutgoingResponse.StatusDescription = ex.Message;
-            }
+            app.Logger.LogInformation("服务已启动: http://127.0.0.1:9527");
+            app.Logger.LogInformation("数据存储目录: {DataRoot}", dataRoot);
+            app.Logger.LogInformation("邮件发送 (Microsoft Graph): {MailStatus}", mail.IsConfigured ? "已配置" : "未配置（请在 appsettings.json 的 GraphMail 节点填写凭据）");
+            app.Run();
         }
 
-        public void UploadCactusNotes(Stream content)
-        {
-            IncomingWebRequestContext request = WebOperationContext.Current.IncomingRequest;
-
-            // 从标头获取用户 UID
-            string UID = request.Headers["UID"];
-            string serial = request.Headers["Serial"];
-
-            // 开始接收文件
-            try
-            {
-                // 获取用户文档库位置
-                string notesPath = profilePath + UID + @"\Notes";
-                string newFilePath = Path.Combine(notesPath, serial);
-
-                if (!Directory.Exists(notesPath))
-                {
-                    Directory.CreateDirectory(notesPath);
-                }
-
-                // 如果文件存在，将其删除
-                if (File.Exists(newFilePath))
-                {
-                    File.Delete(newFilePath);
-                }
-
-                using (FileStream fileStream = File.OpenWrite(newFilePath))
-                {
-                    // 从客户端上传的流中将数据复制到文件流中
-                    content.CopyTo(fileStream);
-                }
-
-                Console.WriteLine(string.Format("在{0}成功接收文件。", DateTime.Now.ToLongTimeString()));
-                // 向客户端发送回应消息
-                WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
-            }
-            catch (Exception ex)
-            {
-                // 处理错误
-                Console.WriteLine(ex.Message);
-                WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.InternalServerError;
-                WebOperationContext.Current.OutgoingResponse.StatusDescription = ex.Message;
-            }
-        }
     }
 }

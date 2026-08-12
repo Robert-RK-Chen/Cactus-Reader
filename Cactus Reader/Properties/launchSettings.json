@@ -1,0 +1,7 @@
+{
+    "profiles": {
+        "Cactus Reader": {
+            "commandName": "MsixPackage"
+        }
+    }
+}

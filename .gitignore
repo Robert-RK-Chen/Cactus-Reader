@@ -1,0 +1,31 @@
+# ============ Visual Studio ============
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ============ 构建产物 ============
+[Bb]in/
+[Oo]bj/
+publish/
+*.publish/
+
+# ============ NuGet ============
+*.nupkg
+packages/
+
+# ============ 签名证书（含私钥，严禁提交） ============
+*.pfx
+*.snk
+
+# ============ 本地数据 ============
+cactus-data/
+*.db
+
+# ============ 其他 IDE / 系统 ============
+.idea/
+*.swp
+*.swo
+*~
+Thumbs.db

@@ -1,18 +1,19 @@
 ﻿using Cactus_Reader.Entities;
 using Cactus_Reader.Sources.ToolKits;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using Windows.Security.Credentials;
-using Windows.Security.Cryptography;
-using Windows.Storage.Streams;
+using System.Threading.Tasks;
 
 namespace Cactus_Reader.Sources.WindowsHello
 {
+    /// <summary>
+    /// Windows Hello 认证服务。
+    /// 2026-08：所有数据库操作（userkey 表等）经 CactusReaderServer API，
+    /// 客户端不再直连 MySQL；公钥/取证数据以 Base64 存储；
+    /// 挑战-响应为真实签名校验（不再恒返回 true）。
+    /// </summary>
     public class AuthService
     {
         private static AuthService instance;
-        static readonly IFreeSql freeSql = IFreeSqlService.Instance;
 
         public static AuthService Instance
         {
@@ -22,86 +23,52 @@ namespace Cactus_Reader.Sources.WindowsHello
         private AuthService()
         { }
 
-        public string GetUID(string username)
+        public async Task<User> GetUserByEmailAsync(string email)
         {
-            User currentUser = freeSql.Select<User>().Where(user => user.Name == username).ToOne();
-            return currentUser == null ? "" : currentUser.UID;
+            return await ApiClient.GetUserByEmailAsync(email);
         }
 
-        public User GetUser(string UID)
+        public async Task<User> GetUserByUidAsync(string uid)
         {
-            return freeSql.Select<User>().Where(user => user.UID == UID).ToOne();
+            return await ApiClient.GetUserByUidAsync(uid);
         }
 
-        public List<User> GetUsersForDevice(string DeviceID)
+        public async Task<User> GetUserByNameAsync(string name)
         {
-            return freeSql.Select<User>().LeftJoin("SELECT `user`.UID,`user`.Email,`user`.`Name`, `user`.Mobile, `user`.`Password`, `user`.RegistDate FROM userkey LEFT JOIN `user` ON `user`.UID = userkey.UID WHERE deviceid = ?deviceID", new { deviceID = DeviceID }).ToList();
+            return await ApiClient.GetUserByNameAsync(name);
         }
 
-        public bool PassportRemoveUser(string UID)
+        /// <summary>删除该用户全部设备密钥（服务端）。</summary>
+        public async Task<bool> PassportRemoveUserAsync(string uid)
         {
-            return freeSql.Delete<Userkey>().Where(userkey => userkey.UID == UID).ExecuteAffrows() == 0;
+            return await ApiClient.RemoveUserKeyAsync(uid);
         }
 
-        public bool PassportRemoveDevice(string UID, string DeviceID)
+        /// <summary>删除该用户指定设备密钥（服务端）。</summary>
+        public async Task<bool> PassportRemoveDeviceAsync(string uid, string deviceId)
         {
-            return freeSql.Delete<Userkey>().Where(userkey => userkey.UID == UID && userkey.DeviceID == DeviceID).ExecuteAffrows() == 0;
+            return await ApiClient.RemoveDeviceKeyAsync(uid, deviceId);
         }
 
-        public void PassportUpdateDetails(string UID, string DeviceID, byte[] publicKey,
-            KeyCredentialAttestationResult keyAttestationResult)
+        /// <summary>上报密钥：PublicKey / Attestation 均以 Base64 编码存储。</summary>
+        public async Task<bool> PassportUpdateDetailsAsync(string uid, string deviceId, byte[] publicKey, byte[] attestation)
         {
-            StringBuilder encryptPwd = new StringBuilder();
-            Userkey currentUserkey = freeSql.Select<Userkey>().Where(userkey => userkey.UID == UID && userkey.DeviceID == DeviceID).ToOne();
-            foreach (byte ch in publicKey)
-            {
-                encryptPwd.Append(ch);
-            }
-
-            if (currentUserkey == null)
-            {
-                currentUserkey = new Userkey
-                {
-                    ID = Guid.NewGuid().ToString("D").ToUpper()
-                };
-            }
-            currentUserkey.UID = UID;
-            currentUserkey.DeviceID = DeviceID;
-            currentUserkey.PublicKey = encryptPwd.ToString();
-            currentUserkey.Attestation = keyAttestationResult.ToString();
-            currentUserkey.LastLogonTime = DateTime.Now;
-            freeSql.InsertOrUpdate<Userkey>().SetSource(currentUserkey).ExecuteAffrows();
+            return await ApiClient.UpdateUserKeyAsync(uid, deviceId,
+                Convert.ToBase64String(publicKey),
+                attestation == null ? "" : Convert.ToBase64String(attestation));
         }
 
-        public bool ValidateCredentials(string username, string password)
+        /// <summary>向服务端申请一次性随机挑战（Base64）。</summary>
+        public async Task<string> PassportRequestChallengeAsync()
         {
-            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
-            {
-                string UID = GetUID(username);
-                if (UID != string.Empty)
-                {
-                    User user = GetUser(UID);
-                    if (user != null)
-                    {
-                        if (string.Equals(password, user.Password))
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
+            return await ApiClient.GetChallengeAsync();
         }
 
-        public IBuffer PassportRequestChallenge()
+        /// <summary>提交挑战签名，服务端用注册公钥验证（真实校验）。</summary>
+        public async Task<bool> SendServerSignedChallengeAsync(string uid, string deviceId, string challengeBase64, byte[] signedChallenge)
         {
-            return CryptographicBuffer.ConvertStringToBinary("ServerChallenge", BinaryStringEncoding.Utf8);
-        }
-
-        public bool SendServerSignedChallenge(string UID, string DeviceID, byte[] signedChallenge)
-        {
-            byte[] userPublicKey = System.Text.Encoding.Default.GetBytes(freeSql.Select<Userkey>().Where(userkey => userkey.UID == UID && userkey.DeviceID == DeviceID).ToOne().PublicKey);
-            return true;
+            return await ApiClient.VerifySignatureAsync(uid, deviceId, challengeBase64,
+                Convert.ToBase64String(signedChallenge));
         }
     }
 }

@@ -28,8 +28,6 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
     {
         private Sticky sticky;
         private StickyQuickView quickView;
-        private readonly AESEncryptTool aesEncryptTool = AESEncryptTool.Instance;
-        private readonly MD5EncryptTool md5EncryptTool = MD5EncryptTool.Instance;
         private readonly ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         private readonly ThemeColorBrushTool brushTool = ThemeColorBrushTool.Instance;
         private ProfileUploadTool profileUploadTool = ProfileUploadTool.Instance;
@@ -68,6 +66,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             string serial = string.Empty;
             List<object> parameter = (List<object>)e.Parameter;
             quickView = (StickyQuickView)parameter[1];
+            // StickySerial 是 DependencyProperty，必须在 quickView 所属线程（StickyPage 主窗口线程）上读取
             await quickView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 serial = quickView.StickySerial;
@@ -93,7 +92,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                     StorageFolder stickyFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
                     stickyFolder = await stickyFolder.GetFolderAsync("Sticky");
                     StorageFile stickyFile = await stickyFolder.GetFileAsync(serial + ".ctsnote");
-                    string stickyText = aesEncryptTool.DecryptStringFromBytesAes(File.ReadAllText(stickyFile.Path), md5EncryptTool.GetSystemEncryptedKey(), md5EncryptTool.GetSystemEncryptedVector());
+                    string stickyText = EncryptStickyTool.Instance.DecryptStickyText(File.ReadAllText(stickyFile.Path));
                     sticky = JsonConvert.DeserializeObject<Sticky>(stickyText);
                 }
                 catch
@@ -110,9 +109,16 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                     };
                 }
             }
-            SwitchStickyTheme(sticky.StickyTheme);
-            StickyEditBox.Document.SetText(TextSetOptions.FormatRtf, sticky.StickyDocument);
-            localSettings.Values["isSaved"] = true;
+            // 本视图为辅助窗口（CoreApplication.CreateNewView 创建），其 UI 线程没有安装
+            // SynchronizationContext，async/await 的 continuation 不会自动回到 UI 线程；
+            // 因此所有 UI 更新必须显式调度到本视图的 Dispatcher，否则会抛出
+            // RPC_E_WRONG_THREAD (0x8001010E) 跨线程访问异常。
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                SwitchStickyTheme(sticky.StickyTheme);
+                StickyEditBox.Document.SetText(TextSetOptions.FormatRtf, sticky.StickyDocument);
+                localSettings.Values["isSaved"] = true;
+            });
         }
 
         // 加粗所选的便签文本
@@ -172,7 +178,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             stickyFolder = await stickyFolder.CreateFolderAsync("Sticky", CreationCollisionOption.OpenIfExists);
             StorageFile stickyFile = await stickyFolder.CreateFileAsync(sticky.StickySerial + ".ctsnote", CreationCollisionOption.OpenIfExists);
 
-            string encryptSticky = aesEncryptTool.EncryptStringToBytesAes(JsonConvert.SerializeObject(sticky), md5EncryptTool.GetSystemEncryptedKey(), md5EncryptTool.GetSystemEncryptedVector());
+            string encryptSticky = EncryptStickyTool.Instance.EncryptStickyText(JsonConvert.SerializeObject(sticky));
             File.WriteAllText(stickyFile.Path, encryptSticky);
             localSettings.Values["isSaved"] = true;
 
@@ -219,6 +225,16 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 stickyFolder = await stickyFolder.CreateFolderAsync("Sticky", CreationCollisionOption.OpenIfExists);
                 StorageFile stickyFile = await stickyFolder.CreateFileAsync(sticky.StickySerial + ".ctsnote", CreationCollisionOption.OpenIfExists);
                 await stickyFile.DeleteAsync();
+
+                // 同步删除服务端存档，避免下次同步时便签被重新下载
+                try
+                {
+                    await ApiClient.DeleteNoteAsync(UID, sticky.StickySerial);
+                }
+                catch (Exception)
+                {
+                    // 网络异常时忽略：服务端残留会在下次同步时被拉回，属预期降级行为
+                }
             }
             catch (Exception) { }
 

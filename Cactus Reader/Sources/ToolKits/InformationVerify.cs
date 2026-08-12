@@ -1,17 +1,14 @@
-﻿using Cactus_Reader.Entities;
-using System;
+﻿using System;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Windows.Storage;
 
 namespace Cactus_Reader.Sources.ToolKits
 {
     public class InformationVerify
     {
-
-        readonly static IFreeSql freeSql = IFreeSqlService.Instance;
         readonly static ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         private static InformationVerify instance;
-        private readonly MD5EncryptTool md5EncryptTool = new MD5EncryptTool();
 
         public static InformationVerify Instance
         {
@@ -39,38 +36,36 @@ namespace Cactus_Reader.Sources.ToolKits
             return Regex.IsMatch(input, matchRule, RegexOptions.IgnoreCase);
         }
 
-        public string MailCodeVerify(string codeInput, Code mailCode)
+        /// <summary>邮箱是否可用（服务端查询，客户端不再直连数据库）。</summary>
+        public async Task<bool> EmailEnabledAsync(string email)
         {
-            if (codeInput.Length == 0)
+            try
             {
-                return "CODE_INPUT_LENGTH_0";
+                return await ApiClient.CheckEmailAvailableAsync(email);
             }
-            if (codeInput != mailCode.VerifyCode)
+            catch (Exception)
             {
-                return "INVALID_MAIL_CODE";
+                return false;
             }
-            if (mailCode.CreateTime.AddMinutes(5) < DateTime.Now)
-            {
-                return "INVALID_MAIL_CODE";
-            }
-            return "VALID_CODE";
         }
 
-        public bool UserNameEnabled(string userName)
+        /// <summary>用户名是否可用（服务端查询）。</summary>
+        public async Task<bool> UserNameEnabledAsync(string userName)
         {
-            return freeSql.Select<User>().Where(user => user.Name == userName).ToOne() is null;
-        }
-
-        public bool EmailEnabled(string email)
-        {
-            return freeSql.Select<User>().Where(user => user.Email == email).ToOne() is null;
+            try
+            {
+                return await ApiClient.CheckNameAvailableAsync(userName);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public bool CheckPassword(string password)
         {
-            byte[] privateKey = (byte[])localSettings.Values["privateKey"];
-            byte[] calibrateKey = md5EncryptTool.GetUserEncryptedPassword(password);
-            return BitConverter.ToString(privateKey) == BitConverter.ToString(calibrateKey);
+            string storedHash = localSettings.Values["privateKey"] as string;
+            return !string.IsNullOrEmpty(storedHash) && PasswordHashTool.Instance.VerifyPassword(password, storedHash);
         }
     }
 }

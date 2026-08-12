@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Storage;
@@ -27,8 +28,8 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         public static StickyPage stickyPage;
         private readonly ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         private readonly ThemeColorBrushTool brushTool = ThemeColorBrushTool.Instance;
-        private readonly AESEncryptTool aesEncryptTool = AESEncryptTool.Instance;
-        private readonly MD5EncryptTool md5EncryptTool = MD5EncryptTool.Instance;
+        private readonly EncryptStickyTool encryptStickyTool = EncryptStickyTool.Instance;
+        private readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
 
         public StickyPage()
         {
@@ -42,8 +43,75 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         {
             base.OnNavigatedTo(e);
 
-            // 遍历便签文件夹，加入所有的便签
             string UID = localSettings.Values["UID"].ToString();
+
+            // 0. 确保便签密钥可用（换设备时需输入个人密码解锁）
+            await EnsureKeyReadyAsync();
+
+            // 1. 先加载本地已有便签，保证页面快速呈现
+            await LoadStickyNotes(UID);
+
+            // 2. 从服务器同步本地缺失的便签，完成后刷新列表
+            await syncTool.SyncUserSticky(UID);
+            await LoadStickyNotes(UID);
+        }
+
+        /// <summary>
+        /// 确保便签密钥可用：本机无密钥且服务端有密码包裹密钥时（换设备场景），
+        /// 弹出密码输入框解锁。用户取消或解锁失败则返回 false。
+        /// </summary>
+        private async Task<bool> EnsureKeyReadyAsync()
+        {
+            if (await encryptStickyTool.EnsureStickyKeyReadyAsync())
+            {
+                return true;
+            }
+
+            while (true)
+            {
+                PasswordBox passwordBox = new PasswordBox
+                {
+                    Width = 360,
+                    PlaceholderText = "请输入个人密码",
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    VerticalContentAlignment = VerticalAlignment.Center,
+                    Header = "检测到该账号在其他设备上设置了个人密码，请输入密码以解锁你的便签本。",
+                };
+                ContentDialog dialog = new ContentDialog
+                {
+                    Title = "解锁便签本",
+                    Content = passwordBox,
+                    CloseButtonText = "取消",
+                    PrimaryButtonText = "确定",
+                    DefaultButton = ContentDialogButton.Primary
+                };
+                ContentDialogResult result = await dialog.ShowAsync();
+
+                if (result != ContentDialogResult.Primary)
+                {
+                    return false; // 用户取消解锁
+                }
+
+                if (await encryptStickyTool.UnlockWithPasswordAsync(passwordBox.Password))
+                {
+                    return true;
+                }
+
+                ContentDialog errorDialog = new ContentDialog
+                {
+                    Title = "密码错误",
+                    Content = "个人密码不正确，请重试。",
+                    CloseButtonText = "确定"
+                };
+                await errorDialog.ShowAsync();
+            }
+        }
+
+        /// <summary>
+        /// 遍历本地便签文件夹，重建便签列表。
+        /// </summary>
+        private async Task LoadStickyNotes(string UID)
+        {
             StorageFolder stickyFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(UID, CreationCollisionOption.OpenIfExists);
             stickyFolder = await stickyFolder.CreateFolderAsync("Sticky", CreationCollisionOption.OpenIfExists);
             IReadOnlyList<StorageFile> fileList = await stickyFolder.GetFilesAsync();
@@ -53,30 +121,38 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 localSettings.Values["EmptyPlaceholderOpacity"] = 0;
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
+                    StickyQuickViewList.Items.Clear();
                     foreach (StorageFile file in fileList)
                     {
-                        string stickyText = aesEncryptTool.DecryptStringFromBytesAes(File.ReadAllText(file.Path), md5EncryptTool.GetSystemEncryptedKey(), md5EncryptTool.GetSystemEncryptedVector());
-                        Sticky sticky = JsonConvert.DeserializeObject<Sticky>(stickyText);
+                        try
+                        {
+                            string stickyText = encryptStickyTool.DecryptStickyText(File.ReadAllText(file.Path));
+                            Sticky sticky = JsonConvert.DeserializeObject<Sticky>(stickyText);
 
-                        if (sticky.IsLock == false)
-                        {
-                            StickyQuickViewList.Items.Add(new StickyQuickView
+                            if (sticky.IsLock == false)
                             {
-                                CreateTimeText = sticky.CreateTime.ToShortDateString(),
-                                StickySerial = sticky.StickySerial,
-                                ThemeKind = sticky.StickyTheme,
-                                QucikViewText = sticky.QuickViewText,
-                            });
+                                StickyQuickViewList.Items.Add(new StickyQuickView
+                                {
+                                    CreateTimeText = sticky.CreateTime.ToShortDateString(),
+                                    StickySerial = sticky.StickySerial,
+                                    ThemeKind = sticky.StickyTheme,
+                                    QucikViewText = sticky.QuickViewText,
+                                });
+                            }
+                            else
+                            {
+                                StickyQuickViewList.Items.Add(new StickyQuickView
+                                {
+                                    CreateTimeText = sticky.CreateTime.ToShortDateString(),
+                                    StickySerial = sticky.StickySerial,
+                                    ThemeKind = sticky.StickyTheme,
+                                    QucikViewText = "🔒 该便签已被锁定。",
+                                });
+                            }
                         }
-                        else
+                        catch (Exception)
                         {
-                            StickyQuickViewList.Items.Add(new StickyQuickView
-                            {
-                                CreateTimeText = sticky.CreateTime.ToShortDateString(),
-                                StickySerial = sticky.StickySerial,
-                                ThemeKind = sticky.StickyTheme,
-                                QucikViewText = "🔒 该便签已被锁定。",
-                            });
+                            // 密钥未解锁或数据损坏：跳过该便签，不中断列表加载
                         }
                     }
                 });

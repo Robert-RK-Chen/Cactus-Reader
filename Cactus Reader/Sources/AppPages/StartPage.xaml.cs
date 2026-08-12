@@ -1,4 +1,4 @@
-﻿using Cactus_Reader.Sources.AppPages.Login;
+﻿using Cactus_Reader.Sources.AppPages.SignIn;
 using Windows.ApplicationModel.Core;
 using Windows.UI;
 using Windows.UI.ViewManagement;
@@ -94,11 +94,11 @@ namespace Cactus_Reader.Sources.AppPages
         }
 
         // 开始用户登陆与注册的过程
-        private void ContinueLogin(object sender, RoutedEventArgs e)
+        private void ContinueSignIn(object sender, RoutedEventArgs e)
         {
-            contentFrame.Navigate(typeof(LoginAccountPage), null, new SlideNavigationTransitionInfo()
+            contentFrame.Navigate(typeof(SignInAccountPage), null, new SlideNavigationTransitionInfo()
             {
-                Effect = SlideNavigationTransitionEffect.FromRight 
+                Effect = SlideNavigationTransitionEffect.FromRight
             });
         }
     }

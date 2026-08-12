@@ -36,7 +36,8 @@
                               Padding="8, 0" SelectionChanged="ListViewSelectionChanged" Grid.Row="1">
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="entity:Chapter">
-                                <TextBlock Text="{x:Bind Name, Mode=OneWay}" HorizontalAlignment="Center"/>
+                                <!-- Chapter.Name 构造后不可变，OneTime 等价且无 WMC1506 警告 -->
+                                <TextBlock Text="{x:Bind Name, Mode=OneTime}" HorizontalAlignment="Center"/>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
@@ -144,7 +145,7 @@
                                 </AppBarButton.Flyout>
                             </AppBarButton>
                             <AppBarSeparator />
-                            <AppBarButton Label="Cactus Notes" ToolTipService.ToolTip="Cactus Notes" 
+                            <AppBarButton Label="Cactus Notes" ToolTipService.ToolTip="Cactus Notes"
                                           LabelPosition="Default" Click="CreateNewSticky">
                                 <AppBarButton.Icon>
                                     <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70B;" />
@@ -159,9 +160,7 @@
                             </AppBarButton>
                         </CommandBar>
                     </Border>
-                    <Grid Grid.Row="1">
-                        <muxc:WebView2 x:Name="PivotItemWebView"/>
-                    </Grid>
+                    <muxc:WebView2 x:Name="PivotItemWebView" Grid.Row="1"/>
                 </Grid>
             </Grid>
         </Grid>

@@ -26,7 +26,7 @@
             <SolidColorBrush Color="#80d6ff" />
         </BrushCollection>
     </Page.Resources>
-    
+
     <Frame x:Name="mainContent">
         <Frame.ContentTransitions>
             <TransitionCollection>
@@ -34,14 +34,13 @@
             </TransitionCollection>
         </Frame.ContentTransitions>
         <Grid>
-            <Border x:Name="appTitleBar" IsHitTestVisible="True" VerticalAlignment="Top" Background="Transparent" 
+            <Border x:Name="appTitleBar" IsHitTestVisible="True" VerticalAlignment="Top" Background="Transparent"
                 Height="32" Canvas.ZIndex="2">
             </Border>
             <Grid Margin="0, 32, 0, 0" x:Name="mainGrid">
                <Border Background="{ThemeResource SystemControlBaseHighAcrylicElementMediumHighBrush}" Canvas.ZIndex="1"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0, 0, 0, 1"
                     HorizontalAlignment="Stretch" CornerRadius="0" VerticalAlignment="Top" Visibility="Visible">
-                    <Grid>
                         <CommandBar Background="Transparent" DefaultLabelPosition="Right" HorizontalAlignment="center">
                             <AppBarButton Label="返回主页" LabelPosition="Default" ToolTipService.ToolTip="返回主页"
                                       Click="BackMainPage">
@@ -113,7 +112,6 @@
                                 </AppBarButton.Icon>
                             </AppBarButton>
                         </CommandBar>
-                    </Grid>
                 </Border>
                 <ScrollViewer x:Name="canvasContainer" HorizontalScrollMode="Enabled" ViewChanged="UpdateScaleMulti"
                           HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
@@ -144,7 +142,7 @@
                         </Grid.ColumnDefinitions>
                         <InkToolbar TargetInkCanvas="{x:Bind inkCanvas}" Grid.Column="0">
                             <InkToolbarCustomPenButton x:Name="calligraphyPen" CustomPen="{StaticResource CalligraphicPen}"
-                                                       Palette="{StaticResource CalligraphicPenPalette}" 
+                                                       Palette="{StaticResource CalligraphicPenPalette}"
                                                        SelectedBrushIndex="0" MinStrokeWidth="1" MaxStrokeWidth="10"
                                                        ToolTipService.ToolTip="钢笔">
                                 <Border>
@@ -175,7 +173,7 @@
                             <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7A7;" FontSize="15"/>
                         </Button>
                         <Button Grid.Column="2" Width="36" Height="36" x:Name="toolButtonRedo" Padding="0"
-                            Background="Transparent" ToolTipService.ToolTip="重做" Margin="0" 
+                            Background="Transparent" ToolTipService.ToolTip="重做" Margin="0"
                             BorderThickness="0" CornerRadius="4">
                             <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE72C;" FontSize="15"/>
                         </Button>

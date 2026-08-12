@@ -1,5 +1,4 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -10,12 +9,10 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Debug|ARM = Debug|ARM
 		Debug|ARM64 = Debug|ARM64
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
-		Release|ARM = Release|ARM
 		Release|ARM64 = Release|ARM64
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
@@ -24,9 +21,6 @@ Global
 		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Debug|Any CPU.Build.0 = Debug|x64
 		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Debug|Any CPU.Deploy.0 = Debug|x64
-		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Debug|ARM.ActiveCfg = Debug|ARM
-		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Debug|ARM.Build.0 = Debug|ARM
-		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Debug|ARM.Deploy.0 = Debug|ARM
 		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Debug|ARM64.ActiveCfg = Debug|ARM64
 		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Debug|ARM64.Build.0 = Debug|ARM64
 		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Debug|ARM64.Deploy.0 = Debug|ARM64
@@ -39,9 +33,6 @@ Global
 		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Release|Any CPU.ActiveCfg = Release|x64
 		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Release|Any CPU.Build.0 = Release|x64
 		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Release|Any CPU.Deploy.0 = Release|x64
-		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Release|ARM.ActiveCfg = Release|ARM
-		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Release|ARM.Build.0 = Release|ARM
-		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Release|ARM.Deploy.0 = Release|ARM
 		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Release|ARM64.ActiveCfg = Release|ARM64
 		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Release|ARM64.Build.0 = Release|ARM64
 		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Release|ARM64.Deploy.0 = Release|ARM64
@@ -53,8 +44,6 @@ Global
 		{7A67B3B9-B8AD-4608-A309-80A798F22815}.Release|x86.Deploy.0 = Release|x86
 		{1581C084-83CD-4D2F-A545-10FB805E205F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1581C084-83CD-4D2F-A545-10FB805E205F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1581C084-83CD-4D2F-A545-10FB805E205F}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{1581C084-83CD-4D2F-A545-10FB805E205F}.Debug|ARM.Build.0 = Debug|Any CPU
 		{1581C084-83CD-4D2F-A545-10FB805E205F}.Debug|ARM64.ActiveCfg = Debug|Any CPU
 		{1581C084-83CD-4D2F-A545-10FB805E205F}.Debug|ARM64.Build.0 = Debug|Any CPU
 		{1581C084-83CD-4D2F-A545-10FB805E205F}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -63,8 +52,6 @@ Global
 		{1581C084-83CD-4D2F-A545-10FB805E205F}.Debug|x86.Build.0 = Debug|Any CPU
 		{1581C084-83CD-4D2F-A545-10FB805E205F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1581C084-83CD-4D2F-A545-10FB805E205F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1581C084-83CD-4D2F-A545-10FB805E205F}.Release|ARM.ActiveCfg = Release|Any CPU
-		{1581C084-83CD-4D2F-A545-10FB805E205F}.Release|ARM.Build.0 = Release|Any CPU
 		{1581C084-83CD-4D2F-A545-10FB805E205F}.Release|ARM64.ActiveCfg = Release|Any CPU
 		{1581C084-83CD-4D2F-A545-10FB805E205F}.Release|ARM64.Build.0 = Release|Any CPU
 		{1581C084-83CD-4D2F-A545-10FB805E205F}.Release|x64.ActiveCfg = Release|Any CPU

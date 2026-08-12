@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:media="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:muxc="using:Microsoft.UI.Xaml.Controls" 
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
     muxc:BackdropMaterial.ApplyToRootOrPageBackground="True"
     SizeChanged="ResizeImmersiveReadingMode">
@@ -26,9 +26,9 @@
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Rectangle x:Name="focusRecTop" Grid.Row="1" VerticalAlignment="Top" Fill="#505050" Height="300" 
+                <Rectangle x:Name="focusRecTop" Grid.Row="1" VerticalAlignment="Top" Fill="#505050" Height="300"
                        Visibility="Collapsed"/>
-                <Rectangle x:Name="focusRecBottom" Grid.Row="1" VerticalAlignment="Bottom" Fill="#505050" Height="300" 
+                <Rectangle x:Name="focusRecBottom" Grid.Row="1" VerticalAlignment="Bottom" Fill="#505050" Height="300"
                        Visibility="Collapsed"/>
                 <ScrollViewer x:Name="scrollViewer" Grid.Row="1" VerticalScrollBarVisibility="Auto">
                     <RichTextBlock x:Name="passageBlock" HorizontalAlignment="Center" VerticalAlignment="Stretch"
@@ -41,7 +41,6 @@
                 <Border Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0, 0, 0, 1"
                     HorizontalAlignment="Stretch" CornerRadius="0" Grid.Row="0">
-                    <Grid>
                         <CommandBar Background="Transparent" DefaultLabelPosition="Right" HorizontalAlignment="Center">
                             <AppBarButton Label="返回" LabelPosition="Collapsed" ToolTipService.ToolTip="返回"
                                   HorizontalAlignment="Left" Click="BackMainPage">
@@ -56,7 +55,7 @@
                                 </AppBarButton.Icon>
                                 <AppBarButton.Flyout>
                                     <Flyout>
-                                        <Slider x:Name="fontSizeSlider" Header="文本大小：" 
+                                        <Slider x:Name="fontSizeSlider" Header="文本大小："
                                             Minimum="10" Maximum="50" Value="18" TickFrequency="8" Width="200"
                                             TickPlacement="Outside" ValueChanged="ChangeFontSize"/>
                                     </Flyout>
@@ -79,9 +78,9 @@
                                                 Minimum="0" Maximum="60" Value="10"
                                                 TickFrequency="10" TickPlacement="Outside"/>
                                             <MenuFlyoutSeparator Grid.Row="1" Margin="0, 12" />
-                                            <Slider Grid.Row="2" Header="行高：" Width="200" 
+                                            <Slider Grid.Row="2" Header="行高：" Width="200"
                                                 x:Name="lineHeightSlider" ValueChanged="ChangeLineHeight"
-                                                Minimum="1" Maximum="3" Value="1.5" 
+                                                Minimum="1" Maximum="3" Value="1.5"
                                                 TickFrequency="0.5" StepFrequency="0.1" TickPlacement="Outside" />
                                         </Grid>
                                     </Flyout>
@@ -278,7 +277,6 @@
                                 </AppBarButton.Icon>
                             </AppBarButton>
                         </CommandBar>
-                    </Grid>
                 </Border>
             </Grid>
         </Grid>
