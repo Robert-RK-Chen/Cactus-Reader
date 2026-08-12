@@ -43,12 +43,20 @@ namespace CactusReaderService.Services
             }
         }
 
-        /// <summary>Graph 凭据是否已配置（未配置时发信直接失败，避免误报成功）。</summary>
+        /// <summary>
+        /// Graph 凭据是否已配置：需为真实 GUID / 域名租户，且不含占位符（YOUR_*）。
+        /// 未配置时发信直接失败，避免误报成功，也避免应用因无效凭据启动崩溃。
+        /// </summary>
         public bool IsConfigured =>
             !string.IsNullOrWhiteSpace(_tenantId) &&
             !string.IsNullOrWhiteSpace(_clientId) &&
             !string.IsNullOrWhiteSpace(_clientSecret) &&
-            !string.IsNullOrWhiteSpace(_fromAddress);
+            !string.IsNullOrWhiteSpace(_fromAddress) &&
+            !_tenantId.Contains("YOUR_") &&
+            !_clientId.Contains("YOUR_") &&
+            !_clientSecret.Contains("YOUR_") &&
+            !_fromAddress.Contains("YOUR_") &&
+            !_fromAddress.Contains("example.com");
 
         /// <summary>发送验证码邮件（Graph SendMail，202 Accepted 即成功）。</summary>
         public async Task<bool> SendVerifyCodeMailAsync(string toEmail, string verifyCode)

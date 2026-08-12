@@ -32,15 +32,16 @@ namespace CactusReaderService
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                // 本地开发凭据：dotnet user-secrets 存储于用户目录（%APPDATA%\Microsoft\UserSecrets），不入库
+                .AddUserSecrets<Program>()
+                // 环境变量可覆盖 appsettings.json（占位符）与 user-secrets，例如：
+                //   ConnectionStrings__MySql、GraphMail__ClientSecret、DataRoot
+                .AddEnvironmentVariables()
                 .Build();
 
             var builder = WebApplication.CreateBuilder(args);
             builder.Configuration.AddConfiguration(configuration);
-            // 本地开发凭据：dotnet user-secrets 存储于用户目录（%APPDATA%\Microsoft\UserSecrets），不入库
-            builder.Configuration.AddUserSecrets<Program>();
-            // 环境变量可覆盖 appsettings.json（占位符）与 user-secrets，例如：
-            //   ConnectionStrings__MySql、GraphMail__ClientSecret、DataRoot
-            builder.Configuration.AddEnvironmentVariables();
+            // 与服务装配读取的是同一份 configuration（含 user-secrets / 环境变量）
 
             // 与旧版一致：仅监听本机回环地址 9527 端口
             builder.WebHost.UseUrls("http://127.0.0.1:9527");

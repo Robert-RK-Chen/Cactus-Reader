@@ -119,11 +119,9 @@ namespace Cactus_Reader.Sources.WindowsHello
 
             if (openKeyResult.Status == KeyCredentialStatus.Success)
             {
-                var consentResult = await Windows.Security.Credentials.UI.UserConsentVerifier.RequestVerificationAsync(user.Name);
-                if (consentResult != Windows.Security.Credentials.UI.UserConsentVerificationResult.Verified)
-                {
-                    return false;
-                }
+                // 注意：不可在此处额外调用 UserConsentVerifier.RequestVerificationAsync ——
+                // RequestSignAsync 内部的 KeyCredential.RequestSignAsync 在签名前
+                // 已强制要求用户通过 Windows Hello（PIN/生物识别）验证，重复验证会让用户输入两次。
                 return await RequestSignAsync(user.UID, openKeyResult);
             }
             else if (openKeyResult.Status == KeyCredentialStatus.NotFound)
