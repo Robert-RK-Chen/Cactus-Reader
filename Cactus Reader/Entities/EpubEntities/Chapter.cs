@@ -1,25 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.Storage;
 
 namespace Cactus_Reader.Entities.EpubEntities
 {
-    public class Chapter
+    public class Chapter(string name, Uri uri, IStorageFile bookFile)
     {
-        public string Name { get; private set; }
+        public string Name { get; private set; } = name;
 
-        public Uri Uri { get; private set; }
+        public Uri Uri { get; private set; } = uri;
 
-        public IStorageFile BookFile { get; private set; }
-
-        public Chapter(string name, Uri uri, IStorageFile bookFile)
-        {
-            Name = name;
-            Uri = uri;
-            BookFile = bookFile;
-        }
+        public IStorageFile BookFile { get; private set; } = bookFile;
     }
 }

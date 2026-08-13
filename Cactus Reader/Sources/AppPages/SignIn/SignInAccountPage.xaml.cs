@@ -49,7 +49,7 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
             try
             {
                 ControllerVisibility.ShowProgressBar(statusBar);
-                currentUser = await ApiClient.GetUserByEmailAsync(email);
+                currentUser = await AccountService.GetUserByEmailAsync(email);
 
                 // 输入的用户帐号是存在的，则要求用户输入密码
                 if (null != currentUser)
@@ -88,10 +88,7 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
             // 确认跳过登录则创建临时帐户
             if (result == ContentDialogResult.Primary)
             {
-                localSettings.Values["isLogin"] = "true";
-                localSettings.Values["UID"] = "Temp User";
-                localSettings.Values["email"] = "你将使用 Cactus Reader 的有限功能";
-                localSettings.Values["name"] = "未登录用户";
+                AccountService.SkipLogin();
                 StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
             }
         }

@@ -1,6 +1,7 @@
 ﻿using Cactus_Reader.Entities.EpubEntities;
 using Cactus_Reader.Sources.AppPages.AppUI;
 using Cactus_Reader.Sources.StickyNotes;
+using Cactus_Reader.Sources.ToolKits;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
 using System;
@@ -15,7 +16,6 @@ using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Storage;
-using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -48,27 +48,14 @@ namespace Cactus_Reader.Sources.AppPages.Reader
 
         public EpubFileReadingPage()
         {
-            Chapters = new ObservableCollection<Chapter>();
+            Chapters = [];
             this.InitializeComponent();
             if (localSettings.Values["StickyTheme"] == null) { localSettings.Values["StickyTheme"] = "GingkoYellow"; }
             if (localSettings.Values["font"] != null) { currentFont = localSettings.Values["font"].ToString(); }
-            if (localSettings.Values["fontSize"] != null) { currentFontSize = (double)localSettings.Values["fontSize"]; }
+            if (localSettings.Values["fontSize"] != null) { currentFontSize = Convert.ToDouble(localSettings.Values["fontSize"]); }
 
-            var titleBar = ApplicationView.GetForCurrentView().TitleBar;
-            titleBar.ButtonBackgroundColor = Colors.Transparent;
-            titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
-
-            // Hide default title bar.
-            var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
-            coreTitleBar.ExtendViewIntoTitleBar = true;
-            UpdateTitleBarLayout(coreTitleBar);
-
-            // Set XAML element as a draggable region.
-            Window.Current.SetTitleBar(appTitleBar);
-
-            // Register a handler for when the size of the overlaid caption control changes.
-            // For example, when the app moves to a screen with a different DPI.
-            coreTitleBar.LayoutMetricsChanged += CoreTitleBarLayoutMetricsChanged;
+            // 统一标题栏：透明按钮 + 隐藏系统标题栏 + 可拖拽区域 + 右侧系统按钮留白（CommandBar 融合）
+            TitleBarService.Attach(appTitleBar, TitleBarStyle.Reader);
 
             DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
             dataTransferManager.DataRequested += DataTransferManagerDataRequested;
@@ -171,18 +158,6 @@ namespace Cactus_Reader.Sources.AppPages.Reader
                 {
                 }
             }
-        }
-
-        private void CoreTitleBarLayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
-        {
-            UpdateTitleBarLayout(sender);
-        }
-
-        private void UpdateTitleBarLayout(CoreApplicationViewTitleBar coreTitleBar)
-        {
-            // 为窗口控制按钮（最小化/最大化/关闭）在右侧预留空间，
-            // 避免 CommandBar 末尾按钮与其重叠
-            appTitleBar.Padding = new Thickness(0, 0, coreTitleBar.SystemOverlayRightInset, 0);
         }
 
         private async Task OpenBook(StorageFile bookFile)

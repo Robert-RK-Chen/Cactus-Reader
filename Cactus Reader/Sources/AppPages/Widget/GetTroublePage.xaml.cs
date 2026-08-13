@@ -1,6 +1,4 @@
-﻿using Windows.ApplicationModel.Core;
-using Windows.UI;
-using Windows.UI.ViewManagement;
+﻿using Cactus_Reader.Sources.ToolKits;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
@@ -16,56 +14,12 @@ namespace Cactus_Reader.Sources.AppPages.Widget
     public sealed partial class GetTroublePage : Page
     {
         private string errorMsg = string.Empty;
-        
+
         public GetTroublePage()
         {
             this.InitializeComponent();
-            var titleBar = ApplicationView.GetForCurrentView().TitleBar;
-            titleBar.ButtonBackgroundColor = Colors.Transparent;
-            titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
-
-            // Hide default title bar.
-            var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
-            coreTitleBar.ExtendViewIntoTitleBar = true;
-            UpdateTitleBarLayout(coreTitleBar);
-
-            // Set XAML element as a draggable region.
-            Window.Current.SetTitleBar(appTitleBar);
-
-            // Register a handler for when the size of the overlaid caption control changes.
-            // For example, when the app moves to a screen with a different DPI.
-            coreTitleBar.LayoutMetricsChanged += CoreTitleBarLayoutMetricsChanged;
-
-            // Register a handler for when the title bar visibility changes.
-            // For example, when the title bar is invoked in full screen mode.
-            coreTitleBar.IsVisibleChanged += CoreTitleBarIsVisibleChanged;
-        }
-
-        private void CoreTitleBarLayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
-        {
-            UpdateTitleBarLayout(sender);
-        }
-
-        private void UpdateTitleBarLayout(CoreApplicationViewTitleBar coreTitleBar)
-        {
-            // Update title bar control size as needed to account for system size changes.
-            appTitleBar.Height = coreTitleBar.Height;
-
-            // Ensure the custom title bar does not overlap window caption controls
-            Thickness currMargin = appTitleBar.Margin;
-            appTitleBar.Margin = new Thickness(currMargin.Left, currMargin.Top, coreTitleBar.SystemOverlayRightInset, currMargin.Bottom);
-        }
-
-        private void CoreTitleBarIsVisibleChanged(CoreApplicationViewTitleBar sender, object args)
-        {
-            if (sender.IsVisible)
-            {
-                appTitleBar.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                appTitleBar.Visibility = Visibility.Collapsed;
-            }
+            // 统一标题栏：透明按钮 + 隐藏系统标题栏 + 可拖拽区域 + 布局/显隐同步
+            TitleBarService.Attach(appTitleBar, TitleBarStyle.Standard);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

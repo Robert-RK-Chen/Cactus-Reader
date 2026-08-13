@@ -16,8 +16,6 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
     /// </summary>
     public sealed partial class SignInCodePage : Page
     {
-        private readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
-        private readonly MailCodeSender codeSender = MailCodeSender.Instance;
         User currentUser = null;
 
         public SignInCodePage()
@@ -57,10 +55,10 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
                 else
                 {
                     // 服务端校验（校验即删，防重放）
-                    bool isValid = await ApiClient.VerifyCodeAsync(currentUser.Email, "signin", codeInput);
+                    bool isValid = await AccountService.VerifyCodeAsync(currentUser.Email, "signin", codeInput);
                     if (isValid)
                     {
-                        syncTool.LoadCurrentUser(currentUser);
+                        AccountService.CompleteLogin(currentUser);
                         StartPage.startPage.mainContent.Navigate(typeof(MainPage), null,
                             new DrillInNavigationTransitionInfo());
                     }
@@ -87,7 +85,7 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
         private async void ResendVerifyCode(object sender, RoutedEventArgs e)
         {
             ControllerVisibility.ShowProgressBar(statusBar);
-            (bool ok, string reason) = await codeSender.SendVerifyCodeAsync(currentUser.Email, "signin");
+            (bool ok, string reason) = await AccountService.SendVerifyCodeAsync(currentUser.Email, "signin");
             ControllerVisibility.HideProgressBar(statusBar);
 
             if (ok)

@@ -79,7 +79,7 @@
                 <Grid>
                     <muxc:InfoBar x:Name="syncInfo" Grid.Row="0" IsOpen="True" Title="请稍等" IsClosable="False"
                                       Message="我们正在同步你的数据。" Margin="12" Width="320" Canvas.ZIndex="2"
-                                      Background="{StaticResource AcrylicInAppFillColorDefaultBrush}"
+                                      Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
                                       HorizontalAlignment="Right" VerticalAlignment="Top">
                         <muxc:InfoBar.IconSource>
                             <muxc:SymbolIconSource Symbol="Sync" />

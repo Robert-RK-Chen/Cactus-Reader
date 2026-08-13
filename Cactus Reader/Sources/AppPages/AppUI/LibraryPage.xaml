@@ -14,7 +14,7 @@
 
     <Grid>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Canvas.ZIndex="1" VerticalAlignment="Top"
-                    Background="{StaticResource AcrylicInAppFillColorDefaultBrush}" Padding="24, 24, 24, 0"
+                    Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" Padding="24, 24, 24, 0"
                     Height="108">
             <TextBlock Text="资源库" FontSize="26" FontWeight="SemiBold"/>
             <TextBlock Text="所有资源，尽在一处。" Margin="0, 12, 0, 0"/>

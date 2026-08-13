@@ -17,8 +17,6 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
     /// </summary>
     public sealed partial class ResetPassword : Page
     {
-        private readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
-        private readonly InformationVerify informationVerify = InformationVerify.Instance;
         User currentUser = null;
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -52,11 +50,11 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
                 {
                     alertMsg.Text = "若要继续，请输入一个长度至少为 8 位，并且含有大小写字母、数字或符号组成的密码。";
                 }
-                else if (informationVerify.IsPassword(password) && string.Equals(password, checkPwd))
+                else if (AccountService.IsPasswordValid(password) && string.Equals(password, checkPwd))
                 {
                     ControllerVisibility.ShowProgressBar(statusBar);
                     // 密码哈希由服务端生成（带盐）
-                    bool resetOk = await ApiClient.ResetPasswordAsync(currentUser.UID, password);
+                    bool resetOk = await AccountService.ResetPasswordAsync(currentUser.UID, password);
                     ControllerVisibility.HideProgressBar(statusBar);
 
                     if (!resetOk)
@@ -76,7 +74,7 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
 
                         if (ContentDialogResult.Primary == result)
                         {
-                            syncTool.LoadCurrentUser(currentUser);
+                            AccountService.CompleteLogin(currentUser);
                             StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
                         }
                     }

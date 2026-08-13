@@ -1,10 +1,8 @@
 ﻿using Cactus_Reader.Entities;
 using Cactus_Reader.Sources.StickyNotes;
 using Cactus_Reader.Sources.ToolKits;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation;
@@ -34,7 +32,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         public StickyPage()
         {
             InitializeComponent();
-            if (localSettings.Values["StickyTheme"] == null) { localSettings.Values["StickyTheme"] = "GingkoYellow"; }
+            StickyService.GetStickyTheme();
             if (localSettings.Values["EmptyPlaceholderOpacity"] == null) { localSettings.Values["EmptyPlaceholderOpacity"] = 1; }
             stickyPage = this;
         }
@@ -45,7 +43,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
             string UID = localSettings.Values["UID"].ToString();
 
-            // 0. 确保便签密钥可用（换设备时需输入个人密码解锁）
+            // 0. 确保便签密钥可用
             await EnsureKeyReadyAsync();
 
             // 1. 先加载本地已有便签，保证页面快速呈现
@@ -57,7 +55,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         }
 
         /// <summary>
-        /// 确保便签密钥可用：本机无密钥且服务端有密码包裹密钥时（换设备场景），
+        /// 确保便签密钥可用：本机无密钥且服务端有密码包裹密钥时
         /// 弹出密码输入框解锁。用户取消或解锁失败则返回 false。
         /// </summary>
         private async Task<bool> EnsureKeyReadyAsync()
@@ -69,7 +67,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
             while (true)
             {
-                PasswordBox passwordBox = new PasswordBox
+                PasswordBox passwordBox = new()
                 {
                     Width = 360,
                     PlaceholderText = "请输入个人密码",
@@ -97,7 +95,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                     return true;
                 }
 
-                ContentDialog errorDialog = new ContentDialog
+                ContentDialog errorDialog = new()
                 {
                     Title = "密码错误",
                     Content = "个人密码不正确，请重试。",
@@ -112,48 +110,24 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         /// </summary>
         private async Task LoadStickyNotes(string UID)
         {
-            StorageFolder stickyFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(UID, CreationCollisionOption.OpenIfExists);
-            stickyFolder = await stickyFolder.CreateFolderAsync("Sticky", CreationCollisionOption.OpenIfExists);
-            IReadOnlyList<StorageFile> fileList = await stickyFolder.GetFilesAsync();
+            // 原子操作：读取并解密全部本地便签（损坏/未解锁的自动跳过）
+            List<Sticky> stickyList = await StickyService.GetStickyListAsync(UID);
 
-            if (fileList.Count > 0)
+            if (stickyList.Count > 0)
             {
                 localSettings.Values["EmptyPlaceholderOpacity"] = 0;
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
                     StickyQuickViewList.Items.Clear();
-                    foreach (StorageFile file in fileList)
+                    foreach (Sticky sticky in stickyList)
                     {
-                        try
+                        StickyQuickViewList.Items.Add(new StickyQuickView
                         {
-                            string stickyText = encryptStickyTool.DecryptStickyText(File.ReadAllText(file.Path));
-                            Sticky sticky = JsonConvert.DeserializeObject<Sticky>(stickyText);
-
-                            if (sticky.IsLock == false)
-                            {
-                                StickyQuickViewList.Items.Add(new StickyQuickView
-                                {
-                                    CreateTimeText = sticky.CreateTime.ToShortDateString(),
-                                    StickySerial = sticky.StickySerial,
-                                    ThemeKind = sticky.StickyTheme,
-                                    QucikViewText = sticky.QuickViewText,
-                                });
-                            }
-                            else
-                            {
-                                StickyQuickViewList.Items.Add(new StickyQuickView
-                                {
-                                    CreateTimeText = sticky.CreateTime.ToShortDateString(),
-                                    StickySerial = sticky.StickySerial,
-                                    ThemeKind = sticky.StickyTheme,
-                                    QucikViewText = "🔒 该便签已被锁定。",
-                                });
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            // 密钥未解锁或数据损坏：跳过该便签，不中断列表加载
-                        }
+                            CreateTimeText = sticky.CreateTime.ToShortDateString(),
+                            StickySerial = sticky.StickySerial,
+                            ThemeKind = sticky.StickyTheme,
+                            QucikViewText = sticky.IsLock ? "🔒 该便签已被锁定。" : sticky.QuickViewText,
+                        });
                     }
                 });
             }
@@ -169,11 +143,11 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             List<object> parameter = new List<object>();
             string serial = Guid.NewGuid().ToString("D").ToUpper();
             string UID = localSettings.Values["UID"].ToString();
-            string theme = localSettings.Values["StickyTheme"].ToString();
+            string theme = StickyService.GetStickyTheme();
             EmptyPlaceholder.Opacity = 0;
             localSettings.Values["EmptyPlaceholderOpacity"] = 0;
 
-            StickyQuickView stickyQuickView = new StickyQuickView
+            StickyQuickView stickyQuickView = new()
             {
                 CreateTimeText = DateTime.Now.ToShortDateString(),
                 StickySerial = serial,

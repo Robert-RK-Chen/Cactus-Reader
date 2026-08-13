@@ -1,9 +1,7 @@
 ﻿using Cactus_Reader.Entities;
 using Cactus_Reader.Sources.ToolKits;
-using Cactus_Reader.Sources.WindowsHello;
 using System;
 using System.Threading.Tasks;
-using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
@@ -18,10 +16,6 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
     /// </summary>
     public sealed partial class SignInPwdPage : Page
     {
-        private ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        private readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
-        private readonly MailCodeSender codeSender = MailCodeSender.Instance;
-
         User currentUser = null;
 
         public SignInPwdPage()
@@ -67,7 +61,7 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
             {
                 // 等待服务端发送结果，成功才进入验证码页
                 ControllerVisibility.ShowProgressBar(statusBar);
-                (bool ok, string reason) = await codeSender.SendVerifyCodeAsync(currentUser.Email, "signin");
+                (bool ok, string reason) = await AccountService.SendVerifyCodeAsync(currentUser.Email, "signin");
                 ControllerVisibility.HideProgressBar(statusBar);
 
                 if (ok)
@@ -101,45 +95,27 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
         /// <param name="e"></param>
         private async void WindowsHelloSignIn(object sender, RoutedEventArgs e)
         {
-            object oCurrentUID = localSettings.Values["email"];
-            bool isTPMEnabled = await MicrosoftPassportHelper.MicrosoftPassportAvailableCheckAsync();
-
-            if (isTPMEnabled)
+            try
             {
-                try
-                {
-                    if (null == oCurrentUID || !string.Equals(currentUser.Email, oCurrentUID.ToString()))
-                    {
-                        alertMsg.Text = "若要使用 Windows Hello，请重新登录。";
-                    }
-                    else
-                    {
-                        ControllerVisibility.ShowProgressBar(statusBar);
-                        // 真实验证流程：打开已注册密钥 → PIN/生物识别确认 → 服务端挑战签名校验
-                        bool isSuccessful = await MicrosoftPassportHelper.GetPassportAuthenticationMessageAsync(currentUser);
+                ControllerVisibility.ShowProgressBar(statusBar);
+                // 真实验证流程：打开已注册密钥 → PIN/生物识别确认 → 服务端挑战签名校验
+                (bool ok, string message) = await AccountService.SignInWithWindowsHelloAsync(currentUser);
+                ControllerVisibility.HideProgressBar(statusBar);
 
-                        if (isSuccessful)
-                        {
-                            syncTool.LoadCurrentUser(currentUser);
-                            StartPage.startPage.mainContent.Navigate(typeof(MainPage), null,
-                                new DrillInNavigationTransitionInfo());
-                        }
-                        else
-                        {
-                            alertMsg.Text = "Windows Hello 验证失败，请再试一次。";
-                        }
-                    }
-                }
-                catch (Exception)
+                if (ok)
                 {
-                    alertMsg.Text = "未连接，请检查网络开关是否已打开。";
+                    StartPage.startPage.mainContent.Navigate(typeof(MainPage), null,
+                        new DrillInNavigationTransitionInfo());
+                }
+                else
+                {
+                    alertMsg.Text = message;
                 }
             }
-            else
+            catch (Exception)
             {
-                alertMsg.Text = "TPM 安全处理器未打开，或未设置 Windows Hello PIN。";
+                alertMsg.Text = "未连接，请检查网络开关是否已打开。";
             }
-            ControllerVisibility.HideProgressBar(statusBar);
             alertMsg.Visibility = Visibility.Visible;
         }
 
@@ -148,7 +124,7 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
             try
             {
                 ControllerVisibility.ShowProgressBar(statusBar);
-                (bool ok, string reason) = await codeSender.SendVerifyCodeAsync(currentUser.Email, "reset");
+                (bool ok, string reason) = await AccountService.SendVerifyCodeAsync(currentUser.Email, "reset");
                 ControllerVisibility.HideProgressBar(statusBar);
 
                 if (ok)
@@ -186,12 +162,12 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
                 {
                     // 密码校验由服务端完成（带盐哈希），客户端不持有哈希
                     ControllerVisibility.ShowProgressBar(statusBar);
-                    bool isValid = await ApiClient.VerifyPasswordAsync(currentUser.UID, userPwdInput.Password);
+                    bool isValid = await AccountService.VerifyPasswordAsync(currentUser.UID, userPwdInput.Password);
                     ControllerVisibility.HideProgressBar(statusBar);
 
                     if (isValid)
                     {
-                        syncTool.LoadCurrentUser(currentUser);
+                        AccountService.CompleteLogin(currentUser);
                         StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
                     }
                     else

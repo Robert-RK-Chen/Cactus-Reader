@@ -1,10 +1,8 @@
 ﻿using Cactus_Reader.Entities;
 using Cactus_Reader.Sources.ToolKits;
 using Cactus_Reader.Sources.WindowsHello;
-using Microsoft.CognitiveServices.Speech;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.Core;
@@ -32,8 +30,6 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
     {
         private ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         private readonly ProfileUploadTool uploadTool = ProfileUploadTool.Instance;
-        private readonly InformationVerify informationVerify = InformationVerify.Instance;
-        private readonly EncryptStickyTool encryptStickyTool = EncryptStickyTool.Instance;
         private MediaPlayer mediaPlayer;
         private bool suppressSyncToggle;
 
@@ -41,47 +37,8 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         {
             InitializeComponent();
 
-            // Initialize App Settings
-            if (localSettings.Values["appThemeIndex"] == null)
-            {
-                localSettings.Values.Add("appThemeIndex", 2);
-            }
-            if (localSettings.Values["font"] == null)
-            {
-                localSettings.Values.Add("font", "宋体");
-            }
-            if (localSettings.Values["fontSize"] == null)
-            {
-                localSettings.Values.Add("fontSize", 15.0);
-            }
-            if (localSettings.Values["voiceIndex"] == null)
-            {
-                localSettings.Values.Add("voiceIndex", 0);
-            }
-            if (localSettings.Values["voiceName"] == null)
-            {
-                localSettings.Values.Add("voiceName", "zh-CN-XiaoxiaoNeural");
-            }
-            if (localSettings.Values["voiceLang"] == null)
-            {
-                localSettings.Values.Add("voiceLang", "Chinese");
-            }
-            if (localSettings.Values["speed"] == null)
-            {
-                localSettings.Values.Add("speed", 1.0);
-            }
-            if (localSettings.Values["tune"] == null)
-            {
-                localSettings.Values.Add("tune", 1.0);
-            }
-            if (localSettings.Values["alreadySetWindowsHello"] == null)
-            {
-                localSettings.Values.Add("alreadySetWindowsHello", false);
-            }
-            if (localSettings.Values["syncEnabled"] == null)
-            {
-                localSettings.Values.Add("syncEnabled", true);
-            }
+            // 补全缺失的默认设置项
+            SettingsService.EnsureDefaultSettings();
 
             // Add a global Media Player Element
             mediaPlayer = new MediaPlayer();
@@ -93,7 +50,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
             // 恢复跨设备同步开关状态（OnNavigatedTo 每次导航进入必触发，比 Loading 事件可靠）
             suppressSyncToggle = true;
-            syncSwitch.IsOn = (bool)localSettings.Values["syncEnabled"];
+            syncSwitch.IsOn = SettingsService.GetSyncEnabled();
             suppressSyncToggle = false;
 
             string UID = localSettings.Values["UID"].ToString();
@@ -103,11 +60,11 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             email.Text = localSettings.Values["email"].ToString();
 
             // TODO: Load App Settings
-            previewText.FontSize = (double)localSettings.Values["fontSize"];
-            speedSlider.Value = (double)localSettings.Values["speed"];
-            tuneSlider.Value = (double)localSettings.Values["tune"];
+            previewText.FontSize = SettingsService.GetFontSize();
+            speedSlider.Value = SettingsService.GetVoiceSpeed();
+            tuneSlider.Value = SettingsService.GetVoiceTune();
 
-            if (localSettings.Values.Keys.Contains("privateKey"))
+            if (SettingsService.IsPrivateKeySet())
             {
                 setKeyButton.Visibility = Visibility.Collapsed;
                 closeKeyButton.Visibility = Visibility.Visible;
@@ -147,15 +104,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             {
                 return;
             }
-
-            bool enabled = syncSwitch.IsOn;
-            localSettings.Values["syncEnabled"] = enabled;
-
-            if (enabled)
-            {
-                string UID = localSettings.Values["UID"].ToString();
-                await ProfileSyncTool.Instance.SyncAllLocalContent(UID);
-            }
+            await SettingsService.SetSyncEnabledAsync(syncSwitch.IsOn);
         }
 
         private void HideUserImage(object sender, SizeChangedEventArgs e)
@@ -172,7 +121,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
         private void SignOut(object sender, RoutedEventArgs e)
         {
-            localSettings.Values["isLogin"] = false;
+            AccountService.SignOut();
             MainPage.mainPage.mainContent.Navigate(typeof(StartPage), null, new DrillInNavigationTransitionInfo());
         }
 
@@ -217,131 +166,61 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
         private void LoadAppTheme(object sender, RoutedEventArgs e)
         {
-            appThemeCombo.SelectedIndex = (int)localSettings.Values["appThemeIndex"];
+            appThemeCombo.SelectedIndex = SettingsService.GetAppThemeIndex();
         }
 
         private void ChangeAppTheme(object sender, SelectionChangedEventArgs e)
         {
-            int appThemeIndex = appThemeCombo.SelectedIndex;
-            localSettings.Values["appThemeIndex"] = appThemeIndex;
-            switch (appThemeIndex)
-            {
-                case 0:
-                    (Window.Current.Content as Frame).RequestedTheme = ElementTheme.Light;
-                    break;
-                case 1:
-                    (Window.Current.Content as Frame).RequestedTheme = ElementTheme.Dark;
-                    break;
-                case 2:
-                    (Window.Current.Content as Frame).RequestedTheme = ElementTheme.Default;
-                    break;
-                default:
-                    (Window.Current.Content as Frame).RequestedTheme = ElementTheme.Default;
-                    break;
-            }
+            SettingsService.ApplyAppTheme(appThemeCombo.SelectedIndex);
         }
 
         private void LoadAppFont(object sender, RoutedEventArgs e)
         {
-            fontsCombo.SelectedValue = localSettings.Values["font"];
+            fontsCombo.SelectedValue = SettingsService.GetAppFont();
         }
 
         private void ChangeAppFont(object sender, SelectionChangedEventArgs e)
         {
-            localSettings.Values["font"] = fontsCombo.SelectedValue;
-            previewText.FontFamily = new FontFamily(fontsCombo.SelectedValue.ToString());
+            string font = fontsCombo.SelectedValue.ToString();
+            SettingsService.SetAppFont(font);
+            previewText.FontFamily = new FontFamily(font);
         }
 
         private void DeceaseFontSize(object sender, RoutedEventArgs e)
         {
-            int currentFontSize = int.Parse(localSettings.Values["fontSize"].ToString());
-            if (currentFontSize > 12)
-            {
-                currentFontSize--;
-                localSettings.Values["fontSize"] = currentFontSize;
-                previewText.FontSize = currentFontSize;
-            }
+            previewText.FontSize = SettingsService.ChangeFontSize(-1);
         }
 
         private void IncreaseFontSize(object sender, RoutedEventArgs e)
         {
-            int currentFontSize = int.Parse(localSettings.Values["fontSize"].ToString());
-            if (currentFontSize < 30)
-            {
-                currentFontSize++;
-                localSettings.Values["fontSize"] = currentFontSize;
-                previewText.FontSize = currentFontSize;
-            }
+            previewText.FontSize = SettingsService.ChangeFontSize(1);
         }
 
         private void LoadSpeechVoice(object sender, RoutedEventArgs e)
         {
-            voiceCombo.SelectedIndex = (int)localSettings.Values["voiceIndex"];
+            voiceCombo.SelectedIndex = SettingsService.GetVoiceIndex();
         }
 
         private void ChangeSpeechVoice(object sender, SelectionChangedEventArgs e)
         {
-            localSettings.Values["voiceIndex"] = voiceCombo.SelectedIndex;
-            switch (voiceCombo.SelectedIndex)
-            {
-                case 0:
-                    localSettings.Values["voiceName"] = "zh-CN-XiaoxiaoNeural";
-                    localSettings.Values["voiceLang"] = "Chinese";
-                    break;
-                case 1:
-                    localSettings.Values["voiceName"] = "zh-CN-YunxiNeural";
-                    localSettings.Values["voiceLang"] = "Chinese";
-                    break;
-                case 2:
-                    localSettings.Values["voiceName"] = "zh-CN-XiaoxuanNeural";
-                    localSettings.Values["voiceLang"] = "Chinese";
-                    break;
-                case 3:
-                    localSettings.Values["voiceName"] = "zh-CN-YunyangNeural";
-                    localSettings.Values["voiceLang"] = "Chinese";
-                    break;
-                case 4:
-                    localSettings.Values["voiceName"] = "en-US-AshleyNeural";
-                    localSettings.Values["voiceLang"] = "English";
-                    break;
-                case 5:
-                    localSettings.Values["voiceName"] = "en-US-JennyNeural";
-                    localSettings.Values["voiceLang"] = "English";
-                    break;
-                case 6:
-                    localSettings.Values["voiceName"] = "en-US-BrandonNeural";
-                    localSettings.Values["voiceLang"] = "English";
-                    break;
-                case 7:
-                    localSettings.Values["voiceName"] = "en-US-ChristopherNeural";
-                    localSettings.Values["voiceLang"] = "English";
-                    break;
-                default:
-                    localSettings.Values["voiceName"] = "zh-CN-XiaoxiaoNeural";
-                    localSettings.Values["voiceLang"] = "Chinese";
-                    break;
-            }
+            SettingsService.SetSpeechVoice(voiceCombo.SelectedIndex);
         }
 
         private void ChangeSpeechSpeed(object sender, RangeBaseValueChangedEventArgs e)
         {
-            double speechSpeed = speedSlider.Value;
-            localSettings.Values["speed"] = speechSpeed;
+            SettingsService.SetSpeechSpeed(speedSlider.Value);
         }
 
         private void ChangeSpeechTune(object sender, RangeBaseValueChangedEventArgs e)
         {
-            double voiceName = tuneSlider.Value;
-            localSettings.Values["tune"] = voiceName;
+            SettingsService.SetSpeechTune(tuneSlider.Value);
         }
 
         private async void PlaySpeechTextExample(object sender, RoutedEventArgs e)
         {
             // 语速与语调暂不可用
-            var config = SpeechConfig.FromSubscription("{subscriptionkey}", "{region}");
-            config.SpeechSynthesisVoiceName = localSettings.Values["voiceName"].ToString();
             string exampleText;
-            if (localSettings.Values["voiceLang"].ToString().Equals("Chinese"))
+            if (SettingsService.GetVoiceLang().Equals("Chinese"))
             {
                 exampleText = "你好，我是讲述人：" + voiceCombo.SelectedItem + ", 欢迎使用 Cactus Reader。";
             }
@@ -352,29 +231,22 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
             try
             {
-                using (var synthesizer = new SpeechSynthesizer(config, null))
+                // 原子操作：合成语音到本地 wav 文件
+                StorageFile audioFile = await SpeechService.SynthesizeToFileAsync(
+                    exampleText, SettingsService.GetVoiceName());
+
+                if (audioFile != null)
                 {
-                    using (var result = await synthesizer.SpeakTextAsync(exampleText).ConfigureAwait(false))
-                    {
-                        if (result.Reason == ResultReason.SynthesizingAudioCompleted)
-                        {
-                            using (var audioStream = AudioDataStream.FromResult(result))
-                            {
-                                var filePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "outputaudio.wav");
-                                await audioStream.SaveToWaveFileAsync(filePath);
-                                mediaPlayer.Source = MediaSource.CreateFromStorageFile(await StorageFile.GetFileFromPathAsync(filePath));
-                                mediaPlayer.Play();
-                            }
-                        }
-                        else
-                        {
-                            new ToastContentBuilder().AddArgument("action", "viewConversation")
-                                .AddArgument("conversationId", 9527)
-                                .AddText("Cactus Reader 讲述人")
-                                .AddText("未能生成语音。若要继续，请将设备连接到网络。")
-                                .Show();
-                        }
-                    }
+                    mediaPlayer.Source = MediaSource.CreateFromStorageFile(audioFile);
+                    mediaPlayer.Play();
+                }
+                else
+                {
+                    new ToastContentBuilder().AddArgument("action", "viewConversation")
+                        .AddArgument("conversationId", 9527)
+                        .AddText("Cactus Reader 讲述人")
+                        .AddText("未能生成语音。若要继续，请将设备连接到网络。")
+                        .Show();
                 }
             }
             catch (Exception)
@@ -398,7 +270,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 VerticalContentAlignment = VerticalAlignment.Center,
                 Header = "需要输入个人密码才能查看便签本中的内容。",
             };
-            ContentDialog setPrivateKeyDialog = new ContentDialog
+            ContentDialog setPrivateKeyDialog = new()
             {
                 Title = "设置个人密码",
                 Content = passwordBox,
@@ -414,12 +286,9 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 string password = passwordBox.Password;
                 if (password.Length >= 6)
                 {
-                    // 使用 PBKDF2 加盐哈希存储个人密码，不再使用 MD5
-                    localSettings.Values["privateKey"] = PasswordHashTool.Instance.HashPassword(password);
+                    // 原子操作：PBKDF2 加盐哈希存储 + 用密码包裹便签密钥上传服务端（换设备时可凭密码找回）
+                    bool vaultSynced = await SettingsService.SetPrivateKeyAsync(password);
                     windowsHelloSwitch.IsEnabled = true;
-
-                    // 用新密码包裹便签加密密钥并上传服务端（换设备时可凭密码找回密钥）
-                    bool vaultSynced = await encryptStickyTool.SetupVaultAsync(password);
 
                     // hide the button and show another button
                     setKeyButton.Visibility = Visibility.Collapsed;
@@ -447,7 +316,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
         private async void ClosePrivateKey(object sender, RoutedEventArgs e)
         {
-            PasswordBox passwordBox = new PasswordBox
+            PasswordBox passwordBox = new()
             {
                 Width = 360,
                 PlaceholderText = "请输入你用于锁定便签本的密码",
@@ -468,45 +337,35 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             while (result == ContentDialogResult.Primary)
             {
                 string password = passwordBox.Password;
-                if (informationVerify.CheckPassword(password))
+                // 原子操作：验证密码 → 删除服务端包裹密钥 → 清除本机设置 → 解锁全部便签
+                bool vaultRemoved = await SettingsService.ClosePrivateKeyAsync(password);
+                if (!vaultRemoved)
                 {
-                    // 删除服务端包裹密钥：本机仍可继续使用，但更换设备后将无法找回便签
-                    bool vaultRemoved = await encryptStickyTool.RemoveVaultAsync();
-                    if (!vaultRemoved)
+                    // 密码错误或云端密钥删除失败
+                    ContentDialog removeFailDialog = new ContentDialog
                     {
-                        ContentDialog removeFailDialog = new ContentDialog
-                        {
-                            Title = "云端密钥删除失败",
-                            Content = "关闭密码后本机仍可正常使用，但云端密钥未能删除，更换设备时仍可凭此密码找回便签。请检查网络后再试。",
-                            CloseButtonText = "确定"
-                        };
-                        await removeFailDialog.ShowAsync();
-                    }
-
-                    localSettings.Values.Remove("privateKey");
-                    localSettings.Values["alreadySetWindowsHello"] = false;
-
-                    windowsHelloSwitch.IsOn = false;
-                    windowsHelloSwitch.IsEnabled = false;
-                    setKeyButton.Visibility = Visibility.Visible;
-                    closeKeyButton.Visibility = Visibility.Collapsed;
-
-                    await Task.Factory.StartNew(() => encryptStickyTool.UnlockAllSticky());
+                        Title = "操作失败",
+                        Content = "密码不正确，或云端密钥删除失败。本机仍可继续使用，但请检查密码后再试。",
+                        CloseButtonText = "确定"
+                    };
+                    await removeFailDialog.ShowAsync();
                     break;
                 }
-                else
-                {
-                    result = await setPrivateKeyDialog.ShowAsync();
-                }
+
+                windowsHelloSwitch.IsOn = false;
+                windowsHelloSwitch.IsEnabled = false;
+                setKeyButton.Visibility = Visibility.Visible;
+                closeKeyButton.Visibility = Visibility.Collapsed;
+                break;
             }
         }
 
         private void LoadedWindowsHello(object sender, object args)
         {
-            if (localSettings.Values.Keys.Contains("privateKey"))
+            if (SettingsService.IsPrivateKeySet())
             {
                 windowsHelloSwitch.IsEnabled = true;
-                windowsHelloSwitch.IsOn = (bool)localSettings.Values["alreadySetWindowsHello"];
+                windowsHelloSwitch.IsOn = SettingsService.IsWindowsHelloSet();
             }
         }
 
@@ -514,7 +373,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         {
             // 当 Windows Hello 打开时判断用户是否设置过 Windows Hello 加密
             // 没有设置过则开始设置 Windows Hello
-            if ((bool)localSettings.Values["alreadySetWindowsHello"] == false)
+            if (!SettingsService.IsWindowsHelloSet())
             {
                 string UID = localSettings.Values["UID"].ToString();
                 string name = localSettings.Values["name"].ToString();
@@ -531,11 +390,11 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                         DefaultButton = ContentDialogButton.Primary
                     };
                     await contentDialog.ShowAsync();
-                    localSettings.Values["alreadySetWindowsHello"] = true;
+                    SettingsService.SetWindowsHello(true);
                 }
                 else
                 {
-                    localSettings.Values["alreadySetWindowsHello"] = false;
+                    SettingsService.SetWindowsHello(false);
                     windowsHelloSwitch.IsOn = false;
                 }
                 windowsHelloSwitch.IsEnabled = true;
@@ -544,7 +403,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             // 当用户关闭 Windows Hello 时，同时关闭密码
             if (windowsHelloSwitch.IsOn == false)
             {
-                localSettings.Values["alreadySetWindowsHello"] = false;
+                SettingsService.SetWindowsHello(false);
             }
         }
     }

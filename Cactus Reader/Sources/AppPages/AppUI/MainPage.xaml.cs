@@ -1,19 +1,14 @@
 ﻿using Cactus_Reader.Sources.AppPages.AppUI;
-using Cactus_Reader.Sources.AppPages.Widget;
 using Cactus_Reader.Sources.ToolKits;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
 using Windows.Storage;
 using Windows.System;
-using Windows.UI;
 using Windows.UI.Core;
-using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
@@ -24,10 +19,13 @@ namespace Cactus_Reader
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
+
     public sealed partial class MainPage : Page
     {
         public static MainPage mainPage;
+
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+
         ProfileSyncTool syncTool = ProfileSyncTool.Instance;
 
         public MainPage()
@@ -36,72 +34,8 @@ namespace Cactus_Reader
             mainPage = this;
             Task.Factory.StartNew(() => AsyncUserProfile());
 
-            var titleBar = ApplicationView.GetForCurrentView().TitleBar;
-
-            titleBar.ButtonBackgroundColor = Colors.Transparent;
-            titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
-
-            // Hide default title bar.
-            var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
-            coreTitleBar.ExtendViewIntoTitleBar = true;
-            UpdateTitleBarLayout(coreTitleBar);
-
-            // Set XAML element as a draggable region.
-            Window.Current.SetTitleBar(appTitleBar);
-
-            // Register a handler for when the size of the overlaid caption control changes.
-            // For example, when the app moves to a screen with a different DPI.
-            coreTitleBar.LayoutMetricsChanged += CoreTitleBarLayoutMetricsChanged;
-
-            // Register a handler for when the title bar visibility changes.
-            // For example, when the title bar is invoked in full screen mode.
-            coreTitleBar.IsVisibleChanged += CoreTitleBarIsVisibleChanged;
-
-            //Register a handler for when the window changes focus
-            Window.Current.Activated += CurrentActivated;
-        }
-
-        private void CoreTitleBarLayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
-        {
-            UpdateTitleBarLayout(sender);
-        }
-
-        private void UpdateTitleBarLayout(CoreApplicationViewTitleBar coreTitleBar)
-        {
-            // Update title bar control size as needed to account for system size changes.
-            appTitleBar.Height = coreTitleBar.Height;
-
-            // Ensure the custom title bar does not overlap window caption controls
-            Thickness currMargin = appTitleBar.Margin;
-            appTitleBar.Margin = new Thickness(currMargin.Left, currMargin.Top, coreTitleBar.SystemOverlayRightInset, currMargin.Bottom);
-        }
-
-        private void CoreTitleBarIsVisibleChanged(CoreApplicationViewTitleBar sender, object args)
-        {
-            if (sender.IsVisible)
-            {
-                appTitleBar.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                appTitleBar.Visibility = Visibility.Collapsed;
-            }
-        }
-
-        // Update the TitleBar based on the inactive/active state of the app
-        private void CurrentActivated(object sender, Windows.UI.Core.WindowActivatedEventArgs e)
-        {
-            SolidColorBrush defaultForegroundBrush = (SolidColorBrush)Application.Current.Resources["TextFillColorPrimaryBrush"];
-            SolidColorBrush inactiveForegroundBrush = (SolidColorBrush)Application.Current.Resources["TextFillColorDisabledBrush"];
-
-            if (e.WindowActivationState == Windows.UI.Core.CoreWindowActivationState.Deactivated)
-            {
-                appTitle.Foreground = inactiveForegroundBrush;
-            }
-            else
-            {
-                appTitle.Foreground = defaultForegroundBrush;
-            }
+            // 统一标题栏：透明按钮 + 隐藏系统标题栏 + 可拖拽区域 + 布局/显隐/激活同步
+            TitleBarService.Attach(appTitleBar, TitleBarStyle.Standard, appTitle);
         }
 
         // List of ValueTuple holding the Navigation Tag and the relative Navigation Page
@@ -158,11 +92,12 @@ namespace Cactus_Reader
                 var item = pages.FirstOrDefault(p => p.Tag.Equals(navItemTag));
                 page = item.Page;
             }
+
             // Get the page type before navigation so you can prevent duplicate entries in the backstack.
             var preNavPageType = contentFrame.CurrentSourcePageType;
 
             // Only navigate if the selected page isn't currently loaded.
-            if (!(page is null) && !Type.Equals(preNavPageType, page))
+            if (page is not null && !Type.Equals(preNavPageType, page))
             {
                 contentFrame.Navigate(page, null, transitionInfo);
             }

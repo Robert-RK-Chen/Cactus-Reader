@@ -1,10 +1,9 @@
 ﻿using Cactus_Reader.Sources.AppPages.AppUI;
 using Cactus_Reader.Sources.StickyNotes;
-using Microsoft.CognitiveServices.Speech;
+using Cactus_Reader.Sources.ToolKits;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
@@ -31,6 +30,11 @@ namespace Cactus_Reader.Sources.AppPages.Reader
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         readonly ThemeColorBrushTool brushTool = ThemeColorBrushTool.Instance;
+        // 顶部亚克力区域（32px 空白 + CommandBar）实际高度：正文初始顶部留白用，
+        // 避免内容被 CommandBar 遮住；滚动时内容仍可穿过亚克力显示模糊效果
+        private double topInset = 80;
+        // 亚克力下方额外呼吸间距：文字不与 CommandBar 紧贴
+        private const double topSpacing = 24;
 
         public TextFileReadingPage()
         {
@@ -51,22 +55,8 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             if (localSettings.Values["tune"] == null) { localSettings.Values["tune"] = 1.0; }
             localSettings.Values["focusLine"] = 1;
 
-            var titleBar = ApplicationView.GetForCurrentView().TitleBar;
-            titleBar.ButtonBackgroundColor = Colors.Transparent;
-            titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
-
-            // Hide default title bar.
-            var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
-            coreTitleBar.ExtendViewIntoTitleBar = true;
-            UpdateTitleBarLayout(coreTitleBar);
-
-            // 仅将底层透明 Border 设为可拖动区域（CommandBar 在其上层，不受影响），
-            // 实现 CommandBar 与标题栏融合且按钮可正常点击
-            Window.Current.SetTitleBar(appTitleBar);
-
-            // Register a handler for when the size of the overlaid caption control changes.
-            // For example, when the app moves to a screen with a different DPI.
-            coreTitleBar.LayoutMetricsChanged += CoreTitleBarLayoutMetricsChanged;
+            // 统一标题栏：透明按钮 + 隐藏系统标题栏 + 可拖拽区域 + 右侧系统按钮留白（CommandBar 融合）
+            TitleBarService.Attach(appTitleBar, TitleBarStyle.Reader);
 
             DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
             dataTransferManager.DataRequested += DataTransferManagerDataRequested;
@@ -95,12 +85,20 @@ namespace Cactus_Reader.Sources.AppPages.Reader
                 text = (string)document;
             }
 
-            fontSizeSlider.Value = (double)localSettings.Values["fontSize"];
-            charSpacingSlider.Value = (double)localSettings.Values["charSpacing"];
-            lineHeightSlider.Value = (double)localSettings.Values["lineHeight"];
+            fontSizeSlider.Value = Convert.ToDouble(localSettings.Values["fontSize"]);
+            charSpacingSlider.Value = Convert.ToDouble(localSettings.Values["charSpacing"]);
+            lineHeightSlider.Value = Convert.ToDouble(localSettings.Values["lineHeight"]);
             passageBlock.FontFamily = new FontFamily(localSettings.Values["font"].ToString());
             ChangeLineWidth(localSettings.Values["passageWidth"].ToString());
             ChangeTheme(localSettings.Values["theme"].ToString());
+
+            // 按 CommandBar 区域实际高度设置正文顶部留白（与 PDF 页一致），初始不被亚克力遮挡
+            double actualInset = commandBarHost.ActualHeight;
+            if (actualInset > 0) { topInset = actualInset; }
+            if (!focusToggleSwitch.IsOn)
+            {
+                passageBlock.Margin = new Thickness(60, topInset + topSpacing, 60, 60);
+            }
 
             passageBlock.Blocks.Clear();
             Paragraph paragraph = new Paragraph();
@@ -114,25 +112,11 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
         }
 
-        private void CoreTitleBarLayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
-        {
-            UpdateTitleBarLayout(sender);
-        }
-
-        private void UpdateTitleBarLayout(CoreApplicationViewTitleBar coreTitleBar)
-        {
-            // 为窗口控制按钮（最小化/最大化/关闭）在右侧预留空间，
-            // 避免 CommandBar 末尾按钮与其重叠
-            appTitleBar.Padding = new Thickness(0, 0, coreTitleBar.SystemOverlayRightInset, 0);
-        }
-
         private async void ReadTextAloud(object sender, RoutedEventArgs e)
         {
             passageBlock.SelectAll();
             string text = passageBlock.SelectedText;
             passageBlock.Select(passageBlock.ContentStart, passageBlock.ContentEnd);
-            var config = SpeechConfig.FromSubscription("{subscriptionkey}", "{region}");
-            config.SpeechSynthesisVoiceName = localSettings.Values["voiceName"].ToString();
             new ToastContentBuilder().AddArgument("action", "viewConversation")
                 .AddArgument("conversationId", 9527)
                 .AddText("Cactus Reader 讲述人\n")
@@ -140,33 +124,23 @@ namespace Cactus_Reader.Sources.AppPages.Reader
                 .Show();
             try
             {
-                using (var synthesizer = new SpeechSynthesizer(config, null))
+                // 原子操作：合成语音到本地 wav 文件
+                StorageFile audioFile = await SpeechService.SynthesizeToFileAsync(text, SettingsService.GetVoiceName());
+                if (audioFile != null)
                 {
-                    using (var result = await synthesizer.SpeakTextAsync(text).ConfigureAwait(false))
+                    await mediaPlayerElement.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        if (result.Reason == ResultReason.SynthesizingAudioCompleted)
-                        {
-                            using (var audioStream = AudioDataStream.FromResult(result))
-                            {
-                                var filePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "outputaudio.wav");
-                                await audioStream.SaveToWaveFileAsync(filePath);
-                                StorageFile outputaudio = await StorageFile.GetFileFromPathAsync(filePath);
-                                await mediaPlayerElement.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                                {
-                                    mediaPlayerElement.Source = MediaSource.CreateFromStorageFile(outputaudio);
-                                    mediaPlayerElement.MediaPlayer.Play();
-                                });
-                            }
-                        }
-                        else
-                        {
-                            new ToastContentBuilder().AddArgument("action", "viewConversation")
-                                .AddArgument("conversationId", 9528)
-                                .AddText("Cactus Reader 讲述人")
-                                .AddText("未能生成语音。若要继续，请将设备连接到网络。")
-                                .Show();
-                        }
-                    }
+                        mediaPlayerElement.Source = MediaSource.CreateFromStorageFile(audioFile);
+                        mediaPlayerElement.MediaPlayer.Play();
+                    });
+                }
+                else
+                {
+                    new ToastContentBuilder().AddArgument("action", "viewConversation")
+                        .AddArgument("conversationId", 9528)
+                        .AddText("Cactus Reader 讲述人")
+                        .AddText("未能生成语音。若要继续，请将设备连接到网络。")
+                        .Show();
                 }
             }
             catch (Exception)
@@ -307,13 +281,17 @@ namespace Cactus_Reader.Sources.AppPages.Reader
                 ChangeFocusLine((int)localSettings.Values["focusLine"]);
                 focusRecTop.Visibility = Visibility.Visible;
                 focusRecBottom.Visibility = Visibility.Visible;
+                // 滚动到文字起始处（跳过 topInset + topSpacing 顶部留白），
+                // 使第一行文字立即对齐焦点透明带，而不是前面一大片空白
+                scrollViewer.ChangeView(null, topInset + topSpacing, null, true);
             }
             else
             {
                 oneLineButton.IsEnabled = false;
                 threeLinesButton.IsEnabled = false;
                 fiveLinesButton.IsEnabled = false;
-                passageBlock.Margin = new Thickness(60, 60, 60, 60);
+                // 顶部留白叠加 topInset + 呼吸间距，避免退出聚焦模式后正文回到被亚克力遮挡的位置
+                passageBlock.Margin = new Thickness(60, topInset + topSpacing, 60, 60);
                 focusRecTop.Visibility = Visibility.Collapsed;
                 focusRecBottom.Visibility = Visibility.Collapsed;
             }
@@ -330,7 +308,9 @@ namespace Cactus_Reader.Sources.AppPages.Reader
                 focusRecBottom.Height = (passageHeight - lineHeight) / 2;
                 if (focusToggleSwitch.IsOn == true)
                 {
-                    passageBlock.Margin = new Thickness(60, focusRecTop.Height, 60, focusRecTop.Height);
+                    // 聚焦模式下顶部留白避开亚克力区域并加呼吸间距；
+                    // ScrollViewer 已滚动到 topInset+topSpacing，第一行文字正好对齐焦点透明带中央
+                    passageBlock.Margin = new Thickness(60, focusRecTop.Height + topInset + topSpacing, 60, focusRecTop.Height);
                 }
             }
             catch (Exception)

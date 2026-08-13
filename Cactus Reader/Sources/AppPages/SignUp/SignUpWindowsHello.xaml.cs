@@ -16,8 +16,6 @@ namespace Cactus_Reader.Sources.AppPages.SignUp
     /// </summary>
     public sealed partial class SignUpWindowsHello : Page
     {
-        private readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
-
         User currentUser = null;
 
         public SignUpWindowsHello()
@@ -44,7 +42,7 @@ namespace Cactus_Reader.Sources.AppPages.SignUp
 
             if (ContentDialogResult.Primary == result)
             {
-                syncTool.LoadCurrentUser(currentUser);
+                AccountService.CompleteLogin(currentUser);
                 StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
             }
         }
@@ -68,7 +66,7 @@ namespace Cactus_Reader.Sources.AppPages.SignUp
 
                 if (ContentDialogResult.Primary == result)
                 {
-                    syncTool.LoadCurrentUser(currentUser);
+                    AccountService.CompleteLogin(currentUser);
                     StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
                 }
             }

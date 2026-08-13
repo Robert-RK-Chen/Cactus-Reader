@@ -16,7 +16,6 @@ namespace Cactus_Reader.Sources.AppPages.SignUp
     /// </summary>
     public sealed partial class SignUpCodePage : Page
     {
-        private readonly MailCodeSender codeSender = MailCodeSender.Instance;
         User currentUser = null;
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -56,7 +55,7 @@ namespace Cactus_Reader.Sources.AppPages.SignUp
                 else
                 {
                     // 服务端校验（校验即删，防重放）
-                    bool isValid = await ApiClient.VerifyCodeAsync(currentUser.Email, "signup", codeInput);
+                    bool isValid = await AccountService.VerifyCodeAsync(currentUser.Email, "signup", codeInput);
                     if (isValid)
                     {
                         contentFrame.Navigate(typeof(SignUpUserInfoPage), currentUser, new SlideNavigationTransitionInfo()
@@ -87,7 +86,7 @@ namespace Cactus_Reader.Sources.AppPages.SignUp
         private async void ResendVerifyCode(object sender, RoutedEventArgs e)
         {
             ControllerVisibility.ShowProgressBar(statusBar);
-            (bool ok, string reason) = await codeSender.SendVerifyCodeAsync(currentUser.Email, "signup");
+            (bool ok, string reason) = await AccountService.SendVerifyCodeAsync(currentUser.Email, "signup");
             ControllerVisibility.HideProgressBar(statusBar);
 
             if (ok)

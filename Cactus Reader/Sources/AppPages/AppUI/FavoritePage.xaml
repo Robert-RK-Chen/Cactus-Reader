@@ -10,7 +10,7 @@
 
     <Grid>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Canvas.ZIndex="1" VerticalAlignment="Top"
-                    Background="{StaticResource AcrylicInAppFillColorDefaultBrush}" Padding="24, 24, 24, 0" Height="108">
+                    Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" Padding="24, 24, 24, 0" Height="108">
             <TextBlock Text="收藏夹" FontSize="26" FontWeight="SemiBold"/>
             <TextBlock Text="你所喜爱的，都在这里。" Margin="0, 12, 0, 0"/>
         </StackPanel>

@@ -199,7 +199,7 @@ typeof(string), typeof(StickyQuickView), new PropertyMetadata(Guid.Empty));
                     }
                     else if (result == ContentDialogResult.Secondary)
                     {
-                        if ((bool)localSettings.Values["alreadySetWindowsHello"] == true)
+                        if (SettingsService.IsWindowsHelloSet())
                         {
                             if (await MicrosoftPassportHelper.CreatePassportKeyAsync(UID, (string)localSettings.Values["name"]))
                             {
@@ -339,7 +339,7 @@ typeof(string), typeof(StickyQuickView), new PropertyMetadata(Guid.Empty));
                 }
                 else if (result == ContentDialogResult.Secondary)
                 {
-                    if ((bool)localSettings.Values["alreadySetWindowsHello"] == true)
+                    if (SettingsService.IsWindowsHelloSet())
                     {
                         if (await MicrosoftPassportHelper.CreatePassportKeyAsync(UID, (string)localSettings.Values["name"]))
                         {

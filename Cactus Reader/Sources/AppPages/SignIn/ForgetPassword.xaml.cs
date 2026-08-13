@@ -16,7 +16,6 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
     /// </summary>
     public sealed partial class ForgetPassword : Page
     {
-        private readonly MailCodeSender codeSender = MailCodeSender.Instance;
         User currentUser = null;
 
         public ForgetPassword()
@@ -56,7 +55,7 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
                 else
                 {
                     // 服务端校验（校验即删，防重放）
-                    bool isValid = await ApiClient.VerifyCodeAsync(currentUser.Email, "reset", codeInput);
+                    bool isValid = await AccountService.VerifyCodeAsync(currentUser.Email, "reset", codeInput);
                     if (isValid)
                     {
                         contentFrame.Navigate(typeof(ResetPassword), currentUser, new SlideNavigationTransitionInfo()
@@ -86,7 +85,7 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
         private async void ResendVerifyCode(object sender, RoutedEventArgs e)
         {
             ControllerVisibility.ShowProgressBar(statusBar);
-            (bool ok, string reason) = await codeSender.SendVerifyCodeAsync(currentUser.Email, "reset");
+            (bool ok, string reason) = await AccountService.SendVerifyCodeAsync(currentUser.Email, "reset");
             ControllerVisibility.HideProgressBar(statusBar);
 
             if (ok)

@@ -15,9 +15,11 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
+
     public sealed partial class AboutInfoPage : Page
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+
         public AboutInfoPage()
         {
             InitializeComponent();
@@ -42,7 +44,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             int newViewId = 0;
             await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                Frame frame = new Frame();
+                Frame frame = new();
                 frame.Navigate(typeof(ServiceAndPrivacy), null, new DrillInNavigationTransitionInfo());
                 Window.Current.Content = frame;
                 Window.Current.Activate();

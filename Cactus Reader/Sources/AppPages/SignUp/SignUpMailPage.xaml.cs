@@ -20,8 +20,6 @@ namespace Cactus_Reader.Sources.AppPages.SignUp
     /// </summary>
     public sealed partial class SignUpMailPage : Page
     {
-        private readonly MailCodeSender codeSender = MailCodeSender.Instance;
-        private readonly InformationVerify informationVerify = InformationVerify.Instance;
         User currentUser = null;
 
         public SignUpMailPage()
@@ -55,21 +53,17 @@ namespace Cactus_Reader.Sources.AppPages.SignUp
             try
             {
                 ControllerVisibility.ShowProgressBar(statusBar);
-                bool isMailEnabled = await informationVerify.EmailEnabledAsync(mailAddress);
-
-                if (!informationVerify.IsEmail(mailAddress))
+                // 邮箱格式 + 可用性校验，返回错误消息（空字符串=通过）
+                string checkMessage = await AccountService.CheckEmailAsync(mailAddress);
+                if (checkMessage.Length > 0)
                 {
-                    alertMsg.Text = "请输入一个有效的电子邮件地址。";
-                }
-                else if (!isMailEnabled)
-                {
-                    alertMsg.Text = "电子邮件地址已被注册，请尝试使用其他电子邮件。";
+                    alertMsg.Text = checkMessage;
                 }
                 else
                 {
                     user.Email = mailAddress;
                     // 等待服务端发信结果：成功才进入验证码页
-                    (bool ok, string reason) = await codeSender.SendVerifyCodeAsync(user.Email, "signup");
+                    (bool ok, string reason) = await AccountService.SendVerifyCodeAsync(user.Email, "signup");
 
                     if (ok)
                     {

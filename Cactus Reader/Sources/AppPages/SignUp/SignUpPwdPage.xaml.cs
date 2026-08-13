@@ -17,9 +17,6 @@ namespace Cactus_Reader.Sources.AppPages.SignUp
     /// </summary>
     public sealed partial class SignUpPwdPage : Page
     {
-        private readonly ProfileSyncTool syncTool = ProfileSyncTool.Instance;
-        private readonly InformationVerify informationVerify = InformationVerify.Instance;
-
         User currentUser = null;
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -53,16 +50,11 @@ namespace Cactus_Reader.Sources.AppPages.SignUp
                 {
                     alertMsg.Text = "若要继续，请为你的帐户创建一个密码。";
                 }
-                else if (informationVerify.IsPassword(password) && string.Equals(password, checkPwd))
+                else if (AccountService.IsPasswordValid(password) && string.Equals(password, checkPwd))
                 {
-                    // UID 在客户端生成，保证页面间传参一致；密码哈希由服务端生成（带盐）
-                    currentUser.UID = Guid.NewGuid().ToString("D").ToUpper();
-                    currentUser.RegistDate = DateTime.Now;
-                    currentUser.Mobile = null;
-
                     ControllerVisibility.ShowProgressBar(statusBar);
-                    (bool ok, string error, string uid) = await ApiClient.SignUpAsync(
-                        currentUser.Email, currentUser.Name, password, currentUser.Mobile, currentUser.UID);
+                    // UID 在客户端生成，密码哈希由服务端生成（带盐）
+                    bool ok = await AccountService.CompleteSignUpAsync(currentUser, password);
                     ControllerVisibility.HideProgressBar(statusBar);
 
                     if (!ok)
@@ -90,7 +82,7 @@ namespace Cactus_Reader.Sources.AppPages.SignUp
 
                             if (ContentDialogResult.Primary == result)
                             {
-                                syncTool.LoadCurrentUser(currentUser);
+                                AccountService.CompleteLogin(currentUser);
                                 StartPage.startPage.mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
                             }
                         }

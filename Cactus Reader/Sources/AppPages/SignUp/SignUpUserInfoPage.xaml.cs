@@ -16,7 +16,6 @@ namespace Cactus_Reader.Sources.AppPages.SignUp
     public sealed partial class SignUpUserInfoPage : Page
     {
         User currentUser = null;
-        private readonly InformationVerify informationVerify = new InformationVerify();
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
@@ -45,19 +44,11 @@ namespace Cactus_Reader.Sources.AppPages.SignUp
             try
             {
                 ControllerVisibility.ShowProgressBar(statusBar);
-                bool isUserNameEnabled = await informationVerify.UserNameEnabledAsync(userName);
-
-                if (userName.Length == 0)
+                // 用户名格式 + 可用性校验，返回错误消息（空字符串=通过）
+                string checkMessage = await AccountService.CheckUserNameAsync(userName);
+                if (checkMessage.Length > 0)
                 {
-                    alertMsg.Text = "若要继续，请输入一个用户名";
-                }
-                else if (!informationVerify.IsUserName(userName))
-                {
-                    alertMsg.Text = "无效的用户名，有效的用户名仅由非空格起始或结尾的字母、数字与空格组成";
-                }
-                else if (!isUserNameEnabled)
-                {
-                    alertMsg.Text = "用户名称已被注册，请换一个尝试。";
+                    alertMsg.Text = checkMessage;
                 }
                 else
                 {
