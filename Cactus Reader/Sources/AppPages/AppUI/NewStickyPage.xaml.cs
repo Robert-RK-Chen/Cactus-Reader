@@ -31,6 +31,8 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         private readonly ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         private readonly ThemeColorBrushTool brushTool = ThemeColorBrushTool.Instance;
         private ProfileUploadTool profileUploadTool = ProfileUploadTool.Instance;
+        private bool suppressTextChanged;
+        private string loadedPlainText = string.Empty;
 
         public NewStickyPage()
         {
@@ -116,8 +118,14 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 SwitchStickyTheme(sticky.StickyTheme);
+                // 记录加载后的初始纯文本，供 TextChanged 内容比较（SetText 的 TextChanged 是延迟异步触发的，
+                // 无法靠标志位可靠抑制，只能用内容是否一致来判断是否真实编辑）
+                suppressTextChanged = true;
                 StickyEditBox.Document.SetText(TextSetOptions.FormatRtf, sticky.StickyDocument);
+                StickyEditBox.Document.GetText(TextGetOptions.None, out string plain);
+                loadedPlainText = plain.TrimEnd();
                 localSettings.Values["isSaved"] = true;
+                suppressTextChanged = false;
             });
         }
 
@@ -170,7 +178,8 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         {
             StickyEditBox.Document.GetText(TextGetOptions.FormatRtf, out string document);
             StickyEditBox.Document.GetText(TextGetOptions.None, out string quickview);
-            sticky.StickyDocument = (document.TrimEnd());
+            // 去掉 RTF 末尾段落标记，避免恢复时多出一个空段落（每次打开末尾多一行空行）
+            sticky.StickyDocument = NormalizeRtfForSave(document);
             sticky.QuickViewText = (quickview.TrimEnd());
 
             string UID = localSettings.Values["UID"].ToString();
@@ -183,6 +192,29 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             localSettings.Values["isSaved"] = true;
 
             profileUploadTool.UploadCactusNotes(stickyFile, UID, stickyFile.Name, "/upload-cactus-notes");
+        }
+
+        /// <summary>
+        /// 规范化 RTF 以便保存：RichEditBox 输出的 RTF 始终以段落标记 \par 结尾（文档至少含一个段落），
+        /// 若原样保存，SetText 恢复时会额外生成一个空段落，导致每次打开便签末尾多一行空行，
+        /// 并因内容不一致触发 TextChanged 被误判为已修改。此处仅移除文档末尾紧跟右大括号前的最后一个 \par，
+        /// 用户有意输入的空行（\par\par）会保留。
+        /// </summary>
+        private static string NormalizeRtfForSave(string rtf)
+        {
+            rtf = rtf.TrimEnd();
+            int closeBrace = rtf.LastIndexOf('}');
+            if (closeBrace < 0)
+            {
+                return rtf;
+            }
+
+            string head = rtf.Substring(0, closeBrace).TrimEnd();
+            if (head.EndsWith("\\par", StringComparison.Ordinal))
+            {
+                return head.Substring(0, head.Length - 4) + rtf.Substring(closeBrace);
+            }
+            return rtf;
         }
 
         private async void ChangeStickyFont(object sender, RoutedEventArgs e)
@@ -210,9 +242,10 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             StickyBackground.Background = brushTool.GetThemeColorBrush(theme, false).BackgroundBrush;
             await quickView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
+                // ThemeKind 变更会自动同步 TitleBackground/ViewBackground，这里显式赋值以覆盖悬停遗留状态
                 quickView.ThemeKind = theme;
                 quickView.TitleBackground = brushTool.GetThemeColorBrush(theme, false).TitleBrush;
-                quickView.Background = brushTool.GetThemeColorBrush(theme, false).BackgroundBrush;
+                quickView.ViewBackground = brushTool.GetThemeColorBrush(theme, false).BackgroundBrush;
             });
         }
 
@@ -226,14 +259,18 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 StorageFile stickyFile = await stickyFolder.CreateFileAsync(sticky.StickySerial + ".ctsnote", CreationCollisionOption.OpenIfExists);
                 await stickyFile.DeleteAsync();
 
-                // 同步删除服务端存档，避免下次同步时便签被重新下载
-                try
+                // 同步删除服务端存档，避免下次同步时便签被重新下载（同步关闭时仅删本地，云端残留会在下次开启全量同步时清理）
+                if (ProfileSyncTool.IsSyncEnabled())
                 {
-                    await ApiClient.DeleteNoteAsync(UID, sticky.StickySerial);
-                }
-                catch (Exception)
-                {
-                    // 网络异常时忽略：服务端残留会在下次同步时被拉回，属预期降级行为
+                    try
+                    {
+                        // 服务端文件名为 {StickySerial}.ctsnote，删除时需带扩展名
+                        await ApiClient.DeleteNoteAsync(UID, sticky.StickySerial + ".ctsnote");
+                    }
+                    catch (Exception)
+                    {
+                        // 网络异常时忽略：服务端残留会在下次同步时被拉回，属预期降级行为
+                    }
                 }
             }
             catch (Exception) { }
@@ -258,12 +295,21 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
         private async void StickyEditTextChanged(object sender, RoutedEventArgs e)
         {
-            localSettings.Values["isSaved"] = false;
             StickyEditBox.Document.GetText(TextGetOptions.None, out string text);
+            string trimmed = text.TrimEnd();
+
+            // 加载便签内容时 SetText 触发的 TextChanged 是延迟异步到达的（标志位已复位），
+            // 因此这里用内容比较：与加载时的初始内容一致则视为未编辑，不标记为已修改
+            if (suppressTextChanged || string.Equals(trimmed, loadedPlainText, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            localSettings.Values["isSaved"] = false;
 
             await quickView.Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
             {
-                quickView.QucikViewText = text.TrimEnd();
+                quickView.QucikViewText = trimmed;
             });
         }
 
@@ -324,6 +370,13 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                         e.Handled = true;
                         break;
                     case ContentDialogResult.None:
+                        // 丢弃修改：把便签列表预览恢复为磁盘上保存的内容
+                        // （编辑过程中 StickyEditTextChanged 会实时更新 quickView 预览，
+                        //   此时未保存，需回滚，避免列表显示未保存的残留内容）
+                        await quickView.Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
+                        {
+                            quickView.QucikViewText = sticky.QuickViewText;
+                        });
                         CancelSaveSticky();
                         e.Handled = false;
                         break;

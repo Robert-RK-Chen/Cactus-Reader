@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Networking.BackgroundTransfer;
+using Windows.Security.Cryptography;
 using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.Web.Http;
 
 namespace Cactus_Reader.Sources.ToolKits
@@ -27,6 +29,21 @@ namespace Cactus_Reader.Sources.ToolKits
         }
 
         private ProfileSyncTool() { }
+
+        /// <summary>
+        /// 跨设备同步开关：默认开启；关闭时不执行任何上传/下载，仅维持本地内容。
+        /// </summary>
+        public static bool IsSyncEnabled()
+        {
+            ApplicationDataContainer settings = ApplicationData.Current.LocalSettings;
+            object value = settings.Values["syncEnabled"];
+            if (value == null)
+            {
+                settings.Values["syncEnabled"] = true;
+                return true;
+            }
+            return (bool)value;
+        }
 
         public bool LoadCurrentUser(User currentUser)
         {
@@ -93,6 +110,11 @@ namespace Cactus_Reader.Sources.ToolKits
         {
             try
             {
+                if (!IsSyncEnabled())
+                {
+                    return;
+                }
+
                 if (!Guid.TryParse(UID, out _))
                 {
                     return;
@@ -170,6 +192,11 @@ namespace Cactus_Reader.Sources.ToolKits
         {
             try
             {
+                if (!IsSyncEnabled())
+                {
+                    return;
+                }
+
                 if (!Guid.TryParse(UID, out _))
                 {
                     return;
@@ -212,6 +239,102 @@ namespace Cactus_Reader.Sources.ToolKits
             catch (Exception)
             {
                 System.Diagnostics.Debug.Write("未连接，无法同步便签。");
+            }
+        }
+
+        /// <summary>
+        /// 全量同步（replace_cloud）：以本地内容为准覆盖云端。
+        /// 1. 上传本地头像（如有）；
+        /// 2. 上传所有本地便签（覆盖云端同名文件）；
+        /// 3. 删除云端存在而本地不存在的便签。
+        /// 在用户重新开启跨设备同步时调用。
+        /// </summary>
+        public async Task SyncAllLocalContent(string UID)
+        {
+            try
+            {
+                if (!Guid.TryParse(UID, out _))
+                {
+                    return;
+                }
+
+                StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(UID, CreationCollisionOption.OpenIfExists);
+
+                // 1. 上传本地头像（如有）；上传后清除 ETag 缓存，避免后续下载误判 304
+                try
+                {
+                    StorageFile imageFile = await storageFolder.GetFileAsync("ProfilePicture.PNG");
+                    if (imageFile != null)
+                    {
+                        await UploadRawFileAsync(imageFile, UID, "/upload-profile-image", null);
+                        localSettings.Values.Remove("profileImageETag_" + UID);
+                    }
+                }
+                catch (System.IO.FileNotFoundException)
+                {
+                    // 本地无头像：跳过
+                }
+
+                // 2. 上传所有本地便签，并记录本地文件名集合
+                StorageFolder stickyFolder = await storageFolder.CreateFolderAsync("Sticky", CreationCollisionOption.OpenIfExists);
+                IReadOnlyList<StorageFile> localFiles = await stickyFolder.GetFilesAsync();
+                HashSet<string> localNames = new HashSet<string>();
+                foreach (StorageFile file in localFiles)
+                {
+                    localNames.Add(file.Name);
+                    await UploadRawFileAsync(file, UID, "/upload-cactus-notes", file.Name);
+                }
+
+                // 3. 删除云端存在而本地不存在的便签（以本地为准的 replace 语义）
+                List<string> remoteFiles = new List<string>();
+                using (var httpClient = new System.Net.Http.HttpClient())
+                {
+                    string listJson = await httpClient.GetStringAsync(new Uri(SERVER_ADDRESS + "notes-list?uid=" + UID));
+                    if (!string.IsNullOrEmpty(listJson))
+                    {
+                        remoteFiles = JsonConvert.DeserializeObject<List<string>>(listJson) ?? new List<string>();
+                    }
+                }
+                foreach (string serial in remoteFiles)
+                {
+                    if (!localNames.Contains(serial))
+                    {
+                        await ApiClient.DeleteNoteAsync(UID, serial);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                System.Diagnostics.Debug.Write("未连接，无法全量同步。");
+            }
+        }
+
+        /// <summary>
+        /// 以原始字节流上传文件（application/octet-stream），Header 携带 UID / Serial。
+        /// 服务端直接落盘，全量同步专用（避开 BackgroundUploader 的 multipart 编码）。
+        /// </summary>
+        private async Task UploadRawFileAsync(StorageFile file, string UID, string method, string serial)
+        {
+            // 读取 IBuffer 后转换为字节数组
+            IBuffer buffer = await FileIO.ReadBufferAsync(file);
+            CryptographicBuffer.CopyToByteArray(buffer, out byte[] bytes);
+            using (var httpClient = new System.Net.Http.HttpClient())
+            using (var content = new System.Net.Http.ByteArrayContent(bytes))
+            {
+                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+                using (var request = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Post, new Uri(SERVER_ADDRESS + method)))
+                {
+                    request.Content = content;
+                    request.Headers.Add("UID", UID);
+                    if (!string.IsNullOrEmpty(serial))
+                    {
+                        request.Headers.Add("Serial", serial);
+                    }
+                    using (System.Net.Http.HttpResponseMessage response = await httpClient.SendAsync(request))
+                    {
+                        response.EnsureSuccessStatusCode();
+                    }
+                }
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using Cactus_Reader.Sources.AppPages.AppUI;
+﻿using Cactus_Reader.Entities;
+using Cactus_Reader.Sources.AppPages.AppUI;
 using Cactus_Reader.Sources.ToolKits;
 using Cactus_Reader.Sources.WindowsHello;
 using System;
@@ -68,12 +69,26 @@ namespace Cactus_Reader.Sources.StickyNotes
         }
 
         public static readonly DependencyProperty ThemeKindProperty = DependencyProperty.Register("ThemeKind",
-    typeof(string), typeof(StickyQuickView), new PropertyMetadata("GingkoYellow"));
+            typeof(string), typeof(StickyQuickView), new PropertyMetadata("GingkoYellow", OnThemeKindChanged));
 
         public string ThemeKind
         {
             get { return (string)GetValue(ThemeKindProperty); }
             set { SetValue(ThemeKindProperty, value); }
+        }
+
+        /// <summary>
+        /// 主题变化时自动同步顶部装饰与内容区域颜色（非悬停状态）。
+        /// 保证任何地方修改 ThemeKind（新建/切换主题/列表重建）后卡片立即更新，
+        /// 不依赖 QuickViewLoaded 或鼠标悬停事件重新赋值。
+        /// </summary>
+        private static void OnThemeKindChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            StickyQuickView view = (StickyQuickView)d;
+            string theme = e.NewValue as string ?? "GingkoYellow";
+            ThemeColorBrush brush = view.brushTool.GetThemeColorBrush(theme, false);
+            view.TitleBackground = brush.TitleBrush;
+            view.ViewBackground = brush.BackgroundBrush;
         }
 
         public static readonly DependencyProperty StickySerialProperties = DependencyProperty.Register("StickySerial",
@@ -221,11 +236,29 @@ typeof(string), typeof(StickyQuickView), new PropertyMetadata(Guid.Empty));
                 localSettings.Values["EmptyPlaceholderOpacity"] = 1;
             }
 
-            string UID = localSettings.Values["UID"].ToString();
-            StorageFolder stickyFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
-            stickyFolder = await stickyFolder.GetFolderAsync("Sticky");
-            StorageFile stickyFile = await stickyFolder.GetFileAsync(StickySerial + ".ctsnote");
-            await stickyFile.DeleteAsync();
+            try
+            {
+                string UID = localSettings.Values["UID"].ToString();
+                StorageFolder stickyFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
+                stickyFolder = await stickyFolder.GetFolderAsync("Sticky");
+                StorageFile stickyFile = await stickyFolder.GetFileAsync(StickySerial + ".ctsnote");
+                await stickyFile.DeleteAsync();
+
+                // 同步删除服务端存档，避免下次同步时便签被重新下载（同步关闭时仅删本地，云端残留会在下次开启全量同步时清理）
+                if (ProfileSyncTool.IsSyncEnabled())
+                {
+                    try
+                    {
+                        // 服务端文件名为 {StickySerial}.ctsnote，删除时需带扩展名
+                        await ApiClient.DeleteNoteAsync(UID, StickySerial + ".ctsnote");
+                    }
+                    catch (Exception)
+                    {
+                        // 网络异常时忽略：服务端残留会在下次同步时被拉回，属预期降级行为
+                    }
+                }
+            }
+            catch (Exception) { }
         }
 
         private async void DataTransferManagerDataRequested(DataTransferManager sender, DataRequestedEventArgs args)
@@ -272,8 +305,8 @@ typeof(string), typeof(StickyQuickView), new PropertyMetadata(Guid.Empty));
 
         private async void UnlockSticky(object sender, RoutedEventArgs e)
         {
-            string UID = localSettings.Values["UID"].ToString();   
-            
+            string UID = localSettings.Values["UID"].ToString();
+
             PasswordBox passwordBox = new PasswordBox
             {
                 Width = 360,

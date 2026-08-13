@@ -35,6 +35,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         private readonly InformationVerify informationVerify = InformationVerify.Instance;
         private readonly EncryptStickyTool encryptStickyTool = EncryptStickyTool.Instance;
         private MediaPlayer mediaPlayer;
+        private bool suppressSyncToggle;
 
         public SettingPage()
         {
@@ -77,6 +78,10 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             {
                 localSettings.Values.Add("alreadySetWindowsHello", false);
             }
+            if (localSettings.Values["syncEnabled"] == null)
+            {
+                localSettings.Values.Add("syncEnabled", true);
+            }
 
             // Add a global Media Player Element
             mediaPlayer = new MediaPlayer();
@@ -85,6 +90,12 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+
+            // 恢复跨设备同步开关状态（OnNavigatedTo 每次导航进入必触发，比 Loading 事件可靠）
+            suppressSyncToggle = true;
+            syncSwitch.IsOn = (bool)localSettings.Values["syncEnabled"];
+            suppressSyncToggle = false;
+
             string UID = localSettings.Values["UID"].ToString();
 
             // TODO: Load User Information
@@ -124,6 +135,27 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
             // TODO: 恢复后台传输列表
             uploadTool.RecoveryBackgroundTransfer();
+        }
+
+        /// <summary>
+        /// 切换跨设备同步：关闭后仅维持本地内容（不执行任何上传/下载）；
+        /// 再次开启时全量上传本地内容覆盖云端（replace_cloud）。
+        /// </summary>
+        private async void ToggleSync(object sender, RoutedEventArgs e)
+        {
+            if (suppressSyncToggle)
+            {
+                return;
+            }
+
+            bool enabled = syncSwitch.IsOn;
+            localSettings.Values["syncEnabled"] = enabled;
+
+            if (enabled)
+            {
+                string UID = localSettings.Values["UID"].ToString();
+                await ProfileSyncTool.Instance.SyncAllLocalContent(UID);
+            }
         }
 
         private void HideUserImage(object sender, SizeChangedEventArgs e)

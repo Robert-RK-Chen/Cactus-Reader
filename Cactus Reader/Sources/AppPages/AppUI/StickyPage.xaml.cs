@@ -179,7 +179,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 StickySerial = serial,
                 ThemeKind = theme,
                 TitleBackground = brushTool.GetThemeColorBrush(theme, false).TitleBrush,
-                Background = brushTool.GetThemeColorBrush(theme, false).BackgroundBrush,
+                ViewBackground = brushTool.GetThemeColorBrush(theme, false).BackgroundBrush,
             };
             StickyQuickViewList.Items.Add(stickyQuickView);
 

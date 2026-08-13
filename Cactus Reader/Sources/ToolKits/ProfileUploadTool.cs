@@ -22,6 +22,12 @@ namespace Cactus_Reader.Sources.ToolKits
 
         public async void RecoveryBackgroundTransfer()
         {
+            // 跨设备同步关闭时不恢复上传队列，避免历史任务意外上传
+            if (!ProfileSyncTool.IsSyncEnabled())
+            {
+                return;
+            }
+
             var uploadTasks = await BackgroundUploader.GetCurrentUploadsAsync();
             if (uploadTasks.Count > 0)
             {
@@ -75,6 +81,12 @@ namespace Cactus_Reader.Sources.ToolKits
 
         public async void UploadProfileImg(StorageFile file, string UID, string method)
         {
+            // 跨设备同步关闭时不执行上传，仅维持本地内容
+            if (!ProfileSyncTool.IsSyncEnabled())
+            {
+                return;
+            }
+
             int n = (await BackgroundUploader.GetCurrentUploadsAsync()).Count;
             if (n > 200)
             {
@@ -92,6 +104,12 @@ namespace Cactus_Reader.Sources.ToolKits
 
         public async void UploadCactusNotes(StorageFile file, string UID, string serial, string method)
         {
+            // 跨设备同步关闭时不执行上传，仅维持本地内容
+            if (!ProfileSyncTool.IsSyncEnabled())
+            {
+                return;
+            }
+
             int n = (await BackgroundUploader.GetCurrentUploadsAsync()).Count;
             if (n > 200)
             {
