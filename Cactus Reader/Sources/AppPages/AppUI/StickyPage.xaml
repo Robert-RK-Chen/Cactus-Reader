@@ -10,8 +10,8 @@
     muxc:BackdropMaterial.ApplyToRootOrPageBackground="True">
 
     <Page.Resources>
-        <FontFamily x:Key="MiSans">/Sources/Fonts/MiSans-Regular.ttf#MiSans</FontFamily>
-        <FontFamily x:Key="MiSansBold">/Sources/Fonts/MiSans-Bold.ttf#MiSans Bold</FontFamily>
+        <FontFamily x:Key="MiSans">/Sources/Fonts/MiSans/MiSans-Regular.ttf#MiSans</FontFamily>
+        <FontFamily x:Key="MiSansBold">/Sources/Fonts/MiSans/MiSans-Bold.ttf#MiSans Bold</FontFamily>
         <FontFamily x:Key="SegoeFluentIcons">/Sources/Fonts/Segoe Fluent Icons.ttf#Segoe Fluent Icons</FontFamily>
     </Page.Resources>
 

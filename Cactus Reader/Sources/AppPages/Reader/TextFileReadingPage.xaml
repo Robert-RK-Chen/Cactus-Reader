@@ -18,19 +18,14 @@
             </TransitionCollection>
         </Frame.ContentTransitions>
         <Grid Background="#f7f1e4">
-            <Border x:Name="appTitleBar" IsHitTestVisible="True" VerticalAlignment="Top" Background="Transparent"
-                    Height="32" Canvas.ZIndex="2">
-            </Border>
-            <Grid x:Name="readerMainGrid" Margin="0, 32, 0, 0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Rectangle x:Name="focusRecTop" Grid.Row="1" VerticalAlignment="Top" Fill="#505050" Height="300"
+            <Grid x:Name="readerMainGrid">
+                <!-- 所有元素叠放：ScrollViewer 延伸到顶部，CommandBar 亚克力作为覆盖层浮于其上，
+                     文字滚动到顶部时穿过亚克力区域，模糊效果可见 -->
+                <Rectangle x:Name="focusRecTop" VerticalAlignment="Top" Fill="#505050" Height="300"
                        Visibility="Collapsed"/>
-                <Rectangle x:Name="focusRecBottom" Grid.Row="1" VerticalAlignment="Bottom" Fill="#505050" Height="300"
+                <Rectangle x:Name="focusRecBottom" VerticalAlignment="Bottom" Fill="#505050" Height="300"
                        Visibility="Collapsed"/>
-                <ScrollViewer x:Name="scrollViewer" Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer x:Name="scrollViewer" VerticalScrollBarVisibility="Auto">
                     <RichTextBlock x:Name="passageBlock" HorizontalAlignment="Center" VerticalAlignment="Stretch"
                                MaxWidth="1200" CanBeScrollAnchor="True" Margin="60" Foreground="Black"
                                FontSize="18" FontFamily="宋体" CharacterSpacing="100" LineHeight="27"
@@ -38,10 +33,20 @@
                                PointerWheelChanged="ChangeReadLines">
                     </RichTextBlock>
                 </ScrollViewer>
-                <Border Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0, 0, 0, 1"
-                    HorizontalAlignment="Stretch" CornerRadius="0" Grid.Row="0">
-                        <CommandBar Background="Transparent" DefaultLabelPosition="Right" HorizontalAlignment="Center">
+                <Border x:Name="commandBarHost" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderThickness="0"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Top" CornerRadius="0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <!-- 顶部 32px 空白标题栏区 + CommandBar 本体，合计高度 = CommandBar + 32 -->
+                            <RowDefinition Height="32"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <!-- 底层透明标题栏：跨两行整块可拖动窗口；CommandBar 叠在其上，
+                             空白区域穿透命中此处，按钮区域命中按钮（不参与拖动） -->
+                        <Border x:Name="appTitleBar" Grid.Row="0" Grid.RowSpan="2" Background="Transparent"
+                                VerticalAlignment="Stretch" Canvas.ZIndex="0"/>
+                        <CommandBar x:Name="readerCommandBar" Grid.Row="1" Background="{x:Null}" DefaultLabelPosition="Right"
+                                    HorizontalAlignment="Center" Canvas.ZIndex="1">
                             <AppBarButton Label="返回" LabelPosition="Collapsed" ToolTipService.ToolTip="返回"
                                   HorizontalAlignment="Left" Click="BackMainPage">
                                 <AppBarButton.Icon>
@@ -277,6 +282,7 @@
                                 </AppBarButton.Icon>
                             </AppBarButton>
                         </CommandBar>
+                    </Grid>
                 </Border>
             </Grid>
         </Grid>

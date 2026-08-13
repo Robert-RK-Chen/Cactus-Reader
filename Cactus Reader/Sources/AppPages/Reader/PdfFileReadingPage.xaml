@@ -34,14 +34,21 @@
             </TransitionCollection>
         </Frame.ContentTransitions>
         <Grid>
-            <Border x:Name="appTitleBar" IsHitTestVisible="True" VerticalAlignment="Top" Background="Transparent"
-                Height="32" Canvas.ZIndex="2">
-            </Border>
-            <Grid Margin="0, 32, 0, 0" x:Name="mainGrid">
-               <Border Background="{ThemeResource SystemControlBaseHighAcrylicElementMediumHighBrush}" Canvas.ZIndex="1"
+            <Grid x:Name="mainGrid">
+               <Border x:Name="commandBarArea" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" Canvas.ZIndex="1"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0, 0, 0, 1"
                     HorizontalAlignment="Stretch" CornerRadius="0" VerticalAlignment="Top" Visibility="Visible">
-                        <CommandBar Background="Transparent" DefaultLabelPosition="Right" HorizontalAlignment="center">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <!-- 顶部 32px 空白标题栏区 + CommandBar 本体，合计高度 = CommandBar + 32 -->
+                            <RowDefinition Height="32"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <!-- 底层透明标题栏：跨两行整块可拖动窗口；CommandBar 叠在其上，
+                             空白区域穿透命中此处，按钮区域命中按钮（不参与拖动） -->
+                        <Border x:Name="appTitleBar" Grid.Row="0" Grid.RowSpan="2" Background="Transparent"
+                                VerticalAlignment="Stretch" Canvas.ZIndex="0"/>
+                        <CommandBar Background="{x:Null}" Grid.Row="1" DefaultLabelPosition="Right" HorizontalAlignment="center" Canvas.ZIndex="1">
                             <AppBarButton Label="返回主页" LabelPosition="Default" ToolTipService.ToolTip="返回主页"
                                       Click="BackMainPage">
                                 <AppBarButton.Icon>
@@ -112,21 +119,22 @@
                                 </AppBarButton.Icon>
                             </AppBarButton>
                         </CommandBar>
+                    </Grid>
                 </Border>
                 <ScrollViewer x:Name="canvasContainer" HorizontalScrollMode="Enabled" ViewChanged="UpdateScaleMulti"
                           HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
                           ZoomMode="Enabled" MinZoomFactor="0.1" MaxZoomFactor="10" >
-                    <Grid Height="auto" Padding="0, 60, 0, 60">
-                        <Canvas x:Name="selectionCanvas" Width="1600">
-                            <Canvas.Background>
-                                <ImageBrush ImageSource="/Sources/Images/capture.jpeg" Stretch="Uniform"/>
-                            </Canvas.Background>
+                    <!-- 顶部留白在代码中按 CommandBar 实际高度动态设置，避免初始时内容被亚克力区域遮挡 -->
+                    <Grid x:Name="contentGrid" Height="auto" Padding="0, 60, 0, 60">
+                        <!-- 画布尺寸由代码按加载内容（当前为占位图片）的实际尺寸动态设置 -->
+                        <Canvas x:Name="selectionCanvas">
+                            <Image x:Name="pageImage" Source="/Sources/Images/capture.jpeg" Stretch="Uniform"/>
                         </Canvas>
                         <InkCanvas x:Name="inkCanvas" Visibility="Visible" />
                     </Grid>
                 </ScrollViewer>
                 <Border Background="{ThemeResource SystemControlAltMediumLowAcrylicElementMediumBrush}"
-                    CornerRadius="8" x:Name="inkToolBar" BorderThickness="1" Padding="60, 36"
+                    CornerRadius="8" x:Name="inkToolBar" BorderThickness="1" Padding="12, 12"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                     HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0, 0, 0, 16">
                     <Border.Transitions>

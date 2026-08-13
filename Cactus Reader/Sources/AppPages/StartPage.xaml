@@ -55,7 +55,7 @@
                     </StackPanel>
                 </Frame>
             </ScrollViewer>
-            <Image Grid.Row="3" Source="/Sources/Images/RCSoftware.png" Height="32" Margin="0, 12, 0, 12"
+            <Image Grid.Row="3" Source="/Sources/Images/catom technology.png" Height="32" Margin="0, 12, 0, 12"
                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
     </Frame>

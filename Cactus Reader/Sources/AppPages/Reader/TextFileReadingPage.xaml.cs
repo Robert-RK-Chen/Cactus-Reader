@@ -60,16 +60,13 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             coreTitleBar.ExtendViewIntoTitleBar = true;
             UpdateTitleBarLayout(coreTitleBar);
 
-            // Set XAML element as a draggable region.
+            // 仅将底层透明 Border 设为可拖动区域（CommandBar 在其上层，不受影响），
+            // 实现 CommandBar 与标题栏融合且按钮可正常点击
             Window.Current.SetTitleBar(appTitleBar);
 
             // Register a handler for when the size of the overlaid caption control changes.
             // For example, when the app moves to a screen with a different DPI.
             coreTitleBar.LayoutMetricsChanged += CoreTitleBarLayoutMetricsChanged;
-
-            // Register a handler for when the title bar visibility changes.
-            // For example, when the title bar is invoked in full screen mode.
-            coreTitleBar.IsVisibleChanged += CoreTitleBarIsVisibleChanged;
 
             DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
             dataTransferManager.DataRequested += DataTransferManagerDataRequested;
@@ -124,24 +121,9 @@ namespace Cactus_Reader.Sources.AppPages.Reader
 
         private void UpdateTitleBarLayout(CoreApplicationViewTitleBar coreTitleBar)
         {
-            // Update title bar control size as needed to account for system size changes.
-            appTitleBar.Height = coreTitleBar.Height;
-
-            // Ensure the custom title bar does not overlap window caption controls
-            Thickness currMargin = appTitleBar.Margin;
-            appTitleBar.Margin = new Thickness(currMargin.Left, currMargin.Top, coreTitleBar.SystemOverlayRightInset, currMargin.Bottom);
-        }
-
-        private void CoreTitleBarIsVisibleChanged(CoreApplicationViewTitleBar sender, object args)
-        {
-            if (sender.IsVisible)
-            {
-                appTitleBar.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                appTitleBar.Visibility = Visibility.Collapsed;
-            }
+            // 为窗口控制按钮（最小化/最大化/关闭）在右侧预留空间，
+            // 避免 CommandBar 末尾按钮与其重叠
+            appTitleBar.Padding = new Thickness(0, 0, coreTitleBar.SystemOverlayRightInset, 0);
         }
 
         private async void ReadTextAloud(object sender, RoutedEventArgs e)
@@ -273,22 +255,32 @@ namespace Cactus_Reader.Sources.AppPages.Reader
                 case "pearl":
                     readerMainGrid.Background = new SolidColorBrush(Color.FromArgb(255, 254, 254, 254));
                     passageBlock.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
+                    commandBarHost.RequestedTheme = ElementTheme.Light;
+                    readerCommandBar.RequestedTheme = ElementTheme.Light;
                     break;
                 case "straw":
                     readerMainGrid.Background = new SolidColorBrush(Color.FromArgb(255, 248, 241, 226));
                     passageBlock.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
+                    commandBarHost.RequestedTheme = ElementTheme.Light;
+                    readerCommandBar.RequestedTheme = ElementTheme.Light;
                     break;
                 case "deep":
                     readerMainGrid.Background = new SolidColorBrush(Color.FromArgb(255, 74, 74, 77));
                     passageBlock.Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
+                    commandBarHost.RequestedTheme = ElementTheme.Dark;
+                    readerCommandBar.RequestedTheme = ElementTheme.Dark;
                     break;
                 case "midnight":
                     readerMainGrid.Background = new SolidColorBrush(Color.FromArgb(255, 18, 18, 18));
                     passageBlock.Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
+                    commandBarHost.RequestedTheme = ElementTheme.Dark;
+                    readerCommandBar.RequestedTheme = ElementTheme.Dark;
                     break;
                 default:
                     readerMainGrid.Background = new SolidColorBrush(Color.FromArgb(255, 248, 241, 226));
                     passageBlock.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
+                    commandBarHost.RequestedTheme = ElementTheme.Light;
+                    readerCommandBar.RequestedTheme = ElementTheme.Light;
                     break;
             }
         }

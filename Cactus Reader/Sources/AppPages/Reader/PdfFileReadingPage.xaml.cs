@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation;
+using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Input.Inking;
@@ -9,6 +11,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Shapes;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
@@ -51,6 +54,8 @@ namespace Cactus_Reader.Sources.AppPages.Reader
         {
             this.InitializeComponent();
             inkCanvas.InkPresenter.InputDeviceTypes = CoreInputDeviceTypes.Pen;
+            Loaded += OnPageLoaded;
+            pageImage.ImageOpened += OnPageImageOpened;
 
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;
             titleBar.ButtonBackgroundColor = Colors.Transparent;
@@ -73,6 +78,37 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             coreTitleBar.IsVisibleChanged += CoreTitleBarIsVisibleChanged;
         }
 
+        /// <summary>
+        /// 页面加载完成后，按顶部 CommandBar 区域实际高度设置内容顶部留白，
+        /// 保证图片初始时不被亚克力区域遮挡；滚动时内容仍可穿过亚克力显示模糊效果。
+        /// </summary>
+        private void OnPageLoaded(object sender, RoutedEventArgs e)
+        {
+            double topInset = commandBarArea.ActualHeight;
+            if (topInset <= 0) { topInset = 80; }
+            contentGrid.Padding = new Thickness(0, topInset, 0, 60);
+        }
+
+        /// <summary>
+        /// 占位图片解码完成后，按图片实际像素尺寸设置画布与图片大小，
+        /// 使画布/墨迹坐标与内容大小一致。
+        /// </summary>
+        private void OnPageImageOpened(object sender, RoutedEventArgs e)
+        {
+            if (pageImage.Source is BitmapImage bitmap)
+            {
+                ResizeCanvasToImage(bitmap.PixelWidth, bitmap.PixelHeight);
+            }
+        }
+
+        private void ResizeCanvasToImage(double width, double height)
+        {
+            selectionCanvas.Width = width;
+            selectionCanvas.Height = height;
+            pageImage.Width = width;
+            pageImage.Height = height;
+        }
+
         private void CoreTitleBarLayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
         {
             UpdateTitleBarLayout(sender);
@@ -80,25 +116,35 @@ namespace Cactus_Reader.Sources.AppPages.Reader
 
         private void UpdateTitleBarLayout(CoreApplicationViewTitleBar coreTitleBar)
         {
-            // Update title bar control size as needed to account for system size changes.
-            appTitleBar.Height = coreTitleBar.Height;
-
-            // Ensure the custom title bar does not overlap window caption controls
-            Thickness currMargin = appTitleBar.Margin;
-            appTitleBar.Margin = new Thickness(currMargin.Left, currMargin.Top, coreTitleBar.SystemOverlayRightInset, currMargin.Bottom);
+            // 为窗口控制按钮（最小化/最大化/关闭）在右侧预留空间，
+            // 避免 CommandBar 末尾按钮与其重叠
+            appTitleBar.Padding = new Thickness(0, 0, coreTitleBar.SystemOverlayRightInset, 0);
         }
 
         private void CoreTitleBarIsVisibleChanged(CoreApplicationViewTitleBar sender, object args)
         {
-            if (sender.IsVisible)
-            {
-                appTitleBar.Visibility = Visibility.Visible;
-            }
-            else
+            // 全屏等标题栏不可见时收起固定工具栏按钮状态；
+            // appTitleBar 保持透明可拖窗，无需隐藏
+            if (!sender.IsVisible)
             {
                 toggleButton.IsChecked = false;
-                appTitleBar.Visibility = Visibility.Collapsed;
             }
+        }
+
+        /// <summary>
+        /// 供后续 PDF 渲染接入：将指定图片（如 PDF 某页渲染结果）设为画布内容，
+        /// 并按图片实际尺寸调整画布大小。
+        /// </summary>
+        private async Task SetPageImageAsync(StorageFile file)
+        {
+            BitmapImage bitmap = new BitmapImage();
+            using (var stream = await file.OpenAsync(FileAccessMode.Read))
+            {
+                await bitmap.SetSourceAsync(stream);
+            }
+
+            pageImage.Source = bitmap;
+            ResizeCanvasToImage(bitmap.PixelWidth, bitmap.PixelHeight);
         }
 
         private void BackMainPage(object sender, RoutedEventArgs e)

@@ -1,4 +1,4 @@
-<div align="center">    
+<div align="center">
   <img src="Cactus Reader/Sources/Images/catom technology.svg" width="30%" alt="catom technology"/>
 </div>
 
@@ -102,7 +102,7 @@ Cactus Reader.sln
 
 ---
 
-# 🕹 部署与配置
+# 🕹️ 部署与配置
 
 ## 服务端敏感配置
 

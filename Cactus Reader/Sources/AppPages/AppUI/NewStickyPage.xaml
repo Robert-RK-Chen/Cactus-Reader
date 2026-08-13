@@ -9,8 +9,8 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Page.Resources>
-        <FontFamily x:Key="MiSans">/Sources/Fonts/MiSans-Regular.ttf#MiSans</FontFamily>
-        <FontFamily x:Key="MiSansBold">/Sources/Fonts/MiSans-Bold.ttf#MiSansBold</FontFamily>
+        <FontFamily x:Key="MiSans">/Sources/Fonts/MiSans/MiSans-Regular.ttf#MiSans</FontFamily>
+        <FontFamily x:Key="MiSansBold">/Sources/Fonts/MiSans/MiSans-Bold.ttf#MiSansBold</FontFamily>
         <FontFamily x:Key="SegoeFluentIcons">/Sources/Fonts/Segoe Fluent Icons.ttf#Segoe Fluent Icons</FontFamily>
     </Page.Resources>
 
@@ -30,22 +30,22 @@
         <Border x:Name="StickyTools" IsHitTestVisible="True" VerticalAlignment="Top" Height="40" Canvas.ZIndex="1"
                 Grid.Row="2" BorderThickness="0, 0.5, 0, 0" BorderBrush="#C5C5C5">
             <StackPanel Orientation="Horizontal" Margin="4, 0, 4, 0" Spacing="8">
-                <Button Height="32" Width="32" Padding="0" Background="Transparent" BorderThickness="0" 
+                <Button Height="32" Width="32" Padding="0" Background="Transparent" BorderThickness="0"
                         VerticalAlignment="Center" ToolTipService.ToolTip="加粗（Ctrl + B）" AccessKey="B"
                         Click="BoldSelectText">
                     <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE8DD;" FontSize="17" Foreground="#5B5B5B"/>
                 </Button>
-                <Button Height="32" Width="32" Padding="0" Background="Transparent" BorderThickness="0" 
+                <Button Height="32" Width="32" Padding="0" Background="Transparent" BorderThickness="0"
                         VerticalAlignment="Center" ToolTipService.ToolTip="倾斜（Ctrl + I）" AccessKey="I"
                         Click="ItalicSelectText">
                     <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE8DB;" FontSize="16" Foreground="#5B5B5B"/>
                 </Button>
-                <Button Height="32" Width="32" Padding="0" Background="Transparent" BorderThickness="0" 
+                <Button Height="32" Width="32" Padding="0" Background="Transparent" BorderThickness="0"
                         VerticalAlignment="Center" ToolTipService.ToolTip="下划线（Ctrl + U）" AccessKey="U"
                         Click="UnderlineSelectText">
                     <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE8DC;" FontSize="16" Foreground="#5B5B5B"/>
                 </Button>
-                <Button Height="32" Width="32" Padding="0" Background="Transparent" BorderThickness="0" 
+                <Button Height="32" Width="32" Padding="0" Background="Transparent" BorderThickness="0"
                         VerticalAlignment="Center" ToolTipService.ToolTip="删除线（Ctrl + D）"
                         Click="DeletelineSelectText">
                     <Button.KeyboardAccelerators>
@@ -107,7 +107,7 @@
                         </Flyout>
                     </Button.Flyout>
                 </Button>
-                <Button Height="32" Width="32" Padding="0" Background="Transparent" BorderThickness="0" 
+                <Button Height="32" Width="32" Padding="0" Background="Transparent" BorderThickness="0"
                         VerticalAlignment="Center" ToolTipService.ToolTip="保存（Ctrl + S）" Click="SaveStickyNote">
                     <Button.KeyboardAccelerators>
                         <KeyboardAccelerator Modifiers="Control" Key="S"/>

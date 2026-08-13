@@ -59,8 +59,8 @@
   <!-- 字体资源（保持 Content 语义，XAML 中通过 ms-appx:/// 引用） -->
   <ItemGroup>
     <Content Include="Sources\Fonts\Segoe Fluent Icons.ttf" />
-    <Content Include="Sources\Fonts\MiSans-Bold.ttf" />
-    <Content Include="Sources\Fonts\MiSans-Regular.ttf" />
+    <Content Include="Sources\Fonts\MiSans\**\*" />
+    <Content Include="Sources\Fonts\JetBrainsMono\**\*" />
   </ItemGroup>
 
   <!-- 页面静态图片资源（迁移现代 .NET UWP 后默认不再自动打包，需显式声明） -->
