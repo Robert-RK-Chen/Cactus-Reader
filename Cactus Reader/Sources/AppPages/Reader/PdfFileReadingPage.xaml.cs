@@ -15,8 +15,6 @@ using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Shapes;
 
-// https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
-
 namespace Cactus_Reader.Sources.AppPages.Reader
 {
     public class CalligraphicPen : InkToolbarCustomPen
@@ -62,7 +60,6 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             titleBar.ButtonBackgroundColor = Colors.Transparent;
             titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
 
-            // 统一标题栏：透明按钮 + 隐藏系统标题栏 + 可拖拽区域 + 右侧系统按钮留白（CommandBar 融合）
             // 标题栏不可见（全屏等）时收起固定工具栏按钮状态
             TitleBarService.Attach(appTitleBar, TitleBarStyle.Reader, null,
                 isVisible => { if (!isVisible) toggleButton.IsChecked = false; });
@@ -152,8 +149,7 @@ namespace Cactus_Reader.Sources.AppPages.Reader
 
         private void ToolButtonLassoClick(object sender, RoutedEventArgs e)
         {
-            // By default, pen barrel button or right mouse button is processed for inking
-            // Set the configuration to instead allow processing these input on the UI thread
+            // 将笔杆按钮/鼠标右键输入交由 UI 线程处理（用于套索选择）
             inkCanvas.InkPresenter.InputProcessingConfiguration.RightDragAction = InkInputRightDragAction.LeaveUnprocessed;
 
             inkCanvas.InkPresenter.UnprocessedInput.PointerPressed += UnprocessedInputPointerPressed;
@@ -171,7 +167,6 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             };
 
             lasso.Points.Add(args.CurrentPoint.RawPosition);
-            //selectionCanvas.Children.Add(lasso);
             isBoundRect = true;
         }
 
@@ -194,8 +189,6 @@ namespace Cactus_Reader.Sources.AppPages.Reader
 
         private void DrawBoundingRect()
         {
-            // selectionCanvas.Children.Clear();
-
             if (boundingRect.Width <= 0 || boundingRect.Height <= 0)
             {
                 return;
@@ -212,8 +205,6 @@ namespace Cactus_Reader.Sources.AppPages.Reader
 
             Canvas.SetLeft(rectangle, boundingRect.X);
             Canvas.SetTop(rectangle, boundingRect.Y);
-
-            // selectionCanvas.Children.Add(rectangle);
         }
 
         private void UpdateScaleMulti(object sender, ScrollViewerViewChangedEventArgs e)

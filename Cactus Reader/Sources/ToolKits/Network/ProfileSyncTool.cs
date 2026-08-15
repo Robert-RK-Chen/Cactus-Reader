@@ -65,9 +65,8 @@ namespace Cactus_Reader.Sources.ToolKits
 
         private async void SetDownload(DownloadOperation opr, bool starting)
         {
-            // 当上传进度更新时能收到报告
+            // 进度上报 + 启动/附加任务
             Progress<DownloadOperation> progressReporter = new Progress<DownloadOperation>(OnProgressHandler);
-            // 启动或附加任务
             try
             {
                 if (starting)

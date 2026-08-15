@@ -4,19 +4,14 @@ using Cactus_Reader.Sources.ToolKits;
 using Cactus_Reader.Sources.WindowsHello;
 using System;
 using System.Collections.Generic;
-using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Core;
-using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Animation;
-
-// The Templated Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234235
 
 namespace Cactus_Reader.Sources.StickyNotes
 {
@@ -239,26 +234,12 @@ typeof(string), typeof(StickyQuickView), new PropertyMetadata(Guid.Empty));
             try
             {
                 string UID = localSettings.Values["UID"].ToString();
-                StorageFolder stickyFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
-                stickyFolder = await stickyFolder.GetFolderAsync("Sticky");
-                StorageFile stickyFile = await stickyFolder.GetFileAsync(StickySerial + ".ctsnote");
-                await stickyFile.DeleteAsync();
-
-                // 同步删除服务端存档，避免下次同步时便签被重新下载（同步关闭时仅删本地，云端残留会在下次开启全量同步时清理）
-                if (ProfileSyncTool.IsSyncEnabled())
-                {
-                    try
-                    {
-                        // 服务端文件名为 {StickySerial}.ctsnote，删除时需带扩展名
-                        await ApiClient.DeleteNoteAsync(UID, StickySerial + ".ctsnote");
-                    }
-                    catch (Exception)
-                    {
-                        // 网络异常时忽略：服务端残留会在下次同步时被拉回，属预期降级行为
-                    }
-                }
+                // 本地删除 + 云端删除（同步关闭时仅删本地；无本地文件/网络异常均安全返回）
+                await StickyService.DeleteStickyAsync(UID, StickySerial);
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+            }
         }
 
         private async void DataTransferManagerDataRequested(DataTransferManager sender, DataRequestedEventArgs args)
@@ -356,17 +337,7 @@ typeof(string), typeof(StickyQuickView), new PropertyMetadata(Guid.Empty));
         private async void OpenSticky()
         {
             List<object> parameter = new List<object> { "open", this };
-            CoreApplicationView newView = CoreApplication.CreateNewView();
-            int newViewId = 0;
-            await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                Frame frame = new Frame();
-                frame.Navigate(typeof(NewStickyPage), parameter, new DrillInNavigationTransitionInfo());
-                Window.Current.Content = frame;
-                Window.Current.Activate();
-                newViewId = ApplicationView.GetForCurrentView().Id;
-            });
-            bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
+            await StickyService.OpenStickyEditWindowAsync(parameter);
         }
     }
 }

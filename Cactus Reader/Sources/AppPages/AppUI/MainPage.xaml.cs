@@ -12,14 +12,8 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
-// https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x804 上介绍了“空白页”项模板
-
 namespace Cactus_Reader
 {
-    /// <summary>
-    /// 可用于自身或导航至 Frame 内部的空白页。
-    /// </summary>
-
     public sealed partial class MainPage : Page
     {
         public static MainPage mainPage;
@@ -38,7 +32,7 @@ namespace Cactus_Reader
             TitleBarService.Attach(appTitleBar, TitleBarStyle.Standard, appTitle);
         }
 
-        // List of ValueTuple holding the Navigation Tag and the relative Navigation Page
+        // 导航项：Tag → 页面类型映射
         private readonly List<(string Tag, Type Page)> pages = new List<(string Tag, Type Page)>
         {
             ("library", typeof(LibraryPage)),
@@ -51,15 +45,13 @@ namespace Cactus_Reader
 
         private void NavViewControlLoaded(object sender, RoutedEventArgs e)
         {
-            // Add handler for ContentFrame navigation.
             contentFrame.Navigated += OnNavigated;
 
-            // NavView doesn't load any page by default, so load home page.
+            // 默认选中首页并导航
             navViewControl.SelectedItem = navViewControl.MenuItems[0];
             NavViewControlNavigate("library", new EntranceNavigationTransitionInfo());
 
-            // Listen to the window directly so the app responds
-            // to accelerator keys regardless of which element has focus.
+            // 监听窗口级快捷键（Alt+← 返回），与焦点所在元素无关
             Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated += CoreDispatcherAcceleratorKeyActivated;
 
             Window.Current.CoreWindow.PointerPressed += CoreWindowPointerPressed;
@@ -93,10 +85,9 @@ namespace Cactus_Reader
                 page = item.Page;
             }
 
-            // Get the page type before navigation so you can prevent duplicate entries in the backstack.
+            // 避免重复导航：目标页与当前页相同时跳过
             var preNavPageType = contentFrame.CurrentSourcePageType;
 
-            // Only navigate if the selected page isn't currently loaded.
             if (page is not null && !Type.Equals(preNavPageType, page))
             {
                 contentFrame.Navigate(page, null, transitionInfo);
@@ -110,7 +101,7 @@ namespace Cactus_Reader
 
         private void CoreDispatcherAcceleratorKeyActivated(CoreDispatcher sender, AcceleratorKeyEventArgs e)
         {
-            // When Alt+Left are pressed navigate back
+            // Alt+← 返回
             if (e.EventType == CoreAcceleratorKeyEventType.SystemKeyDown
                 && e.VirtualKey == VirtualKey.Left
                 && e.KeyStatus.IsMenuKeyDown == true
@@ -130,7 +121,7 @@ namespace Cactus_Reader
 
         private void CoreWindowPointerPressed(CoreWindow sender, PointerEventArgs e)
         {
-            // Handle mouse back button.
+            // 鼠标侧键（后退键）返回
             if (e.CurrentPoint.Properties.IsXButton1Pressed)
             {
                 e.Handled = TryGoBack();
@@ -178,43 +169,27 @@ namespace Cactus_Reader
 
         private void AutoSuggestBoxTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-            // Only get results when it was a user typing,
-            // otherwise assume the value got filled in by TextMemberPath
-            // or the handler for SuggestionChosen.
+            // 仅在用户输入时处理（避免程序填充触发）
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                //Set the ItemsSource to be your filtered dataset
-                //sender.ItemsSource = dataset;
             }
         }
 
         private void AutoSuggestBoxSuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
-            // Set sender.Text. You can use args.SelectedItem to build your text string.
         }
 
         private void AutoSuggestBoxQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
-            if (args.ChosenSuggestion != null)
-            {
-                // User selected an item from the suggestion list, take an action on it here.
-            }
-            else
-            {
-                // Use args.QueryText to determine what to do.
-            }
         }
 
-        /// <summary>
-        /// 同步的类型：用户配置文件；加载时间：登陆完成后；
-        /// 在用户的应用端创建一个 UID 的文件夹保存用户数据。
-        /// </summary>
+        /// <summary>登录后同步用户头像等配置文件。</summary>
         private async void AsyncUserProfile()
         {
             string UID = localSettings.Values["UID"].ToString();
             syncTool.SyncUserImage(UID);
 
-            // 三秒后让同步提示框收起。
+            // 三秒后收起同步提示框
             await Task.Delay(3200);
             await syncInfo.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {

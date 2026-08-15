@@ -4,7 +4,7 @@
 
 # Cactus Reader
 
-> @Robert Chen 更新日期：2026 年 8 月 13 日
+> @Robert Chen 更新日期：2026 年 8 月 16 日
 
 - 阅读 Cactus Reader 的开发文档，请访问：[Cactus Reader 开发文档](https://www.notion.so/robertchen13/Cactus-Reader-93e5d471876f4bcbb78c0d7500a69631?source=copy_link) ，开发文档被托管在 Notion 上。
 - 访问 Cactus Reader 的 [GitHub 开源库](https://github.com/Robert-RK-Chen/Cactus-Reader) ，代码被托管在 GitHub 上
@@ -18,6 +18,8 @@
 Cactus Reader 是一款现代化风格的 UWP 文档阅读器，为 Microsoft Windows 打造，具有高效、美观、兼容性强等优点，兼容 EPUB、MOBI、TXT、PDF、Office Open XML 等格式的主流文档，并支持对文档进行标记、摘抄收藏等功能。
 
 此外，软件提供 Cactus Note 功能，为用户提供快速记载备忘录服务：支持多主题便签、便签锁定、跨设备云同步，并支持使用个人密码或 Windows Hello 保护便签本。
+
+讲述人：阅读器内置文本转语音（讲述人）功能，底层由 **Xiaomi MiMo 语音合成服务**（MiMo-V2.5-TTS）提供，支持多种预置音色、发音风格、语速与音调调节，采用流式合成边合成边播放，显著降低等待时间。
 
 ## 安全架构
 
@@ -50,7 +52,8 @@ Cactus Reader 是一款现代化风格的 UWP 文档阅读器，为 Microsoft Wi
 Cactus Reader.sln
 ├── Cactus Reader/          # 客户端（latest .NET UWP）
 │   ├── Sources/AppPages/   # 页面（启动页 / 阅读器 / 便签 / 设置）
-│   ├── Sources/ToolKits/   # 工具（AES-GCM 加密 / PBKDF2 哈希 / API 客户端 / 同步）
+│   ├── Sources/ToolKits/   # 工具（AES-GCM 加密 / PBKDF2 哈希 / API 客户端 / 同步 / TTS）
+│   ├── Sources/ToolKits/ViewModels/ # MVVM 视图模型（讲述人音色 / 风格等设置）
 │   ├── Sources/StickyNotes/# 便签控件与样式
 │   ├── Sources/WindowsHello# Windows Hello 认证
 │   └── Entities/           # 数据实体
@@ -70,7 +73,6 @@ Cactus Reader.sln
 
 | NuGet 包名 | 版本 |
 | --- | --- |
-| Microsoft.CognitiveServices.Speech | 1.51.1 |
 | Microsoft.Toolkit.Uwp.Notifications | 7.1.3 |
 | Microsoft.UI.Xaml | 2.8.7 |
 | Microsoft.Web.WebView2 | 1.0.4129.50 |
@@ -131,7 +133,12 @@ dotnet run --project CactusReaderServer
 - `Cactus Reader_TemporaryKey.pfx`（MSIX 签名证书，含私钥）已被 `.gitignore` 排除，**不会提交**。
 - 克隆项目后，如需本地打包 MSIX：请使用 Visual Studio 的"应用打包"生成你自己的测试证书，并将 `Cactus Reader.csproj` 中的 `PackageCertificateThumbprint` 更新为对应指纹。
 - 未配置证书不影响 Debug 调试（依赖 `AllowLocalNetworkLoopback` 访问本机服务端）。
+## 讲述人（TTS）配置
 
+- 讲述人语音合成由 **Xiaomi MiMo 语音合成服务**（MiMo-V2.5-TTS，OpenAI 兼容接口）提供，需要有效的 MiMo API Key。
+- 在**设置页 → 讲述人 → MiMo API Key** 输入 Key 并点击「保存」即可；Key 使用 Windows 凭据保险箱（`PasswordVault`）加密存储，**不会**以明文写入本地设置或提交到仓库。
+- API Key 可在 [platform.xiaomimimo.com](https://platform.xiaomimimo.com/console) 获取；未配置 Key 时，朗读功能会提示“未能生成语音”。
+- 讲述人支持：预置音色（冰糖 / 茉莉 / 苏打 / 白桦 / Mia / Chloe / Milo / Dean）、发音风格（温柔 / 活泼 / 严肃 等 20 种）、语速与音调调节（映射为 MiMo 音频标签）。
 ## 便签加密说明
 
 - 便签内容使用 AES-256-GCM 加密；个人密码使用 PBKDF2-SHA256（迭代+随机盐）。

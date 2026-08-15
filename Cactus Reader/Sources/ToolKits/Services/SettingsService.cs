@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Windows.Security.Credentials;
 using Windows.Storage;
 using Windows.UI.Xaml;
 
@@ -22,8 +23,10 @@ namespace Cactus_Reader.Sources.ToolKits
             SetIfMissing("font", "宋体");
             SetIfMissing("fontSize", 15.0);
             SetIfMissing("voiceIndex", 0);
-            SetIfMissing("voiceName", "zh-CN-XiaoxiaoNeural");
+            SetIfMissing("voiceName", "冰糖");
             SetIfMissing("voiceLang", "Chinese");
+            SetIfMissing("styleIndex", 0);
+            SetIfMissing("styleName", "");
             SetIfMissing("speed", 1.0);
             SetIfMissing("tune", 1.0);
             SetIfMissing("alreadySetWindowsHello", false);
@@ -101,13 +104,25 @@ namespace Cactus_Reader.Sources.ToolKits
         public static string GetVoiceName()
         {
             object value = localSettings.Values["voiceName"];
-            return value == null ? "zh-CN-XiaoxiaoNeural" : value.ToString();
+            return value == null ? "冰糖" : value.ToString();
         }
 
         public static string GetVoiceLang()
         {
             object value = localSettings.Values["voiceLang"];
             return value == null ? "Chinese" : value.ToString();
+        }
+
+        public static int GetStyleIndex()
+        {
+            object value = localSettings.Values["styleIndex"];
+            return value == null ? 0 : (int)value;
+        }
+
+        public static string GetStyleName()
+        {
+            object value = localSettings.Values["styleName"];
+            return value == null ? "" : value.ToString();
         }
 
         public static double GetVoiceSpeed()
@@ -120,24 +135,55 @@ namespace Cactus_Reader.Sources.ToolKits
             return Convert.ToDouble(localSettings.Values["tune"]);
         }
 
-        /// <summary>按下拉索引选择讲述人，同步 voiceName / voiceLang。</summary>
+        /// <summary>按下拉索引选择讲述人，同步 voiceName / voiceLang（MiMo 预置音色）。</summary>
         public static void SetSpeechVoice(int index)
         {
             localSettings.Values["voiceIndex"] = index;
             (string voiceName, string voiceLang) = index switch
             {
-                0 => ("zh-CN-XiaoxiaoNeural", "Chinese"),
-                1 => ("zh-CN-YunxiNeural", "Chinese"),
-                2 => ("zh-CN-XiaoxuanNeural", "Chinese"),
-                3 => ("zh-CN-YunyangNeural", "Chinese"),
-                4 => ("en-US-AshleyNeural", "English"),
-                5 => ("en-US-JennyNeural", "English"),
-                6 => ("en-US-BrandonNeural", "English"),
-                7 => ("en-US-ChristopherNeural", "English"),
-                _ => ("zh-CN-XiaoxiaoNeural", "Chinese"),
+                0 => ("冰糖", "Chinese"),
+                1 => ("茉莉", "Chinese"),
+                2 => ("苏打", "Chinese"),
+                3 => ("白桦", "Chinese"),
+                4 => ("Mia", "English"),
+                5 => ("Chloe", "English"),
+                6 => ("Milo", "English"),
+                7 => ("Dean", "English"),
+                _ => ("冰糖", "Chinese"),
             };
             localSettings.Values["voiceName"] = voiceName;
             localSettings.Values["voiceLang"] = voiceLang;
+        }
+
+        /// <summary>按下拉索引选择讲述人风格，同步 styleName（用于 (风格) 标签）。</summary>
+        public static void SetSpeechStyle(int index)
+        {
+            localSettings.Values["styleIndex"] = index;
+            string styleName = index switch
+            {
+                0 => "",
+                1 => "温柔",
+                2 => "高冷",
+                3 => "活泼",
+                4 => "严肃",
+                5 => "慵懒",
+                6 => "俏皮",
+                7 => "深沉",
+                8 => "干练",
+                9 => "凌厉",
+                10 => "开心",
+                11 => "悲伤",
+                12 => "平静",
+                13 => "磁性",
+                14 => "清亮",
+                15 => "甜美",
+                16 => "沙哑",
+                17 => "御姐音",
+                18 => "正太音",
+                19 => "大叔音",
+                _ => "",
+            };
+            localSettings.Values["styleName"] = styleName;
         }
 
         public static void SetSpeechSpeed(double value)
@@ -148,6 +194,50 @@ namespace Cactus_Reader.Sources.ToolKits
         public static void SetSpeechTune(double value)
         {
             localSettings.Values["tune"] = value;
+        }
+
+        // ---------------- MiMo API Key（Windows 凭据保险箱） ----------------
+
+        private const string VaultResource = "CactusReader";
+        private const string VaultUserName = "MiMoApiKey";
+
+        /// <summary>读取 MiMo API Key；未设置时返回 null。</summary>
+        public static string GetMimoApiKey()
+        {
+            try
+            {
+                var vault = new PasswordVault();
+                PasswordCredential credential = vault.Retrieve(VaultResource, VaultUserName);
+                return credential?.Password;
+            }
+            catch (Exception)
+            {
+                // 凭据不存在或读取失败均视为未设置
+                return null;
+            }
+        }
+
+        /// <summary>保存或更新 MiMo API Key（空字符串/ null 表示清除）。</summary>
+        public static void SetMimoApiKey(string apiKey)
+        {
+            var vault = new PasswordVault();
+            try
+            {
+                PasswordCredential existing = vault.Retrieve(VaultResource, VaultUserName);
+                if (existing != null)
+                {
+                    vault.Remove(existing);
+                }
+            }
+            catch (Exception)
+            {
+                // 无既有凭据，忽略
+            }
+
+            if (!string.IsNullOrEmpty(apiKey))
+            {
+                vault.Add(new PasswordCredential(VaultResource, VaultUserName, apiKey));
+            }
         }
 
         // ---------------- 跨设备同步 ----------------

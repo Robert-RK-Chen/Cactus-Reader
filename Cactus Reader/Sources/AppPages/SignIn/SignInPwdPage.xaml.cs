@@ -7,13 +7,8 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
-// https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
-
 namespace Cactus_Reader.Sources.AppPages.SignIn
 {
-    /// <summary>
-    /// 可用于自身或导航至 Frame 内部的空白页。
-    /// </summary>
     public sealed partial class SignInPwdPage : Page
     {
         User currentUser = null;
@@ -23,7 +18,7 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
             InitializeComponent();
         }
 
-        // 用于接受其他页面过渡到这一页时传入的用户信息
+        // 接收上页传入的用户信息
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -87,10 +82,7 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
             alertMsg.Visibility = Visibility.Visible;
         }
 
-        /// <summary>
-        /// 用户使用 Windows Hello 登录，这一登录过程如下：
-        /// 首先判断用户设备是否能使用 Windows Hello，然后调用 Windows Hello
-        /// </summary>
+        /// <summary>Windows Hello 登录：设备可用性检查 → 密钥签名挑战 → 服务端验证。</summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private async void WindowsHelloSignIn(object sender, RoutedEventArgs e)

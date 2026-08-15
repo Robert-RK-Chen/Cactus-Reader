@@ -1,17 +1,18 @@
 ﻿using Cactus_Reader.Sources.AppPages.AppUI;
 using Cactus_Reader.Sources.StickyNotes;
 using Cactus_Reader.Sources.ToolKits;
+using Cactus_Reader.Sources.ToolKits.ViewModels;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System;
 using System.Collections.Generic;
-using Windows.ApplicationModel.Core;
+using System.Text;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.Foundation;
 using Windows.Media.Core;
+using Windows.Media.Playback;
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Core;
-using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
@@ -19,27 +20,27 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
-// https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
-
 namespace Cactus_Reader.Sources.AppPages.Reader
 {
-    /// <summary>
-    /// 可用于自身或导航至 Frame 内部的空白页。
-    /// </summary>
     public sealed partial class TextFileReadingPage : Page
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        readonly ThemeColorBrushTool brushTool = ThemeColorBrushTool.Instance;
-        // 顶部亚克力区域（32px 空白 + CommandBar）实际高度：正文初始顶部留白用，
-        // 避免内容被 CommandBar 遮住；滚动时内容仍可穿过亚克力显示模糊效果
+        // 顶部亚克力区域实际高度：正文初始顶部留白，避免被 CommandBar 遮挡
         private double topInset = 80;
-        // 亚克力下方额外呼吸间距：文字不与 CommandBar 紧贴
+        // 亚克力下方呼吸间距
         private const double topSpacing = 24;
+
+        /// <summary>讲述人设置视图模型（音色 / 风格，供 x:Bind 使用）。</summary>
+        public SpeechSettingsViewModel SpeechSettings { get; } = SpeechSettingsViewModel.Instance;
+
+        // 后台播放器（无可见控件，由播放/暂停按钮控制）
+        private MediaPlayer speechPlayer;
 
         public TextFileReadingPage()
         {
             this.InitializeComponent();
             if (localSettings.Values["StickyTheme"] == null) { localSettings.Values["StickyTheme"] = "GingkoYellow"; }
+            // 字号与设置页共用 fontSize 键（设置页为全局默认字号）
             if (localSettings.Values["fontSize"] == null) { localSettings.Values["fontSize"] = 20.0; }
             if (localSettings.Values["charSpacing"] == null) { localSettings.Values["charSpacing"] = 20.0; }
             if (localSettings.Values["lineHeight"] == null) { localSettings.Values["lineHeight"] = 2.0; }
@@ -47,10 +48,7 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             if (localSettings.Values["passageWidth"] == null) { localSettings.Values["passageWidth"] = "normal"; }
             if (localSettings.Values["theme"] == null) { localSettings.Values["theme"] = "straw"; }
             if (localSettings.Values["voiceIndex"] == null) { localSettings.Values["voiceIndex"] = 0; }
-            if (localSettings.Values["voiceName"] == null)
-            {
-                localSettings.Values["voiceName"] = "zh-CN-XiaoxiaoNeural";
-            }
+            if (localSettings.Values["voiceName"] == null) { localSettings.Values["voiceName"] = "冰糖"; }
             if (localSettings.Values["speed"] == null) { localSettings.Values["speed"] = 1.0; }
             if (localSettings.Values["tune"] == null) { localSettings.Values["tune"] = 1.0; }
             localSettings.Values["focusLine"] = 1;
@@ -74,25 +72,12 @@ namespace Cactus_Reader.Sources.AppPages.Reader
         {
             base.OnNavigatedTo(e);
 
-            string text = string.Empty;
-            var document = e.Parameter;
-            if (document.GetType() == typeof(StorageFile))
-            {
-                text = await FileIO.ReadTextAsync((StorageFile)document);
-            }
-            else if (document.GetType() == typeof(string))
-            {
-                text = (string)document;
-            }
+            // 读取正文：StorageFile 读文件内容，string 直接用
+            string text = await LoadTextAsync(e.Parameter);
 
-            fontSizeSlider.Value = Convert.ToDouble(localSettings.Values["fontSize"]);
-            charSpacingSlider.Value = Convert.ToDouble(localSettings.Values["charSpacing"]);
-            lineHeightSlider.Value = Convert.ToDouble(localSettings.Values["lineHeight"]);
-            passageBlock.FontFamily = new FontFamily(localSettings.Values["font"].ToString());
-            ChangeLineWidth(localSettings.Values["passageWidth"].ToString());
-            ChangeTheme(localSettings.Values["theme"].ToString());
+            RestoreReadingSettings();
 
-            // 按 CommandBar 区域实际高度设置正文顶部留白（与 PDF 页一致），初始不被亚克力遮挡
+            // 按 CommandBar 实际高度设置顶部留白（与 PDF 页一致），初始不被亚克力遮挡
             double actualInset = commandBarHost.ActualHeight;
             if (actualInset > 0) { topInset = actualInset; }
             if (!focusToggleSwitch.IsOn)
@@ -106,6 +91,27 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             passageBlock.Blocks.Add(paragraph);
         }
 
+        /// <summary>读取正文：StorageFile 返回文件内容，string 原样返回，其他返回空串。</summary>
+        private async Task<string> LoadTextAsync(object document)
+        {
+            if (document is StorageFile file)
+            {
+                return await FileIO.ReadTextAsync(file);
+            }
+            return document as string ?? string.Empty;
+        }
+
+        /// <summary>恢复阅读设置：字号/间距/行高/字体/行宽/主题从本地设置回填。</summary>
+        private void RestoreReadingSettings()
+        {
+            fontSizeSlider.Value = Convert.ToDouble(localSettings.Values["fontSize"]);
+            charSpacingSlider.Value = Convert.ToDouble(localSettings.Values["charSpacing"]);
+            lineHeightSlider.Value = Convert.ToDouble(localSettings.Values["lineHeight"]);
+            passageBlock.FontFamily = new FontFamily(localSettings.Values["font"].ToString());
+            ChangeLineWidth(localSettings.Values["passageWidth"].ToString());
+            ChangeTheme(localSettings.Values["theme"].ToString());
+        }
+
         private void BackMainPage(object sender, RoutedEventArgs e)
         {
             focusToggleSwitch.IsOn = false;
@@ -114,9 +120,8 @@ namespace Cactus_Reader.Sources.AppPages.Reader
 
         private async void ReadTextAloud(object sender, RoutedEventArgs e)
         {
-            passageBlock.SelectAll();
-            string text = passageBlock.SelectedText;
-            passageBlock.Select(passageBlock.ContentStart, passageBlock.ContentEnd);
+            // 直接读取正文模型，避免 SelectAll 造成整篇高亮
+            string text = GetPassageText();
             new ToastContentBuilder().AddArgument("action", "viewConversation")
                 .AddArgument("conversationId", 9527)
                 .AddText("Cactus Reader 讲述人\n")
@@ -124,15 +129,15 @@ namespace Cactus_Reader.Sources.AppPages.Reader
                 .Show();
             try
             {
-                // 原子操作：合成语音到本地 wav 文件
-                StorageFile audioFile = await SpeechService.SynthesizeToFileAsync(text, SettingsService.GetVoiceName());
-                if (audioFile != null)
+                // 流式合成：返回后立即开始播放，边合成边出声，无需等待整段生成
+                MediaStreamSource source = await SpeechService.CreateStreamingSourceAsync(
+                    text, SettingsService.GetVoiceName(), SettingsService.GetStyleName(),
+                    SettingsService.GetVoiceSpeed(), SettingsService.GetVoiceTune());
+                if (source != null)
                 {
-                    await mediaPlayerElement.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                    {
-                        mediaPlayerElement.Source = MediaSource.CreateFromStorageFile(audioFile);
-                        mediaPlayerElement.MediaPlayer.Play();
-                    });
+                    EnsureSpeechPlayer();
+                    speechPlayer.Source = MediaSource.CreateFromMediaStreamSource(source);
+                    speechPlayer.Play();
                 }
                 else
                 {
@@ -153,16 +158,116 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             }
         }
 
+        /// <summary>提取正文全文：递归遍历 Blocks/Paragraph/Inlines 拼接 Run 文本（避免 SelectAll 高亮）。</summary>
+        private string GetPassageText()
+        {
+            var builder = new StringBuilder();
+            foreach (var block in passageBlock.Blocks)
+            {
+                if (block is Paragraph paragraph)
+                {
+                    AppendInlineText(paragraph.Inlines, builder);
+                }
+            }
+            return builder.ToString();
+        }
+
+        /// <summary>递归拼接 Inline 文本：Run 直接取 Text；Span（Bold/Italic/Hyperlink 等）继续遍历其子 Inlines。</summary>
+        private void AppendInlineText(IEnumerable<Inline> inlines, StringBuilder builder)
+        {
+            foreach (var inline in inlines)
+            {
+                if (inline is Run run)
+                {
+                    builder.Append(run.Text);
+                }
+                else if (inline is Span span)
+                {
+                    AppendInlineText(span.Inlines, builder);
+                }
+            }
+        }
+
+        /// <summary>懒创建后台播放器并订阅播放状态变化（用于更新播放/暂停按钮）。</summary>
+        private void EnsureSpeechPlayer()
+        {
+            if (speechPlayer == null)
+            {
+                speechPlayer = new MediaPlayer();
+                speechPlayer.PlaybackSession.PlaybackStateChanged += OnSpeechPlaybackStateChanged;
+            }
+        }
+
+        /// <summary>播放/暂停切换：尚无朗读内容时先触发朗读，否则按当前状态暂停或继续。</summary>
+        private void ToggleSpeechPlayback(object sender, RoutedEventArgs e)
+        {
+            if (speechPlayer == null || speechPlayer.Source == null)
+            {
+                // 尚无朗读内容：直接触发整段朗读
+                ReadTextAloud(sender, e);
+                return;
+            }
+
+            if (speechPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Playing)
+            {
+                speechPlayer.Pause();
+            }
+            else
+            {
+                speechPlayer.Play();
+            }
+        }
+
+        private void OnSpeechPlaybackStateChanged(MediaPlaybackSession sender, object args)
+        {
+            // 播放状态在播放器线程回调，回到 UI 线程更新按钮
+            _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                bool playing = sender.PlaybackState == MediaPlaybackState.Playing;
+                speechPlayPauseIcon.Glyph = playing ? "\uE769" : "\uE768"; // 暂停 / 播放
+                speechPlayPauseText.Text = playing ? "暂停朗读" : "播放朗读";
+            });
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
+            // 离开页面时停止并释放播放器，避免后台继续播放/占用资源
+            if (speechPlayer != null)
+            {
+                speechPlayer.PlaybackSession.PlaybackStateChanged -= OnSpeechPlaybackStateChanged;
+                speechPlayer.Pause();
+                speechPlayer.Source = null;
+                speechPlayer.Dispose();
+                speechPlayer = null;
+                speechPlayPauseIcon.Glyph = "\uE768";
+                speechPlayPauseText.Text = "播放朗读";
+            }
+        }
+
+        /// <summary>应用字号：更新正文与行高并保存设置。</summary>
+        private void ApplyFontSize(double fontSize)
+        {
+            passageBlock.FontSize = fontSize;
+            passageBlock.LineHeight = fontSize * lineHeightSlider.Value;
+            localSettings.Values["fontSize"] = fontSize;
+        }
+
         private async void ChangeFontSize(object sender,
             Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             await passageBlock.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                passageBlock.FontSize = fontSizeSlider.Value;
-                passageBlock.LineHeight = fontSizeSlider.Value * lineHeightSlider.Value;
-                localSettings.Values["fontSize"] = fontSizeSlider.Value;
+                ApplyFontSize(fontSizeSlider.Value);
             });
             ChangeFocusLine((int)localSettings.Values["focusLine"]);
+        }
+
+        /// <summary>应用文字间距并保存设置。</summary>
+        private void ApplyCharSpacing(double charSpacing)
+        {
+            passageBlock.CharacterSpacing = 10 * (int)charSpacing;
+            localSettings.Values["charSpacing"] = charSpacing;
         }
 
         private async void ChangeCharSpacing(object sender,
@@ -170,9 +275,15 @@ namespace Cactus_Reader.Sources.AppPages.Reader
         {
             await passageBlock.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                passageBlock.CharacterSpacing = 10 * (int)charSpacingSlider.Value;
-                localSettings.Values["charSpacing"] = charSpacingSlider.Value;
+                ApplyCharSpacing(charSpacingSlider.Value);
             });
+        }
+
+        /// <summary>应用行高并保存设置。</summary>
+        private void ApplyLineHeight(double lineHeight)
+        {
+            passageBlock.LineHeight = passageBlock.FontSize * lineHeight;
+            localSettings.Values["lineHeight"] = lineHeight;
         }
 
         private async void ChangeLineHeight(object sender,
@@ -180,10 +291,16 @@ namespace Cactus_Reader.Sources.AppPages.Reader
         {
             await passageBlock.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                passageBlock.LineHeight = passageBlock.FontSize * lineHeightSlider.Value;
-                localSettings.Values["lineHeight"] = lineHeightSlider.Value;
+                ApplyLineHeight(lineHeightSlider.Value);
             });
             ChangeFocusLine((int)localSettings.Values["focusLine"]);
+        }
+
+        /// <summary>应用正文字体并保存设置。</summary>
+        private void ApplyFont(string font)
+        {
+            passageBlock.FontFamily = new FontFamily(font);
+            localSettings.Values["font"] = font;
         }
 
         private async void ChangeFont(object sender, RoutedEventArgs e)
@@ -191,8 +308,7 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             string font = ((MenuFlyoutItem)sender).Tag.ToString();
             await passageBlock.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                passageBlock.FontFamily = new FontFamily(font);
-                localSettings.Values["font"] = font;
+                ApplyFont(font);
             });
         }
 
@@ -219,7 +335,8 @@ namespace Cactus_Reader.Sources.AppPages.Reader
         {
             string lineWidth = ((MenuFlyoutItem)sender).Tag.ToString();
             ChangeLineWidth(lineWidth);
-            localSettings.Values["lineWidth"] = lineWidth;
+            // 键名与读取端一致（旧版本误存为 lineWidth）
+            localSettings.Values["passageWidth"] = lineWidth;
         }
 
         private void ChangeTheme(string theme)
@@ -271,9 +388,10 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             DataTransferManager.ShowShareUI();
         }
 
-        private void ChangeFocusMode(object sender, RoutedEventArgs e)
+        /// <summary>切换专注模式：开启时启用行数按钮并显示焦点遮罩，关闭时恢复原状。</summary>
+        private void SetFocusMode(bool isFocus)
         {
-            if (focusToggleSwitch.IsOn == true)
+            if (isFocus)
             {
                 oneLineButton.IsEnabled = true;
                 threeLinesButton.IsEnabled = true;
@@ -281,8 +399,7 @@ namespace Cactus_Reader.Sources.AppPages.Reader
                 ChangeFocusLine((int)localSettings.Values["focusLine"]);
                 focusRecTop.Visibility = Visibility.Visible;
                 focusRecBottom.Visibility = Visibility.Visible;
-                // 滚动到文字起始处（跳过 topInset + topSpacing 顶部留白），
-                // 使第一行文字立即对齐焦点透明带，而不是前面一大片空白
+                // 滚动到正文起始处（跳过顶部留白），使首行对齐焦点透明带
                 scrollViewer.ChangeView(null, topInset + topSpacing, null, true);
             }
             else
@@ -290,11 +407,16 @@ namespace Cactus_Reader.Sources.AppPages.Reader
                 oneLineButton.IsEnabled = false;
                 threeLinesButton.IsEnabled = false;
                 fiveLinesButton.IsEnabled = false;
-                // 顶部留白叠加 topInset + 呼吸间距，避免退出聚焦模式后正文回到被亚克力遮挡的位置
+                // 恢复顶部留白，避免正文被亚克力遮挡
                 passageBlock.Margin = new Thickness(60, topInset + topSpacing, 60, 60);
                 focusRecTop.Visibility = Visibility.Collapsed;
                 focusRecBottom.Visibility = Visibility.Collapsed;
             }
+        }
+
+        private void ChangeFocusMode(object sender, RoutedEventArgs e)
+        {
+            SetFocusMode(focusToggleSwitch.IsOn == true);
         }
 
         private void ChangeFocusLine(int lineNum)
@@ -308,8 +430,7 @@ namespace Cactus_Reader.Sources.AppPages.Reader
                 focusRecBottom.Height = (passageHeight - lineHeight) / 2;
                 if (focusToggleSwitch.IsOn == true)
                 {
-                    // 聚焦模式下顶部留白避开亚克力区域并加呼吸间距；
-                    // ScrollViewer 已滚动到 topInset+topSpacing，第一行文字正好对齐焦点透明带中央
+                    // 聚焦模式：顶部留白避开亚克力，首行对齐焦点透明带
                     passageBlock.Margin = new Thickness(60, focusRecTop.Height + topInset + topSpacing, 60, focusRecTop.Height);
                 }
             }
@@ -326,102 +447,42 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             localSettings.Values["focusLine"] = lineNum;
         }
 
-        private void LoadSpeechVoice(object sender, RoutedEventArgs e)
+        /// <summary>按焦点行高滚动：向上/向下滚动一行，返回是否消费了滚轮事件。</summary>
+        private bool ScrollByFocusLine(int wheelDelta)
         {
-            speechTuneCombo.SelectedIndex = (int)localSettings.Values["voiceIndex"];
-            tuneTip.Visibility = Visibility.Collapsed;
-        }
+            int lineNum = (int)localSettings.Values["focusLine"];
+            double lineHeight = passageBlock.LineHeight * lineNum;
+            double verticalOffset = 0.0;
 
-        private void ChangeSpeechTune(object sender, SelectionChangedEventArgs e)
-        {
-            tuneTip.Visibility = Visibility.Visible;
-            localSettings.Values["voiceIndex"] = speechTuneCombo.SelectedIndex;
-            switch (speechTuneCombo.SelectedIndex)
+            if (wheelDelta > 0)
             {
-                case 0:
-                    localSettings.Values["voiceName"] = "zh-CN-XiaoxiaoNeural";
-                    break;
-                case 1:
-                    localSettings.Values["voiceName"] = "zh-CN-YunxiNeural";
-                    break;
-                case 2:
-                    localSettings.Values["voiceName"] = "zh-CN-XiaoxuanNeural";
-                    break;
-                case 3:
-                    localSettings.Values["voiceName"] = "zh-CN-YunyangNeural";
-                    break;
-                case 4:
-                    localSettings.Values["voiceName"] = "en-US-AshleyNeural";
-                    break;
-                case 5:
-                    localSettings.Values["voiceName"] = "en-US-JennyNeural";
-                    break;
-                case 6:
-                    localSettings.Values["voiceName"] = "en-US-BrandonNeural";
-                    break;
-                case 7:
-                    localSettings.Values["voiceName"] = "en-US-ChristopherNeural";
-                    break;
-                default:
-                    localSettings.Values["voiceName"] = "zh-CN-XiaoxiaoNeural";
-                    break;
+                verticalOffset = scrollViewer.VerticalOffset - lineHeight;
             }
+            else if (wheelDelta < 0)
+            {
+                verticalOffset = scrollViewer.VerticalOffset + lineHeight;
+            }
+            scrollViewer.ChangeView(scrollViewer.HorizontalOffset, verticalOffset, scrollViewer.ZoomFactor);
+            return true;
         }
 
         private void ChangeReadLines(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
-            if (focusToggleSwitch.IsOn)
+            if (!focusToggleSwitch.IsOn)
             {
-                e.Handled = true;
-                int lineNum = (int)localSettings.Values["focusLine"];
-                double lineHeight = passageBlock.LineHeight * lineNum;
-                double verticalOffset = 0.0;
-
-                int delta = e.GetCurrentPoint(sender as UIElement).Properties.MouseWheelDelta;
-                if (delta > 0)
-                {
-                    verticalOffset = scrollViewer.VerticalOffset - lineHeight;
-                }
-                else if (delta < 0)
-                {
-                    verticalOffset = scrollViewer.VerticalOffset + lineHeight;
-                }
-                scrollViewer.ChangeView(scrollViewer.HorizontalOffset, verticalOffset, scrollViewer.ZoomFactor);
+                return;
             }
+            int delta = e.GetCurrentPoint(sender as UIElement).Properties.MouseWheelDelta;
+            e.Handled = ScrollByFocusLine(delta);
         }
 
         private async void CreateNewSticky(object sender, RoutedEventArgs e)
         {
-            List<object> parameter = new List<object>();
             string serial = Guid.NewGuid().ToString("D").ToUpper();
-            string UID = localSettings.Values["UID"].ToString();
-            string theme = localSettings.Values["StickyTheme"].ToString();
+            StickyQuickView stickyQuickView = StickyService.CreateNewStickyQuickView(serial);
 
-            StickyQuickView stickyQuickView = new StickyQuickView
-            {
-                CreateTimeText = DateTime.Now.ToShortDateString(),
-                StickySerial = serial,
-                ThemeKind = theme,
-                TitleBackground = brushTool.GetThemeColorBrush(theme, false).TitleBrush,
-                Background = brushTool.GetThemeColorBrush(theme, false).BackgroundBrush,
-            };
-
-            parameter.Add("new");
-            parameter.Add(stickyQuickView);
-
-            // 打开新便签界面
-            CoreApplicationView newView = CoreApplication.CreateNewView();
-            int newViewId = 0;
-            await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                Frame frame = new Frame();
-                frame.Navigate(typeof(NewStickyPage), parameter, new DrillInNavigationTransitionInfo());
-                Window.Current.Content = frame;
-                Window.Current.Activate();
-                newViewId = ApplicationView.GetForCurrentView().Id;
-            });
-            ApplicationView.PreferredLaunchViewSize = new Size(300, 300);
-            bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
+            List<object> parameter = new List<object> { "new", stickyQuickView };
+            await StickyService.OpenStickyEditWindowAsync(parameter);
         }
 
         private void ResizeImmersiveReadingMode(object sender, SizeChangedEventArgs e)

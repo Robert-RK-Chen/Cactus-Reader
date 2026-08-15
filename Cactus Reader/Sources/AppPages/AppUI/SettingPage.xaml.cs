@@ -1,5 +1,6 @@
 ﻿using Cactus_Reader.Entities;
 using Cactus_Reader.Sources.ToolKits;
+using Cactus_Reader.Sources.ToolKits.ViewModels;
 using Cactus_Reader.Sources.WindowsHello;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System;
@@ -19,19 +20,17 @@ using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
-// https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
-
 namespace Cactus_Reader.Sources.AppPages.AppUI
 {
-    /// <summary>
-    /// 可用于自身或导航至 Frame 内部的空白页。
-    /// </summary>
     public sealed partial class SettingPage : Page
     {
         private ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         private readonly ProfileUploadTool uploadTool = ProfileUploadTool.Instance;
         private MediaPlayer mediaPlayer;
         private bool suppressSyncToggle;
+
+        /// <summary>讲述人设置视图模型（音色 / 风格，供 x:Bind 使用）。</summary>
+        public SpeechSettingsViewModel SpeechSettings { get; } = SpeechSettingsViewModel.Instance;
 
         public SettingPage()
         {
@@ -40,7 +39,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             // 补全缺失的默认设置项
             SettingsService.EnsureDefaultSettings();
 
-            // Add a global Media Player Element
+            // 全局播放器：供试听朗读使用
             mediaPlayer = new MediaPlayer();
         }
 
@@ -53,17 +52,39 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             syncSwitch.IsOn = SettingsService.GetSyncEnabled();
             suppressSyncToggle = false;
 
-            string UID = localSettings.Values["UID"].ToString();
+            LoadUserInfo();
+            LoadAppSettings();
+            UpdatePrivateKeyButtons();
 
-            // TODO: Load User Information
+            // TODO: 加载用户头像
+            await LoadAvatarAsync();
+
+            // TODO: 恢复后台传输列表
+            uploadTool.RecoveryBackgroundTransfer();
+        }
+
+        /// <summary>回填用户信息（姓名/邮箱）。</summary>
+        private void LoadUserInfo()
+        {
             name.Text = localSettings.Values["name"].ToString();
             email.Text = localSettings.Values["email"].ToString();
+        }
 
-            // TODO: Load App Settings
+        /// <summary>回填应用设置：预览字号/语速/音调/MiMo Key。</summary>
+        private void LoadAppSettings()
+        {
+            // TODO: 加载应用设置
             previewText.FontSize = SettingsService.GetFontSize();
             speedSlider.Value = SettingsService.GetVoiceSpeed();
             tuneSlider.Value = SettingsService.GetVoiceTune();
 
+            // 回填已保存的 MiMo API Key（密码框不回显明文，仅显示占位点数）
+            mimoApiKeyBox.Password = SettingsService.GetMimoApiKey() ?? string.Empty;
+        }
+
+        /// <summary>按私钥是否已设置切换按钮显隐。</summary>
+        private void UpdatePrivateKeyButtons()
+        {
             if (SettingsService.IsPrivateKeySet())
             {
                 setKeyButton.Visibility = Visibility.Collapsed;
@@ -74,8 +95,12 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 setKeyButton.Visibility = Visibility.Visible;
                 closeKeyButton.Visibility = Visibility.Collapsed;
             }
+        }
 
-            // TODO: Load User Profile Image
+        /// <summary>加载本地头像并显示（缺失时回退为显示用户名）。</summary>
+        private async Task LoadAvatarAsync()
+        {
+            string UID = localSettings.Values["UID"].ToString();
             try
             {
                 StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
@@ -89,9 +114,6 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             {
                 userProfileImage.DisplayName = localSettings.Values["name"].ToString();
             }
-
-            // TODO: 恢复后台传输列表
-            uploadTool.RecoveryBackgroundTransfer();
         }
 
         /// <summary>
@@ -128,7 +150,29 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         private async void ChangeProfileImg(object sender, RoutedEventArgs e)
         {
             string UID = localSettings.Values["UID"].ToString();
+            StorageFile imageFile = await PickImageAsync();
+            if (imageFile == null)
+            {
+                return;
+            }
 
+            // 本地留存
+            StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
+            await imageFile.CopyAsync(storageFolder, "ProfilePicture.PNG", NameCollisionOption.ReplaceExisting);
+
+            // 从本地副本读取并显示头像（不依赖选择器的临时缓存文件，确保立即显示）
+            StorageFile localFile = await storageFolder.GetFileAsync("ProfilePicture.PNG");
+            await DisplayProfileImageAsync(localFile);
+
+            // 向服务器上传用户头像（上传本地副本，避免临时文件失效）
+            uploadTool.UploadProfileImg(localFile, UID, "/upload-profile-image");
+
+            Frame.Navigate(typeof(SettingPage));
+        }
+
+        /// <summary>弹出文件选择器挑选头像图片（bmp/png/jpg/jpeg），取消时返回 null。</summary>
+        private async Task<StorageFile> PickImageAsync()
+        {
             FileOpenPicker picker = new FileOpenPicker
             {
                 SuggestedStartLocation = PickerLocationId.ComputerFolder
@@ -137,31 +181,22 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             picker.FileTypeFilter.Add(".png");
             picker.FileTypeFilter.Add(".jpg");
             picker.FileTypeFilter.Add(".jpeg");
-            StorageFile imageFile = await picker.PickSingleFileAsync();
+            return await picker.PickSingleFileAsync();
+        }
 
-            if (imageFile != null)
+        /// <summary>从本地文件读取图片并显示到头像控件。</summary>
+        private async Task DisplayProfileImageAsync(StorageFile localFile)
+        {
+            BitmapImage image = new BitmapImage();
+            using (IRandomAccessStream stream = await localFile.OpenReadAsync())
             {
-                // 本地留存
-                StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
-                await imageFile.CopyAsync(storageFolder, "ProfilePicture.PNG", NameCollisionOption.ReplaceExisting);
-
-                // 从本地副本读取并显示头像（不依赖选择器的临时缓存文件，确保立即显示）
-                StorageFile localFile = await storageFolder.GetFileAsync("ProfilePicture.PNG");
-                BitmapImage image = new BitmapImage();
-                using (IRandomAccessStream stream = await localFile.OpenReadAsync())
-                {
-                    await image.SetSourceAsync(stream);
-                }
-
-                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                {
-                    userProfileImage.ProfilePicture = image;
-                });
-
-                // 向服务器上传用户头像（上传本地副本，避免临时文件失效）
-                uploadTool.UploadProfileImg(localFile, UID, "/upload-profile-image");
+                await image.SetSourceAsync(stream);
             }
-            Frame.Navigate(typeof(SettingPage));
+
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                userProfileImage.ProfilePicture = image;
+            });
         }
 
         private void LoadAppTheme(object sender, RoutedEventArgs e)
@@ -196,16 +231,6 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             previewText.FontSize = SettingsService.ChangeFontSize(1);
         }
 
-        private void LoadSpeechVoice(object sender, RoutedEventArgs e)
-        {
-            voiceCombo.SelectedIndex = SettingsService.GetVoiceIndex();
-        }
-
-        private void ChangeSpeechVoice(object sender, SelectionChangedEventArgs e)
-        {
-            SettingsService.SetSpeechVoice(voiceCombo.SelectedIndex);
-        }
-
         private void ChangeSpeechSpeed(object sender, RangeBaseValueChangedEventArgs e)
         {
             SettingsService.SetSpeechSpeed(speedSlider.Value);
@@ -216,28 +241,40 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             SettingsService.SetSpeechTune(tuneSlider.Value);
         }
 
+        /// <summary>保存 MiMo API Key 到 Windows 凭据保险箱。</summary>
+        private void SaveMimoApiKey(object sender, RoutedEventArgs e)
+        {
+            SettingsService.SetMimoApiKey(mimoApiKeyBox.Password);
+            new ToastContentBuilder().AddArgument("action", "viewConversation")
+                .AddArgument("conversationId", 9528)
+                .AddText("Cactus Reader 设置")
+                .AddText("MiMo API Key 已保存。")
+                .Show();
+        }
+
         private async void PlaySpeechTextExample(object sender, RoutedEventArgs e)
         {
-            // 语速与语调暂不可用
             string exampleText;
+            string voiceDisplay = SpeechSettings.SelectedVoice?.DisplayName ?? SettingsService.GetVoiceName();
             if (SettingsService.GetVoiceLang().Equals("Chinese"))
             {
-                exampleText = "你好，我是讲述人：" + voiceCombo.SelectedItem + ", 欢迎使用 Cactus Reader。";
+                exampleText = "你好，我是讲述人：" + voiceDisplay + ", 欢迎使用 Cactus Reader。";
             }
             else
             {
-                exampleText = "Nice to meet you, this is " + voiceCombo.SelectedItem + ". Welcome to Cactus Reader.";
+                exampleText = "Nice to meet you, this is " + voiceDisplay + ". Welcome to Cactus Reader.";
             }
 
             try
             {
-                // 原子操作：合成语音到本地 wav 文件
-                StorageFile audioFile = await SpeechService.SynthesizeToFileAsync(
-                    exampleText, SettingsService.GetVoiceName());
+                // 流式合成：返回后立即开始播放，边合成边出声，无需等待整段生成
+                MediaStreamSource source = await SpeechService.CreateStreamingSourceAsync(
+                    exampleText, SettingsService.GetVoiceName(), SettingsService.GetStyleName(),
+                    SettingsService.GetVoiceSpeed(), SettingsService.GetVoiceTune());
 
-                if (audioFile != null)
+                if (source != null)
                 {
-                    mediaPlayer.Source = MediaSource.CreateFromStorageFile(audioFile);
+                    mediaPlayer.Source = MediaSource.CreateFromMediaStreamSource(source);
                     mediaPlayer.Play();
                 }
                 else
@@ -259,52 +296,64 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             }
         }
 
-        private async void SetPrivateKey(object sender, RoutedEventArgs e)
+        /// <summary>构建密码输入对话框（标题/提示/占位符可定制）。</summary>
+        private static ContentDialog BuildPasswordDialog(string title, string header, string placeholder)
         {
-            // Show a password input UI
             PasswordBox passwordBox = new PasswordBox
             {
                 Width = 360,
-                PlaceholderText = "密码长度至少为 6 位",
+                PlaceholderText = placeholder,
                 VerticalAlignment = VerticalAlignment.Bottom,
                 VerticalContentAlignment = VerticalAlignment.Center,
-                Header = "需要输入个人密码才能查看便签本中的内容。",
+                Header = header,
             };
-            ContentDialog setPrivateKeyDialog = new()
+            return new ContentDialog
             {
-                Title = "设置个人密码",
+                Title = title,
                 Content = passwordBox,
                 CloseButtonText = "取消",
                 PrimaryButtonText = "确定",
                 DefaultButton = ContentDialogButton.Primary
             };
+        }
+
+        /// <summary>私钥设置成功后的 UI 反馈：启用 Windows Hello、切换按钮显隐、提示云同步结果。</summary>
+        private async Task OnPrivateKeySetAsync(bool vaultSynced)
+        {
+            windowsHelloSwitch.IsEnabled = true;
+
+            // 切换按钮显隐
+            setKeyButton.Visibility = Visibility.Collapsed;
+            closeKeyButton.Visibility = Visibility.Visible;
+
+            ContentDialog keyAlertDialog = new ContentDialog
+            {
+                Title = "请勿忘记便签本密码",
+                Content = vaultSynced
+                    ? "忘记便签本的密码将导致即使你可以通过 Windows Hello 等方式访问你的便签本，你可能会永久性地失去对你便签本的管理权限。"
+                    : "密码已设置（本机可用）。但密钥云同步失败，更换设备时将无法凭密码找回便签，请检查网络后重新设置。",
+                CloseButtonText = "取消",
+                PrimaryButtonText = "确定",
+                DefaultButton = ContentDialogButton.Primary
+            };
+            await keyAlertDialog.ShowAsync();
+        }
+
+        private async void SetPrivateKey(object sender, RoutedEventArgs e)
+        {
+            ContentDialog setPrivateKeyDialog = BuildPasswordDialog(
+                "设置个人密码", "需要输入个人密码才能查看便签本中的内容。", "密码长度至少为 6 位");
             ContentDialogResult result = await setPrivateKeyDialog.ShowAsync();
 
             while (result == ContentDialogResult.Primary)
             {
-                // Get password and check it's correct
-                string password = passwordBox.Password;
+                // 校验密码长度并设置
+                string password = (setPrivateKeyDialog.Content as PasswordBox).Password;
                 if (password.Length >= 6)
                 {
                     // 原子操作：PBKDF2 加盐哈希存储 + 用密码包裹便签密钥上传服务端（换设备时可凭密码找回）
                     bool vaultSynced = await SettingsService.SetPrivateKeyAsync(password);
-                    windowsHelloSwitch.IsEnabled = true;
-
-                    // hide the button and show another button
-                    setKeyButton.Visibility = Visibility.Collapsed;
-                    closeKeyButton.Visibility = Visibility.Visible;
-
-                    ContentDialog keyAlertDialog = new ContentDialog
-                    {
-                        Title = "请勿忘记便签本密码",
-                        Content = vaultSynced
-                            ? "忘记便签本的密码将导致即使你可以通过 Windows Hello 等方式访问你的便签本，你可能会永久性地失去对你便签本的管理权限。"
-                            : "密码已设置（本机可用）。但密钥云同步失败，更换设备时将无法凭密码找回便签，请检查网络后重新设置。",
-                        CloseButtonText = "取消",
-                        PrimaryButtonText = "确定",
-                        DefaultButton = ContentDialogButton.Primary
-                    };
-                    await keyAlertDialog.ShowAsync();
+                    await OnPrivateKeySetAsync(vaultSynced);
                     break;
                 }
                 else
@@ -314,29 +363,24 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             }
         }
 
+        /// <summary>关闭私钥成功后的 UI 反馈：禁用 Windows Hello、切换按钮显隐。</summary>
+        private void OnPrivateKeyClosed()
+        {
+            windowsHelloSwitch.IsOn = false;
+            windowsHelloSwitch.IsEnabled = false;
+            setKeyButton.Visibility = Visibility.Visible;
+            closeKeyButton.Visibility = Visibility.Collapsed;
+        }
+
         private async void ClosePrivateKey(object sender, RoutedEventArgs e)
         {
-            PasswordBox passwordBox = new()
-            {
-                Width = 360,
-                PlaceholderText = "请输入你用于锁定便签本的密码",
-                VerticalAlignment = VerticalAlignment.Bottom,
-                VerticalContentAlignment = VerticalAlignment.Center,
-                Header = "我们需要验证你的密码，然后为你关闭密码，这将解锁你的所有便签。",
-            };
-            ContentDialog setPrivateKeyDialog = new ContentDialog
-            {
-                Title = "关闭便签本密码",
-                Content = passwordBox,
-                CloseButtonText = "取消",
-                PrimaryButtonText = "确定",
-                DefaultButton = ContentDialogButton.Primary
-            };
+            ContentDialog setPrivateKeyDialog = BuildPasswordDialog(
+                "关闭便签本密码", "我们需要验证你的密码，然后为你关闭密码，这将解锁你的所有便签。", "请输入你用于锁定便签本的密码");
             ContentDialogResult result = await setPrivateKeyDialog.ShowAsync();
 
             while (result == ContentDialogResult.Primary)
             {
-                string password = passwordBox.Password;
+                string password = (setPrivateKeyDialog.Content as PasswordBox).Password;
                 // 原子操作：验证密码 → 删除服务端包裹密钥 → 清除本机设置 → 解锁全部便签
                 bool vaultRemoved = await SettingsService.ClosePrivateKeyAsync(password);
                 if (!vaultRemoved)
@@ -352,10 +396,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                     break;
                 }
 
-                windowsHelloSwitch.IsOn = false;
-                windowsHelloSwitch.IsEnabled = false;
-                setKeyButton.Visibility = Visibility.Visible;
-                closeKeyButton.Visibility = Visibility.Collapsed;
+                OnPrivateKeyClosed();
                 break;
             }
         }
@@ -371,33 +412,10 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
         private async void OpenWindowsHello(object sender, RoutedEventArgs e)
         {
-            // 当 Windows Hello 打开时判断用户是否设置过 Windows Hello 加密
-            // 没有设置过则开始设置 Windows Hello
+            // 未设置过 Windows Hello 时引导用户设置
             if (!SettingsService.IsWindowsHelloSet())
             {
-                string UID = localSettings.Values["UID"].ToString();
-                string name = localSettings.Values["name"].ToString();
-
-                windowsHelloSwitch.IsEnabled = false;
-                bool isSuccessful = await MicrosoftPassportHelper.CreatePassportKeyAsync(UID, name);
-                if (isSuccessful)
-                {
-                    ContentDialog contentDialog = new ContentDialog
-                    {
-                        Title = "Windows Hello 验证成功",
-                        Content = "你现在可以使用 Windows Hello 来查看和管理锁定的便签本。",
-                        PrimaryButtonText = "确定",
-                        DefaultButton = ContentDialogButton.Primary
-                    };
-                    await contentDialog.ShowAsync();
-                    SettingsService.SetWindowsHello(true);
-                }
-                else
-                {
-                    SettingsService.SetWindowsHello(false);
-                    windowsHelloSwitch.IsOn = false;
-                }
-                windowsHelloSwitch.IsEnabled = true;
+                await SetupWindowsHelloAsync();
             }
 
             // 当用户关闭 Windows Hello 时，同时关闭密码
@@ -405,6 +423,34 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             {
                 SettingsService.SetWindowsHello(false);
             }
+        }
+
+        /// <summary>创建 Windows Hello 密钥并提示结果，成功则写入设置。</summary>
+        private async Task SetupWindowsHelloAsync()
+        {
+            string UID = localSettings.Values["UID"].ToString();
+            string name = localSettings.Values["name"].ToString();
+
+            windowsHelloSwitch.IsEnabled = false;
+            bool isSuccessful = await MicrosoftPassportHelper.CreatePassportKeyAsync(UID, name);
+            if (isSuccessful)
+            {
+                ContentDialog contentDialog = new ContentDialog
+                {
+                    Title = "Windows Hello 验证成功",
+                    Content = "你现在可以使用 Windows Hello 来查看和管理锁定的便签本。",
+                    PrimaryButtonText = "确定",
+                    DefaultButton = ContentDialogButton.Primary
+                };
+                await contentDialog.ShowAsync();
+                SettingsService.SetWindowsHello(true);
+            }
+            else
+            {
+                SettingsService.SetWindowsHello(false);
+                windowsHelloSwitch.IsOn = false;
+            }
+            windowsHelloSwitch.IsEnabled = true;
         }
     }
 }

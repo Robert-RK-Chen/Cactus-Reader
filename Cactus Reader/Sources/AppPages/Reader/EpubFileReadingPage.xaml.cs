@@ -12,39 +12,29 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.Foundation;
 using Windows.Storage;
 using Windows.UI.Core;
-using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
-// https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
-
 namespace Cactus_Reader.Sources.AppPages.Reader
 {
-    /// <summary>
-    /// 可用于自身或导航至 Frame 内部的空白页。
-    /// </summary>
     public sealed partial class EpubFileReadingPage : Page
     {
         public ObservableCollection<Chapter> Chapters { get; private set; }
         BookInfo bookInfo = null;
         private string currentFont = "MiSans";
         private double currentFontSize = 18;
-        // WebView2 虚拟主机映射：把书籍解压目录映射为 epub.local，
-        // 章节用 https://epub.local/ 加载（WebView2 不支持 ms-appdata:/// 协议）
+        // 解压目录映射为 epub.local 虚拟主机（WebView2 不支持 ms-appdata:/// 协议）
         private const string EpubVirtualHost = "epub.local";
         private string contentFolderPath;
-        // WebView 内部导航（点击章节内超链接）时同步左侧目录，此标志防止循环触发
+        // 防止 WebView 内部导航与目录选中互相循环触发
         private bool syncingChapterSelection;
 
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        readonly ThemeColorBrushTool brushTool = ThemeColorBrushTool.Instance;
 
         public EpubFileReadingPage()
         {
@@ -52,6 +42,7 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             this.InitializeComponent();
             if (localSettings.Values["StickyTheme"] == null) { localSettings.Values["StickyTheme"] = "GingkoYellow"; }
             if (localSettings.Values["font"] != null) { currentFont = localSettings.Values["font"].ToString(); }
+            // 字号与设置页共用 fontSize 键（设置页为全局默认字号）
             if (localSettings.Values["fontSize"] != null) { currentFontSize = Convert.ToDouble(localSettings.Values["fontSize"]); }
 
             // 统一标题栏：透明按钮 + 隐藏系统标题栏 + 可拖拽区域 + 右侧系统按钮留白（CommandBar 融合）
@@ -84,26 +75,32 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             try
             {
                 string path = new Uri(args.Uri).AbsolutePath.TrimStart('/');
-                if (path.Length == 0) return;
-
-                for (int i = 0; i < Chapters.Count; i++)
+                int index = FindChapterIndexByPath(path);
+                if (index >= 0 && ChapterPivot.SelectedIndex != index)
                 {
-                    string chapterPath = Chapters[i].Uri.AbsolutePath.TrimStart('/');
-                    if (string.Equals(path, chapterPath, StringComparison.OrdinalIgnoreCase))
-                    {
-                        if (ChapterPivot.SelectedIndex != i)
-                        {
-                            syncingChapterSelection = true;
-                            ChapterPivot.SelectedIndex = i;
-                            syncingChapterSelection = false;
-                        }
-                        break;
-                    }
+                    syncingChapterSelection = true;
+                    ChapterPivot.SelectedIndex = index;
+                    syncingChapterSelection = false;
                 }
             }
             catch (Exception)
             {
             }
+        }
+
+        /// <summary>按规范化路径查找章节索引（忽略大小写），未找到返回 -1。</summary>
+        private int FindChapterIndexByPath(string path)
+        {
+            if (path.Length == 0) return -1;
+            for (int i = 0; i < Chapters.Count; i++)
+            {
+                string chapterPath = Chapters[i].Uri.AbsolutePath.TrimStart('/');
+                if (string.Equals(path, chapterPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         private void DataTransferManagerDataRequested(DataTransferManager sender, DataRequestedEventArgs args)
@@ -633,17 +630,18 @@ namespace Cactus_Reader.Sources.AppPages.Reader
                     // 用户可能已离开页面，此时再导航会抛异常
                     if (PivotItemWebView.CoreWebView2 != null)
                     {
-                        EnsureVirtualHostAndNavigate(chapter);
+                        LoadChapter(chapter);
                     }
                 }, TaskScheduler.FromCurrentSynchronizationContext());
             }
             else
             {
-                EnsureVirtualHostAndNavigate(chapter);
+                LoadChapter(chapter);
             }
         }
 
-        private void EnsureVirtualHostAndNavigate(Chapter chapter)
+        /// <summary>加载章节到 WebView：虚拟主机映射失败时回退本地文件路径。</summary>
+        private void LoadChapter(Chapter chapter)
         {
             try
             {
@@ -715,6 +713,22 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             currentFont = font;
             localSettings.Values["font"] = font;
 
+            await RewriteAllChaptersAsync();
+
+            var current = ChapterPivot.SelectedItem as Chapter;
+            if (current != null)
+            {
+                PivotItemWebView.Source = current.Uri;
+            }
+        }
+
+        /// <summary>
+        /// 按当前字体/字号重写全部章节文件（body 样式 + 全局 CSS 注入）。
+        /// 同步 File API（独占锁）逐章读写，避免与 WebView2 渲染读取同一文件冲突；
+        /// 单章写入失败不中断整体切换。
+        /// </summary>
+        private async Task RewriteAllChaptersAsync()
+        {
             string style = BuildBodyStyle();
             string overlayCss = BuildOverlayCss();
             foreach (var chapter in Chapters)
@@ -732,46 +746,15 @@ namespace Cactus_Reader.Sources.AppPages.Reader
                     // 单个章节写入失败不中断整体字体切换
                 }
             }
-
-            var current = ChapterPivot.SelectedItem as Chapter;
-            if (current != null)
-            {
-                PivotItemWebView.Source = current.Uri;
-            }
         }
 
         private async void CreateNewSticky(object sender, RoutedEventArgs e)
         {
-            List<object> parameter = new List<object>();
             string serial = Guid.NewGuid().ToString("D").ToUpper();
-            string UID = localSettings.Values["UID"].ToString();
-            string theme = localSettings.Values["StickyTheme"].ToString();
+            StickyQuickView stickyQuickView = StickyService.CreateNewStickyQuickView(serial);
 
-            StickyQuickView stickyQuickView = new StickyQuickView
-            {
-                CreateTimeText = DateTime.Now.ToShortDateString(),
-                StickySerial = serial,
-                ThemeKind = theme,
-                TitleBackground = brushTool.GetThemeColorBrush(theme, false).TitleBrush,
-                Background = brushTool.GetThemeColorBrush(theme, false).BackgroundBrush,
-            };
-
-            parameter.Add("new");
-            parameter.Add(stickyQuickView);
-
-            // 打开新便签界面
-            CoreApplicationView newView = CoreApplication.CreateNewView();
-            int newViewId = 0;
-            await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                Frame frame = new Frame();
-                frame.Navigate(typeof(NewStickyPage), parameter, new DrillInNavigationTransitionInfo());
-                Window.Current.Content = frame;
-                Window.Current.Activate();
-                newViewId = ApplicationView.GetForCurrentView().Id;
-            });
-            ApplicationView.PreferredLaunchViewSize = new Size(300, 300);
-            bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
+            List<object> parameter = new List<object> { "new", stickyQuickView };
+            await StickyService.OpenStickyEditWindowAsync(parameter);
         }
     }
 }

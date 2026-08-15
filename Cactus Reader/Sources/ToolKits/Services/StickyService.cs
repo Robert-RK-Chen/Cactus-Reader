@@ -1,11 +1,19 @@
 using Cactus_Reader.Entities;
+using Cactus_Reader.Sources.AppPages.AppUI;
 using Cactus_Reader.Sources.StickyNotes;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Core;
+using Windows.Foundation;
 using Windows.Storage;
+using Windows.UI.Core;
+using Windows.UI.ViewManagement;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media.Animation;
 
 namespace Cactus_Reader.Sources.ToolKits
 {
@@ -59,6 +67,38 @@ namespace Cactus_Reader.Sources.ToolKits
                 StickySerial = serial,
                 QuickViewText = string.Empty,
             };
+        }
+
+        /// <summary>创建新建模式的便签卡片（视图背景用 ViewBackground，模板绑定而非 Control.Background）。</summary>
+        public static StickyQuickView CreateNewStickyQuickView(string serial)
+        {
+            string theme = GetStickyTheme();
+            ThemeColorBrush brush = ThemeColorBrushTool.Instance.GetThemeColorBrush(theme, false);
+            return new StickyQuickView
+            {
+                CreateTimeText = DateTime.Now.ToShortDateString(),
+                StickySerial = serial,
+                ThemeKind = theme,
+                TitleBackground = brush.TitleBrush,
+                ViewBackground = brush.BackgroundBrush,
+            };
+        }
+
+        /// <summary>在独立视图（新窗口）中打开便签编辑页，参数为 List&lt;object&gt;（新建/打开模式 + 卡片）。</summary>
+        public static async Task OpenStickyEditWindowAsync(List<object> parameter)
+        {
+            CoreApplicationView newView = CoreApplication.CreateNewView();
+            int newViewId = 0;
+            await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                Frame frame = new Frame();
+                frame.Navigate(typeof(NewStickyPage), parameter, new DrillInNavigationTransitionInfo());
+                Window.Current.Content = frame;
+                Window.Current.Activate();
+                newViewId = ApplicationView.GetForCurrentView().Id;
+            });
+            ApplicationView.PreferredLaunchViewSize = new Size(300, 300);
+            await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
         }
 
         /// <summary>读取并解密单个便签（文件缺失/解密失败返回 null）。</summary>

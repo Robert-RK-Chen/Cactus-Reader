@@ -223,47 +223,48 @@
                                 </AppBarButton.Icon>
                                 <AppBarButton.Flyout>
                                     <Flyout>
-                                        <StackPanel Orientation="Vertical" Spacing="16">
-                                            <MediaPlayerElement x:Name="mediaPlayerElement" MaxWidth="400"
-                                                            AutoPlay="False" AreTransportControlsEnabled="True">
-                                                <MediaPlayerElement.TransportControls>
-                                                    <MediaTransportControls IsCompact="True"
-                                                                        IsFastForwardButtonVisible="True"
-                                                                        IsFastForwardEnabled="True"
-                                                                        IsFastRewindButtonVisible="True"
-                                                                        IsFastRewindEnabled="True"
-                                                                        IsFullWindowButtonVisible="False"
-                                                                        IsZoomButtonVisible="False"
-                                                                        IsVolumeButtonVisible="False"/>
-                                                </MediaPlayerElement.TransportControls>
-                                            </MediaPlayerElement>
+                                        <StackPanel Orientation="Vertical" Spacing="10">
+                                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                                <TextBlock Text="播放控制：" FontWeight="Bold" VerticalAlignment="Center" Width="90"/>
+                                                <Button x:Name="speechPlayPauseButton" Height="36" Width="200"
+                                                        Click="ToggleSpeechPlayback">
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <FontIcon x:Name="speechPlayPauseIcon" FontSize="16"
+                                                                  FontFamily="Segoe Fluent Icons" Glyph="&#xE768;"/>
+                                                        <TextBlock x:Name="speechPlayPauseText" Text="播放朗读"
+                                                                   VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Button>
+                                            </StackPanel>
                                             <media:MenuFlyoutSeparator Margin="0, 0, 0, 4"/>
                                             <StackPanel Orientation="Horizontal" Spacing="12">
-                                                <TextBlock Text="讲述人音色：" FontWeight="Bold" VerticalAlignment="Center"/>
-                                                <ComboBox x:Name="speechTuneCombo" Height="36" Width="300"
-                                                      Loaded="LoadSpeechVoice" SelectionChanged="ChangeSpeechTune">
-                                                    <x:String>Azure TTS - 晓晓（中文）</x:String>
-                                                    <x:String>Azure TTS - 云希（中文）</x:String>
-                                                    <x:String>Azure TTS - 晓萱（中文）</x:String>
-                                                    <x:String>Azure TTS - 云阳（中文）</x:String>
-                                                    <x:String>Azure TTS - Ashley（English）</x:String>
-                                                    <x:String>Azure TTS - Jenny（English）</x:String>
-                                                    <x:String>Azure TTS - Brandon（English）</x:String>
-                                                    <x:String>Azure TTS - Christopher（English）</x:String>
+                                                <TextBlock Text="讲述人音色：" FontWeight="Bold" VerticalAlignment="Center" Width="90"/>
+                                                <ComboBox x:Name="speechTuneCombo" Height="36" Width="200"
+                                                      ItemsSource="{x:Bind SpeechSettings.Voices}"
+                                                      SelectedIndex="{x:Bind SpeechSettings.SelectedVoiceIndex, Mode=TwoWay}">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding DisplayName}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
                                                 </ComboBox>
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal" Spacing="12">
-                                                <TextBlock Text="讲述人语速：" FontWeight="Bold" VerticalAlignment="Center"/>
-                                                <Slider Minimum="1" Maximum="3.0" TickFrequency="0.5" Value="1"
-                                                    StepFrequency="0.1" TickPlacement="Outside" Width="300"/>
+                                                <TextBlock Text="讲述人风格：" FontWeight="Bold" VerticalAlignment="Center" Width="90"/>
+                                                <ComboBox x:Name="speechStyleCombo" Height="36" Width="200"
+                                                      ItemsSource="{x:Bind SpeechSettings.Styles}"
+                                                      SelectedIndex="{x:Bind SpeechSettings.SelectedStyleIndex, Mode=TwoWay}"/>
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal" Spacing="12">
-                                                <TextBlock Text="讲述人音调：" FontWeight="Bold" VerticalAlignment="Center"/>
-                                                <Slider Minimum="0" Maximum="2" TickFrequency="0.5" Value="1"
-                                                    StepFrequency="0.1" TickPlacement="Outside" Width="300"/>
+                                                <TextBlock Text="讲述人语速：" FontWeight="Bold" VerticalAlignment="Center" Width="90"/>
+                                                <Slider Minimum="1" Maximum="3.0" TickFrequency="0.5" Value="1"
+                                                    StepFrequency="0.1" TickPlacement="Outside" Width="200"/>
                                             </StackPanel>
-                                            <TextBlock x:Name="tuneTip" Text="语音将在下次生成时被更改。" FontSize="12"
-                                                   Visibility="Collapsed" Margin="0, 4, 0, 0"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                                <TextBlock Text="讲述人音调：" FontWeight="Bold" VerticalAlignment="Center" Width="90"/>
+                                                <Slider Minimum="0" Maximum="2" TickFrequency="0.5" Value="1"
+                                                    StepFrequency="0.1" TickPlacement="Outside" Width="200"/>
+                                            </StackPanel>
                                         </StackPanel>
                                     </Flyout>
                                 </AppBarButton.Flyout>
