@@ -28,6 +28,10 @@ namespace Cactus_Reader.Sources.AppPages.Reader
         BookInfo bookInfo = null;
         private string currentFont = "MiSans";
         private double currentFontSize = 18;
+        // 文本列宽偏好（narrow=1/3、normal=1/2、wide=1/1），与 LocalSettings["columnWidth"] 同步
+        private string columnWidthPreference = "normal";
+        // 阅读区最窄可接受宽度（px），低于该值时自动升级到更宽的列，保证文本始终可读
+        private const double MinReadingWidth = 400;
         // 解压目录映射为 epub.local 虚拟主机（WebView2 不支持 ms-appdata:/// 协议）
         private const string EpubVirtualHost = "epub.local";
         private string contentFolderPath;
@@ -44,6 +48,8 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             if (localSettings.Values["font"] != null) { currentFont = localSettings.Values["font"].ToString(); }
             // 字号与设置页共用 fontSize 键（设置页为全局默认字号）
             if (localSettings.Values["fontSize"] != null) { currentFontSize = Convert.ToDouble(localSettings.Values["fontSize"]); }
+            // 文本列宽偏好（窄 1/3 / 中 1/2 / 满 1/1）
+            if (localSettings.Values["columnWidth"] != null) { columnWidthPreference = localSettings.Values["columnWidth"].ToString(); }
 
             // 统一标题栏：透明按钮 + 隐藏系统标题栏 + 可拖拽区域 + 右侧系统按钮留白（CommandBar 融合）
             TitleBarService.Attach(appTitleBar, TitleBarStyle.Reader);
@@ -55,13 +61,68 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             PivotItemWebView.NavigationStarting += OnWebViewNavigationStarting;
         }
 
-        /// <summary>窗口大小变化时，将阅读区域宽度设为视口一半并居中。</summary>
+        /// <summary>
+        /// 窗口大小变化时按列宽偏好重排阅读区：窄 1/3、中 1/2、满 1/1；
+        /// 窗口缩小时自动升级到更宽的列，保证文本始终可读。
+        /// </summary>
         private void OnPageSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (PivotItemWebView != null)
+            ApplyColumnWidth();
+        }
+
+        /// <summary>文本列样式菜单点击：切换窄/中/满列宽偏好并持久化，立即重排。</summary>
+        private void OnColumnWidthSelected(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuFlyoutItem item && item.Tag is string tag)
             {
-                PivotItemWebView.Width = e.NewSize.Width / 2.0;
+                columnWidthPreference = tag;
+                localSettings.Values["columnWidth"] = tag;
+                ApplyColumnWidth();
             }
+        }
+
+        /// <summary>
+        /// 按列宽偏好计算 WebView 宽度（相对阅读区视口：窄 1/3、中 1/2、满 1/1）。
+        /// 窗口缩小时，若按偏好列宽计算出的阅读宽度低于 MinReadingWidth，
+        /// 自动升级到更大的列宽（窄→中→满）；窗口重新拉大后回到偏好列宽。
+        /// </summary>
+        private void ApplyColumnWidth()
+        {
+            if (PivotItemWebView == null) return;
+
+            // 阅读区视口宽度（总宽减左侧目录列与边框），布局未完成时为 0 则等待下次触发
+            double viewportWidth = ReadingArea.ActualWidth;
+            if (viewportWidth <= 0) return;
+
+            string[] order = { "narrow", "normal", "wide" };
+            int start = Array.IndexOf(order, columnWidthPreference);
+            if (start < 0) { start = 1; columnWidthPreference = "normal"; }
+
+            double width = viewportWidth;
+            for (int i = start; i < order.Length; i++)
+            {
+                double candidate = viewportWidth / RatioOf(order[i]);
+                if (candidate >= MinReadingWidth || i == order.Length - 1)
+                {
+                    width = candidate;
+                    break;
+                }
+            }
+
+            // 宽度无变化时不重复赋值，避免多余布局抖动
+            double current = PivotItemWebView.Width;
+            if (double.IsNaN(current) || Math.Abs(current - width) > 0.5)
+            {
+                PivotItemWebView.Width = width;
+            }
+        }
+
+        /// <summary>列宽偏好对应的视口分割数（窄 3、中 2、满 1）。</summary>
+        private static double RatioOf(string preference)
+        {
+            if (preference == "narrow") return 3.0;
+            if (preference == "wide") return 1.0;
+            return 2.0;
         }
 
         /// <summary>
@@ -267,7 +328,9 @@ namespace Cactus_Reader.Sources.AppPages.Reader
         private static readonly Regex ItemTagRegex = new Regex(@"<item\b[^>]*>", RegexOptions.IgnoreCase);
         private static readonly Regex NavLinkRegex = new Regex(@"<a\b[^>]*href\s*=\s*[""']([^""']+)[""'][^>]*>(.*?)</a>", RegexOptions.IgnoreCase | RegexOptions.Singleline);
         private static readonly Regex BodyOpenTagRegex = new Regex(@"<body\b[^>]*>", RegexOptions.IgnoreCase);
-        private static readonly Regex StyleAttrRegex = new Regex(@"style\s*=\s*[""'][^""']*[""']", RegexOptions.IgnoreCase);
+        // 成对引号匹配 style 属性：捕获开引号，值内允许出现另一种引号（如注入的 'MiSans'），
+        // 用反向引用匹配同种引号闭合；旧版 [^"']* 会在值内单引号处截断，重复注入时产生畸形属性（attributes construct error）
+        private static readonly Regex StyleAttrRegex = new Regex(@"style\s*=\s*(""|')(?:(?!\1)[\s\S])*\1", RegexOptions.IgnoreCase);
 
         /// <summary>从 XML 片段中提取指定元素的属性值（正则，兼容大小写与命名空间前缀）。</summary>
         private static string ExtractAttribute(string xml, string elementName, string attrName)
@@ -685,7 +748,25 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             catch (Exception)
             {
             }
-            mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+            NavigateBackToMainPage();
+        }
+
+        /// <summary>
+        /// 返回主页：必须操作承载本页的外层 Frame（MainPage.mainContent），
+        /// 而不是本页内部的 mainContent Frame——否则会在阅读页内嵌套新 MainPage，页面逐层叠加。
+        /// 有返回栈时 GoBack 回到原 MainPage UI（实例不重建）；无返回栈时兜底导航新 MainPage。
+        /// </summary>
+        private void NavigateBackToMainPage()
+        {
+            Frame hostFrame = Frame;
+            if (hostFrame != null && hostFrame.CanGoBack)
+            {
+                hostFrame.GoBack();
+            }
+            else if (hostFrame != null)
+            {
+                hostFrame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+            }
         }
 
         private void PrevPage(object sender, RoutedEventArgs e)
@@ -750,6 +831,12 @@ namespace Cactus_Reader.Sources.AppPages.Reader
 
         private async void CreateNewSticky(object sender, RoutedEventArgs e)
         {
+            // 密钥就绪检查：旧设备设置过密码时需先解锁（登录时已弹过，此处兜底防直开窗口）
+            if (!await StickyService.EnsureKeyReadyWithDialogAsync())
+            {
+                return;
+            }
+
             string serial = Guid.NewGuid().ToString("D").ToUpper();
             StickyQuickView stickyQuickView = StickyService.CreateNewStickyQuickView(serial);
 

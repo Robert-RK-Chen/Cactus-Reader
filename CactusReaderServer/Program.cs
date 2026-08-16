@@ -72,6 +72,7 @@ namespace CactusReaderService
             // 端点映射（单一职责：HTTP 层）
             app.MapProfileEndpoints(storage);
             app.MapNotesEndpoints(storage);
+            app.MapFileEndpoints(storage);
             app.MapAuthEndpoints(db, mail, passport, app.Logger);
             app.MapVaultEndpoints(db);
 

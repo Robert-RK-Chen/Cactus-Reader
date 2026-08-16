@@ -2,6 +2,7 @@ using Cactus_Reader.Entities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,6 +29,62 @@ namespace Cactus_Reader.Sources.ToolKits
                 response.EnsureSuccessStatusCode();
                 string text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return JObject.Parse(text);
+            }
+        }
+
+        /// <summary>POST 携带 Header（UID/Serial/自定义）的请求，返回 JSON 响应。</summary>
+        private static async Task<JObject> PostWithHeadersAsync(string path, System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>> headers)
+        {
+            using (var request = new HttpRequestMessage(HttpMethod.Post, BaseUrl + path))
+            {
+                foreach (System.Collections.Generic.KeyValuePair<string, string> pair in headers)
+                {
+                    request.Headers.Add(pair.Key, pair.Value);
+                }
+                using (HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(false))
+                {
+                    response.EnsureSuccessStatusCode();
+                    string text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    return JObject.Parse(text);
+                }
+            }
+        }
+
+        /// <summary>以原始字节流上传文件（application/octet-stream），Header 携带 UID/Serial。返回 ok。</summary>
+        private static async Task<bool> UploadBytesAsync(string path, string uid, string serial, byte[] bytes)
+        {
+            using (var content = new ByteArrayContent(bytes))
+            {
+                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+                using (var request = new HttpRequestMessage(HttpMethod.Post, BaseUrl + path))
+                {
+                    request.Content = content;
+                    request.Headers.Add("UID", uid);
+                    if (!string.IsNullOrEmpty(serial))
+                    {
+                        request.Headers.Add("Serial", serial);
+                    }
+                    using (HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(false))
+                    {
+                        response.EnsureSuccessStatusCode();
+                        string text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                        return (bool)(JObject.Parse(text)["ok"] ?? false);
+                    }
+                }
+            }
+        }
+
+        /// <summary>GET 下载文件字节；404（服务端无文件）返回空字节数组。</summary>
+        private static async Task<byte[]> DownloadBytesAsync(string path)
+        {
+            using (HttpResponseMessage response = await client.GetAsync(BaseUrl + path).ConfigureAwait(false))
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return Array.Empty<byte>();
+                }
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
             }
         }
 
@@ -168,17 +225,102 @@ namespace Cactus_Reader.Sources.ToolKits
         /// <summary>删除服务端便签存档（Header 携带 UID/Serial，与上传协议一致）。</summary>
         public static async Task<bool> DeleteNoteAsync(string uid, string serial)
         {
-            using (var request = new HttpRequestMessage(HttpMethod.Post, BaseUrl + "/delete-cactus-notes"))
+            JObject result = await PostWithHeadersAsync("/delete-cactus-notes",
+                new[] { new System.Collections.Generic.KeyValuePair<string, string>("UID", uid),
+                        new System.Collections.Generic.KeyValuePair<string, string>("Serial", serial) });
+            return (bool)(result["ok"] ?? false);
+        }
+
+        // ---------------- 阅读内容存档（Library 区） ----------------
+
+        /// <summary>上传阅读记录存档到服务端 Library 区（文件名 {serial}.json）。</summary>
+        public static async Task<bool> UploadLibraryFileAsync(string uid, string serial, byte[] bytes)
+        {
+            return await UploadBytesAsync("/upload-cactus-library", uid, serial, bytes);
+        }
+
+        /// <summary>下载阅读记录存档（不存在返回空字节数组）。</summary>
+        public static async Task<byte[]> DownloadLibraryFileAsync(string uid, string serial)
+        {
+            return await DownloadBytesAsync($"/download-cactus-library?uid={uid}&serial={serial}");
+        }
+
+        /// <summary>删除服务端 Library 区存档。</summary>
+        public static async Task<bool> DeleteLibraryFileAsync(string uid, string serial)
+        {
+            JObject result = await PostWithHeadersAsync("/delete-cactus-library",
+                new[] { new System.Collections.Generic.KeyValuePair<string, string>("UID", uid),
+                        new System.Collections.Generic.KeyValuePair<string, string>("Serial", serial) });
+            return (bool)(result["ok"] ?? false);
+        }
+
+        /// <summary>获取服务端 Library 区文件名清单；网络异常时返回空列表。</summary>
+        public static async Task<List<string>> ListLibraryFilesAsync(string uid)
+        {
+            return await ListFilesAsync($"/library-list?uid={uid}");
+        }
+
+        // ---------------- 回收站（Recycle 区） ----------------
+
+        /// <summary>上传文件到服务端 Recycle 区（删除进回收站时同步云端）。</summary>
+        public static async Task<bool> UploadRecycleFileAsync(string uid, string serial, byte[] bytes)
+        {
+            return await UploadBytesAsync("/upload-cactus-recycle", uid, serial, bytes);
+        }
+
+        /// <summary>下载 Recycle 区文件（不存在返回空字节数组）。</summary>
+        public static async Task<byte[]> DownloadRecycleFileAsync(string uid, string serial)
+        {
+            return await DownloadBytesAsync($"/download-cactus-recycle?uid={uid}&serial={serial}");
+        }
+
+        /// <summary>删除服务端 Recycle 区文件（彻底删除时调用）。</summary>
+        public static async Task<bool> DeleteRecycleFileAsync(string uid, string serial)
+        {
+            JObject result = await PostWithHeadersAsync("/delete-cactus-recycle",
+                new[] { new System.Collections.Generic.KeyValuePair<string, string>("UID", uid),
+                        new System.Collections.Generic.KeyValuePair<string, string>("Serial", serial) });
+            return (bool)(result["ok"] ?? false);
+        }
+
+        /// <summary>获取服务端 Recycle 区文件名清单；网络异常时返回空列表。</summary>
+        public static async Task<List<string>> ListRecycleFilesAsync(string uid)
+        {
+            return await ListFilesAsync($"/recycle-list?uid={uid}");
+        }
+
+        /// <summary>
+        /// 跨区移动云端文件（notes / library / recycle 之间）。
+        /// 删除进回收站 = MoveFile(serial, from, "recycle")；恢复 = MoveFile(serial, "recycle", to)。
+        /// 源文件不存在时服务端按幂等成功处理。
+        /// </summary>
+        public static async Task<bool> MoveFileAsync(string uid, string serial, string fromSection, string toSection)
+        {
+            JObject result = await PostWithHeadersAsync("/move-file",
+                new[] { new System.Collections.Generic.KeyValuePair<string, string>("UID", uid),
+                        new System.Collections.Generic.KeyValuePair<string, string>("Serial", serial),
+                        new System.Collections.Generic.KeyValuePair<string, string>("From", fromSection),
+                        new System.Collections.Generic.KeyValuePair<string, string>("To", toSection) });
+            return (bool)(result["ok"] ?? false);
+        }
+
+        /// <summary>GET 拉取文件名清单（JSON 数组）；网络异常返回空列表。</summary>
+        private static async Task<List<string>> ListFilesAsync(string path)
+        {
+            try
             {
-                request.Headers.Add("UID", uid);
-                request.Headers.Add("Serial", serial);
-                using (HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(false))
+                using (HttpResponseMessage response = await client.GetAsync(BaseUrl + path).ConfigureAwait(false))
                 {
                     response.EnsureSuccessStatusCode();
                     string text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    JObject result = JObject.Parse(text);
-                    return (bool)(result["ok"] ?? false);
+                    return JsonConvert.DeserializeObject<List<string>>(text) ?? new List<string>();
                 }
             }
-        }    }
+            catch (Exception)
+            {
+                // 网络异常：按无远端数据处理
+                return new List<string>();
+            }
+        }
+    }
 }

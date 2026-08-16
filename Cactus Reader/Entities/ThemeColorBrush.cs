@@ -2,15 +2,9 @@
 
 namespace Cactus_Reader.Entities
 {
+    /// <summary>便签主题色返回值容器（标题/背景画笔，由 ThemeColorBrushTool 在调用线程新建）。</summary>
     public class ThemeColorBrush
     {
-        private static ThemeColorBrush instance;
-
-        public static ThemeColorBrush Instance
-        {
-            get { return instance ??= new ThemeColorBrush(); }
-        }
-
         public SolidColorBrush TitleBrush { get; set; }
 
         public SolidColorBrush BackgroundBrush { get; set; }

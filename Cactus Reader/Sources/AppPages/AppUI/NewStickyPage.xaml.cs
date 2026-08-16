@@ -24,13 +24,19 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         private StickyQuickView quickView;
         private readonly ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         private readonly ThemeColorBrushTool brushTool = ThemeColorBrushTool.Instance;
-        private bool suppressTextChanged;
+
+        /// <summary>窗口模式："new" 新建 / "open" 打开已有。</summary>
+        private string mode;
+
+        /// <summary>当前内容是否已保存（实例状态，多窗口互不干扰）。</summary>
+        private bool isSaved;
+
+        /// <summary>加载完成时的纯文本快照，用于区分真实编辑与 SetText 触发的延迟 TextChanged。</summary>
         private string loadedPlainText = string.Empty;
 
         public NewStickyPage()
         {
             InitializeComponent();
-            localSettings.Values["isSaved"] = false;
 
             var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
             coreTitleBar.ExtendViewIntoTitleBar = true;
@@ -58,18 +64,22 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             SystemNavigationManagerPreview.GetForCurrentView().CloseRequested += StickyPageCloseRequested;
 
             List<object> parameter = (List<object>)e.Parameter;
+            mode = (string)parameter[0];
             quickView = (StickyQuickView)parameter[1];
-            sticky = await LoadStickyAsync((string)parameter[0], quickView);
+            sticky = await LoadStickyAsync(mode, quickView);
 
+            // 同步主题（内部已分别调度本视图与主窗口线程，任意线程可调用）
+            await SwitchStickyThemeAsync(sticky.StickyTheme);
+
+            // 编辑器初始化必须在本视图 UI 线程：辅助视图无 SynchronizationContext，
+            // async/await 延续不会回到视图线程，故用非 async 的 RunAsync 显式调度，
+            // 且 lambda 内不做任何 await，避免延续线程漂移后再访问 UI 元素
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                SwitchStickyTheme(sticky.StickyTheme);
-                suppressTextChanged = true;
                 StickyEditBox.Document.SetText(TextSetOptions.FormatRtf, sticky.StickyDocument);
                 StickyEditBox.Document.GetText(TextGetOptions.None, out string plain);
                 loadedPlainText = plain.TrimEnd();
-                localSettings.Values["isSaved"] = true;
-                suppressTextChanged = false;
+                isSaved = true;
             });
         }
 
@@ -94,7 +104,7 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
                 return StickyService.CreateSticky(serial);
             }
 
-            string UID = localSettings.Values["UID"].ToString();
+            string UID = localSettings.Values["UID"]?.ToString();
             // 读取并解密，文件缺失/解密失败时回退为新便签
             return await StickyService.LoadStickyAsync(UID, serial) ?? StickyService.CreateSticky(serial);
         }
@@ -145,12 +155,35 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
 
         private async void SaveStickyNote(object sender, RoutedEventArgs e)
         {
+            await SaveStickyInternalAsync();
+        }
+
+        /// <summary>保存便签：规范化 RTF → 加密落盘 → 上传云端（受同步开关控制）。</summary>
+        private async Task SaveStickyInternalAsync()
+        {
             StickyEditBox.Document.GetText(TextGetOptions.FormatRtf, out string document);
             StickyEditBox.Document.GetText(TextGetOptions.None, out string quickview);
 
-            string UID = localSettings.Values["UID"].ToString();
-            // 规范化 RTF → 加密落盘 → 上传云端（受同步开关控制）
-            await StickyService.SaveStickyAsync(UID, sticky, document, quickview);
+            string UID = localSettings.Values["UID"]?.ToString();
+            try
+            {
+                await StickyService.SaveStickyAsync(UID, sticky, document, quickview);
+                isSaved = true;
+            }
+            catch (EncryptStickyTool.VaultKeyRequiredException)
+            {
+                // 密钥未就绪（理论上登录/创建前已检查，此处兜底）：提示用户先完成解锁，避免崩溃
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                {
+                    ContentDialog dialog = new ContentDialog
+                    {
+                        Title = "无法保存便签",
+                        Content = "便签加密密钥尚未解锁，请先回到便签本完成密码验证后再保存。",
+                        CloseButtonText = "确定"
+                    };
+                    await dialog.ShowAsync();
+                });
+            }
         }
 
         private async void ChangeStickyFont(object sender, RoutedEventArgs e)
@@ -162,26 +195,40 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             });
         }
 
-        private void ChangeStickyTheme(object sender, RoutedEventArgs e)
+        private async void ChangeStickyTheme(object sender, RoutedEventArgs e)
         {
             string theme = ((MenuFlyoutItem)sender).Tag.ToString();
-            SwitchStickyTheme(theme);
+            await SwitchStickyThemeAsync(theme);
             sticky.StickyTheme = theme;
             StickyService.SetStickyTheme(theme);
         }
 
-        private async void SwitchStickyTheme(string theme)
+        /// <summary>
+        /// 切换便签主题：本视图元素与主窗口卡片分别用各自的 Dispatcher 调度，
+        /// SolidColorBrush 的创建与赋值都在目标 UI 线程内完成。
+        /// 辅助视图无 SynchronizationContext，async/await 延续可能在线程池线程，
+        /// 因此本方法不假定调用线程，所有 UI 操作（含 brush 创建）均显式 RunAsync。
+        /// </summary>
+        private async Task SwitchStickyThemeAsync(string theme)
         {
-            localSettings.Values["isSaved"] = false;
+            isSaved = false;
 
-            StickyTitle.Background = brushTool.GetThemeColorBrush(theme, false).TitleBrush;
-            StickyBackground.Background = brushTool.GetThemeColorBrush(theme, false).BackgroundBrush;
+            // 编辑窗口自身元素：brush 创建 + 赋值都在本视图 UI 线程完成
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                ThemeColorBrush brush = brushTool.GetThemeColorBrush(theme, false);
+                StickyTitle.Background = brush.TitleBrush;
+                StickyBackground.Background = brush.BackgroundBrush;
+            });
+
+            // 卡片元素属于主窗口线程：brush 创建 + 赋值都在主窗口线程完成
             await quickView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
+                ThemeColorBrush cardBrush = brushTool.GetThemeColorBrush(theme, false);
                 // ThemeKind 自动同步画笔，此处显式赋值以覆盖悬停遗留状态
                 quickView.ThemeKind = theme;
-                quickView.TitleBackground = brushTool.GetThemeColorBrush(theme, false).TitleBrush;
-                quickView.ViewBackground = brushTool.GetThemeColorBrush(theme, false).BackgroundBrush;
+                quickView.TitleBackground = cardBrush.TitleBrush;
+                quickView.ViewBackground = cardBrush.BackgroundBrush;
             });
         }
 
@@ -189,30 +236,22 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         {
             try
             {
-                string UID = localSettings.Values["UID"].ToString();
+                string UID = localSettings.Values["UID"]?.ToString();
                 // 本地删除 + 云端删除（同步关闭时仅删本地）
                 await StickyService.DeleteStickyAsync(UID, sticky.StickySerial);
 
-                // 从主窗口列表移除卡片（quickView 与列表同属主窗口线程，一个 Dispatcher 即可）
-                await StickyPage.stickyPage.StickyQuickViewList.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                {
-                    StickyPage.stickyPage.StickyQuickViewList.Items.Remove(quickView);
-                    if (StickyPage.stickyPage.StickyQuickViewList.Items.Count == 0)
-                    {
-                        StickyPage.stickyPage.EmptyPlaceholder.Opacity = 1;
-                        localSettings.Values["EmptyPlaceholderOpacity"] = 1;
-                    }
-                });
+                // 从主窗口列表移除卡片（RemoveQuickView 内部自动调度回主窗口线程）
+                StickyPage.RemoveQuickView(quickView);
 
+                // 关闭编辑窗口（CoreWindow.Close 必须在本视图线程调用）
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
-                    CoreApplicationView view = CoreApplication.GetCurrentView();
-                    view.CoreWindow.Close();
+                    CoreApplication.GetCurrentView().CoreWindow.Close();
                 });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // 防止 async void 未捕获异常导致视图崩溃
+                System.Diagnostics.Debug.WriteLine("删除便签失败：" + ex.Message);
             }
         }
 
@@ -221,76 +260,91 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             StickyEditBox.Document.GetText(TextGetOptions.None, out string text);
             string trimmed = text.TrimEnd();
 
-            // SetText 触发的 TextChanged 延迟到达（标志位已复位），改用内容比较判断是否编辑
-            if (suppressTextChanged || string.Equals(trimmed, loadedPlainText, StringComparison.Ordinal))
+            // SetText 触发的 TextChanged 延迟到达，用内容比较判断是否为真实编辑
+            if (string.Equals(trimmed, loadedPlainText, StringComparison.Ordinal))
             {
                 return;
             }
 
-            localSettings.Values["isSaved"] = false;
+            isSaved = false;
 
             await quickView.Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
             {
-                quickView.QucikViewText = trimmed;
+                quickView.QuickViewText = trimmed;
             });
         }
 
-        private async void CancelSaveSticky()
+        /// <summary>丢弃未保存的编辑：本地无文件（新建且未保存）时移除卡片，已保存过的保留卡片。</summary>
+        private async Task CancelSaveStickyAsync()
         {
             try
             {
-                string UID = localSettings.Values["UID"].ToString();
-                StorageFolder stickyFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
-                stickyFolder = await stickyFolder.GetFolderAsync("Sticky");
-                StorageFile stickyFile = await stickyFolder.GetFileAsync(sticky.StickySerial + ".ctsnote");
+                string UID = localSettings.Values["UID"]?.ToString();
+                StorageFolder stickyFolder = await StickyService.GetStickyFolderAsync(UID);
+                StorageFile stickyFile = await stickyFolder.TryGetItemAsync(sticky.StickySerial + ".ctsnote") as StorageFile;
+                if (stickyFile != null)
+                {
+                    return; // 已保存过，保留卡片
+                }
             }
             catch (Exception)
             {
-                try
-                {
-                    await StickyPage.stickyPage.StickyQuickViewList.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-                    async () =>
-                    {
-                        await quickView.Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
-                        {
-                            StickyPage.stickyPage.StickyQuickViewList.Items.Remove(quickView);
-                            if (StickyPage.stickyPage.StickyQuickViewList.Items.Count == 0)
-                            {
-                                StickyPage.stickyPage.EmptyPlaceholder.Opacity = 1;
-                                localSettings.Values["EmptyPlaceholderOpacity"] = 1;
-                            }
-                        });
-                    });
-                }
-                catch (Exception)
-                {
-                }
+                return; // 目录异常时保守保留卡片
             }
+
+            // 新建未保存：从列表移除卡片（跨线程自动调度）
+            StickyPage.RemoveQuickView(quickView);
         }
 
         private async void StickyPageCloseRequested(object sender, SystemNavigationCloseRequestedPreviewEventArgs e)
         {
-            if (localSettings.Values["isSaved"] is false)
+            // 新建便签且未输入任何内容：直接丢弃并删除卡片，无需确认（空便签没有保留价值）
+            if (mode == "new" && IsEmptyContent())
             {
                 var deferral = e.GetDeferral();
-                ContentDialogResult result = await ShowUnsavedDialogAsync();
-                switch (result)
+                try
                 {
-                    case ContentDialogResult.Primary:
-                        SaveStickyNote(null, null);
-                        break;
-                    case ContentDialogResult.Secondary:
-                        e.Handled = true;
-                        break;
-                    case ContentDialogResult.None:
-                        await DiscardUnsavedChangesAsync();
-                        e.Handled = false;
-                        break;
-                    default:
-                        break;
+                    await DiscardUnsavedChangesAsync();
                 }
-                deferral.Complete();
+                finally
+                {
+                    deferral.Complete();
+                }
+                return;
             }
+
+            if (!isSaved)
+            {
+                var deferral = e.GetDeferral();
+                try
+                {
+                    ContentDialogResult result = await ShowUnsavedDialogAsync();
+                    switch (result)
+                    {
+                        case ContentDialogResult.Primary:
+                            // 保存完成后 deferral.Complete()，e.Handled 保持 false → 窗口正常关闭
+                            await SaveStickyInternalAsync();
+                            break;
+                        case ContentDialogResult.Secondary:
+                            e.Handled = true; // 返回编辑
+                            break;
+                        case ContentDialogResult.None:
+                            await DiscardUnsavedChangesAsync();
+                            break;
+                    }
+                }
+                finally
+                {
+                    deferral.Complete();
+                }
+            }
+        }
+
+        /// <summary>编辑区是否为空（无任何文字）。须在本视图 UI 线程调用（关闭事件即在此线程触发）。</summary>
+        private bool IsEmptyContent()
+        {
+            StickyEditBox.Document.GetText(TextGetOptions.None, out string text);
+            return string.IsNullOrWhiteSpace(text.TrimEnd());
         }
 
         /// <summary>弹出"便签内容暂未保存"确认对话框。</summary>
@@ -313,9 +367,9 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         {
             await quickView.Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
             {
-                quickView.QucikViewText = sticky.QuickViewText;
+                quickView.QuickViewText = sticky.QuickViewText;
             });
-            CancelSaveSticky();
+            await CancelSaveStickyAsync();
         }
     }
 }

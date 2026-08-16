@@ -10,36 +10,46 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="stickynotes:StickyQuickView">
-                    <Grid CornerRadius="4" Background="{TemplateBinding ViewBackground}"
+                    <!-- 事件统一在 OnApplyTemplate 中绑定（Root），此处不声明事件避免双重触发 -->
+                    <Grid x:Name="Root" CornerRadius="4" Background="{TemplateBinding ViewBackground}"
                           BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                          Tag="{TemplateBinding ThemeKind}" HorizontalAlignment="Stretch"
-                          PointerEntered="QuickViewPointEntered" PointerExited="QuickViewPointExited"
-                          DoubleTapped="QuickViewDoubleTapped" Loaded="QuickViewLoaded">
+                          Tag="{TemplateBinding ThemeKind}" HorizontalAlignment="Stretch">
                         <Grid.ContextFlyout>
                             <MenuFlyout>
-                                <MenuFlyoutItem x:Name="OpenSticky">
+                                <MenuFlyoutItem x:Name="OpenSticky" Text="打开便签">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE890;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
-                                <MenuFlyoutItem x:Name="ShareSticky">
+                                <MenuFlyoutItem x:Name="ShareSticky" Text="分享便签">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE72D;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem x:Name="LockSticky" Visibility="Visible">
+                                <MenuFlyoutItem x:Name="UnfavoriteSticky" Text="取消收藏" Visibility="Collapsed">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE735;"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem x:Name="FavoriteSticky" Text="收藏" Visibility="Visible">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE734;"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutSeparator />
+                                <MenuFlyoutItem x:Name="LockSticky" Text="锁定便签" Visibility="Visible">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE72E;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
-                                <MenuFlyoutItem x:Name="UnlockSticky" Visibility="Collapsed">
+                                <MenuFlyoutItem x:Name="UnlockSticky" Text="解锁便签" Visibility="Collapsed">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xe785;"/>
                                     </MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem x:Name="DeleteSticky">
+                                <MenuFlyoutItem x:Name="DeleteSticky" Text="删除便签">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE74D;"/>
                                     </MenuFlyoutItem.Icon>
@@ -48,18 +58,27 @@
                         </Grid.ContextFlyout>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="12"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="36"/>
+                            <RowDefinition Height="68"/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0" Background="{TemplateBinding TitleBackground}"
                               CornerRadius="4, 4, 0, 0"/>
-                        <TextBlock Grid.Row="1" TextTrimming="CharacterEllipsis" FontSize="13"
-                                   FontWeight="Bold" FontFamily="{StaticResource MiSans}" Padding="12, 8, 12, 8"
-                                   Text="{TemplateBinding CreateTimeText}" Foreground="Black"/>
-                        <TextBlock Grid.Row="2" TextWrapping="Wrap" FontSize="14" Padding="12, 0, 12, 8"
+                        <Grid Grid.Row="1">
+                            <TextBlock TextTrimming="CharacterEllipsis" FontSize="13"
+                                       FontWeight="Bold" FontFamily="{StaticResource MiSans}" Padding="12, 8, 12, 8"
+                                       Text="{TemplateBinding CreateTimeText}" Foreground="Black"/>
+                            <!-- 收藏星标：已收藏时右上角显示金色星标 -->
+                            <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE735;"
+                                      Foreground="#FFC83D" FontSize="16" Margin="0, 6, 10, 0"
+                                      HorizontalAlignment="Right" VerticalAlignment="Top"
+                                      Visibility="{TemplateBinding FavoriteStarVisibility}"/>
+                        </Grid>
+                        <!-- 固定高度：行 2 恒为 68px（文字区 60px = 3 行 × 行高 20 + 底部 padding 8），
+                             内容不足或超出均不改变组件高度，超出部分裁剪省略 -->
+                        <TextBlock x:Name="PreviewText" Grid.Row="2" TextWrapping="Wrap" FontSize="14" Padding="12, 0, 12, 8"
                                    FontFamily="{StaticResource MiSans}" LineHeight="20" FontWeight="Medium"
-                                   Text="{TemplateBinding QucikViewText}" Foreground="Black"
-                                   TextTrimming="CharacterEllipsis" MinHeight="40" MaxHeight="132"/>
+                                   Text="{TemplateBinding QuickViewText}" Foreground="Black"
+                                   TextTrimming="CharacterEllipsis"/>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

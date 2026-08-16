@@ -18,6 +18,9 @@ namespace Cactus_Reader
     {
         public static MainPage mainPage;
 
+        // 同步提示条仅在进程内首次进入主页面时显示（返回/重新导航不再弹出）
+        private static bool hasShownSyncInfo;
+
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
 
         ProfileSyncTool syncTool = ProfileSyncTool.Instance;
@@ -30,6 +33,13 @@ namespace Cactus_Reader
 
             // 统一标题栏：透明按钮 + 隐藏系统标题栏 + 可拖拽区域 + 布局/显隐/激活同步
             TitleBarService.Attach(appTitleBar, TitleBarStyle.Standard, appTitle);
+
+            // 非首次进入：立即收起同步提示条（XAML 默认 IsOpen=True，此处覆盖）
+            if (hasShownSyncInfo)
+            {
+                syncInfo.IsOpen = false;
+            }
+            hasShownSyncInfo = true;
         }
 
         // 导航项：Tag → 页面类型映射
@@ -183,11 +193,28 @@ namespace Cactus_Reader
         {
         }
 
-        /// <summary>登录后同步用户头像等配置文件。</summary>
+        /// <summary>
+        /// 登录后同步用户数据：
+        /// 1. 先做一次全量合并（双向，云端权威）拉取 / 推送头像、便签、阅读记录、回收站；
+        /// 2. 立即验证便签密钥（UI 线程弹解锁框）——旧设备设置过密码时首次登录即验证，
+        ///    之后任何入口（便签本 / 阅读页）创建便签都不会因密钥未就绪而闪退；
+        /// 3. 收起同步提示框。
+        /// </summary>
         private async void AsyncUserProfile()
         {
             string UID = localSettings.Values["UID"].ToString();
-            syncTool.SyncUserImage(UID);
+
+            // 全量合并：开启同步时执行；同步开关关闭时内部自动跳过
+            if (ProfileSyncTool.IsSyncEnabled())
+            {
+                await syncTool.SyncAllLocalContent(UID);
+            }
+
+            // 便签密钥验证必须在 UI 线程（ContentDialog 依赖可见窗口），经主窗口 Dispatcher 调度
+            await syncInfo.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            {
+                await StickyService.EnsureKeyReadyWithDialogAsync();
+            });
 
             // 三秒后收起同步提示框
             await Task.Delay(3200);

@@ -26,7 +26,16 @@ namespace Cactus_Reader.Sources.AppPages.Widget
 
         private void BackMainPage(object sender, RoutedEventArgs e)
         {
-            mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+            // 返回承载本页的外层 Frame（MainPage.mainContent），避免在页内嵌套新 MainPage
+            Frame hostFrame = Frame;
+            if (hostFrame != null && hostFrame.CanGoBack)
+            {
+                hostFrame.GoBack();
+            }
+            else if (hostFrame != null)
+            {
+                hostFrame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+            }
         }
     }
 }

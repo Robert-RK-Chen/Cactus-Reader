@@ -42,7 +42,7 @@
                         </ListView.ItemTemplate>
                     </ListView>
                 </Grid>
-                <Grid Grid.Column="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                <Grid x:Name="ReadingArea" Grid.Column="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                       BorderThickness="1, 1, 0, 0" CornerRadius="8, 0, 0, 0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
@@ -103,17 +103,17 @@
                                 </AppBarButton.Icon>
                                 <AppBarButton.Flyout>
                                     <MenuFlyout>
-                                        <MenuFlyoutItem Text="窄列宽" Width="140" Height="40" Tag="narrow">
+                                        <MenuFlyoutItem Text="窄列宽" Width="140" Height="40" Tag="narrow" Click="OnColumnWidthSelected">
                                             <MenuFlyoutItem.Icon>
                                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xF576;" />
                                             </MenuFlyoutItem.Icon>
                                         </MenuFlyoutItem>
-                                        <MenuFlyoutItem Text="中列宽" Width="140" Height="40" Tag="normal">
+                                        <MenuFlyoutItem Text="中列宽" Width="140" Height="40" Tag="normal" Click="OnColumnWidthSelected">
                                             <MenuFlyoutItem.Icon>
                                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xF574;" />
                                             </MenuFlyoutItem.Icon>
                                         </MenuFlyoutItem>
-                                        <MenuFlyoutItem Text="满列宽" Width="140" Height="40" Tag="wide">
+                                        <MenuFlyoutItem Text="满列宽" Width="140" Height="40" Tag="wide" Click="OnColumnWidthSelected">
                                             <MenuFlyoutItem.Icon>
                                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xF573;" />
                                             </MenuFlyoutItem.Icon>

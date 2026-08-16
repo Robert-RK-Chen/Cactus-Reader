@@ -29,6 +29,8 @@ namespace Cactus_Reader.Sources.AppPages.Reader
         private double topInset = 80;
         // 亚克力下方呼吸间距
         private const double topSpacing = 24;
+        // 文本列宽偏好（窄 600 / 中 900 / 满 1200），与 LocalSettings["passageWidth"] 同步
+        private string passageWidthPreference = "normal";
 
         /// <summary>讲述人设置视图模型（音色 / 风格，供 x:Bind 使用）。</summary>
         public SpeechSettingsViewModel SpeechSettings { get; } = SpeechSettingsViewModel.Instance;
@@ -46,6 +48,8 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             if (localSettings.Values["lineHeight"] == null) { localSettings.Values["lineHeight"] = 2.0; }
             if (localSettings.Values["font"] == null) { localSettings.Values["font"] = "宋体"; }
             if (localSettings.Values["passageWidth"] == null) { localSettings.Values["passageWidth"] = "normal"; }
+            // 文本列宽偏好（窄 600 / 中 900 / 满 1200）
+            if (localSettings.Values["passageWidth"] != null) { passageWidthPreference = localSettings.Values["passageWidth"].ToString(); }
             if (localSettings.Values["theme"] == null) { localSettings.Values["theme"] = "straw"; }
             if (localSettings.Values["voiceIndex"] == null) { localSettings.Values["voiceIndex"] = 0; }
             if (localSettings.Values["voiceName"] == null) { localSettings.Values["voiceName"] = "冰糖"; }
@@ -108,14 +112,32 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             charSpacingSlider.Value = Convert.ToDouble(localSettings.Values["charSpacing"]);
             lineHeightSlider.Value = Convert.ToDouble(localSettings.Values["lineHeight"]);
             passageBlock.FontFamily = new FontFamily(localSettings.Values["font"].ToString());
-            ChangeLineWidth(localSettings.Values["passageWidth"].ToString());
+            ApplyPassageWidth();
             ChangeTheme(localSettings.Values["theme"].ToString());
         }
 
         private void BackMainPage(object sender, RoutedEventArgs e)
         {
             focusToggleSwitch.IsOn = false;
-            mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+            NavigateBackToMainPage();
+        }
+
+        /// <summary>
+        /// 返回主页：必须操作承载本页的外层 Frame（MainPage.mainContent），
+        /// 而不是本页内部的 mainContent Frame——否则会在阅读页内嵌套新 MainPage，页面逐层叠加。
+        /// 有返回栈时 GoBack 回到原 MainPage UI（实例不重建）；无返回栈时兜底导航新 MainPage。
+        /// </summary>
+        private void NavigateBackToMainPage()
+        {
+            Frame hostFrame = Frame;
+            if (hostFrame != null && hostFrame.CanGoBack)
+            {
+                hostFrame.GoBack();
+            }
+            else if (hostFrame != null)
+            {
+                hostFrame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+            }
         }
 
         private async void ReadTextAloud(object sender, RoutedEventArgs e)
@@ -312,31 +334,66 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             });
         }
 
-        private void ChangeLineWidth(string lineWidth)
+        /// <summary>
+        /// 按列宽偏好计算正文 MaxWidth：窄 600、中 900、满 1200。
+        /// 窗口缩小时，若视口无法容纳偏好列宽，自动升级到更大的列宽（窄→中→满），
+        /// 保证正文不被窄列宽限制；窗口重新拉大后回到偏好列宽。
+        /// </summary>
+        private void ApplyPassageWidth()
         {
-            switch (lineWidth)
+            if (passageBlock == null) return;
+
+            // 可用正文宽度 = 视口宽度 - 左右留白；布局未完成时直接按偏好列宽设置，SizeChanged 会再次校正
+            double viewportWidth = scrollViewer.ActualWidth;
+            double margin = passageBlock.Margin.Left + passageBlock.Margin.Right;
+            double available = viewportWidth - margin;
+            if (viewportWidth <= 0)
             {
-                case "narrow":
-                    passageBlock.MaxWidth = 600;
+                passageBlock.MaxWidth = MaxWidthOf(passageWidthPreference);
+                return;
+            }
+
+            string[] order = { "narrow", "normal", "wide" };
+            int start = Array.IndexOf(order, passageWidthPreference);
+            if (start < 0) { start = 1; passageWidthPreference = "normal"; }
+
+            double maxWidth = MaxWidthOf(passageWidthPreference);
+            for (int i = start; i < order.Length; i++)
+            {
+                double candidate = MaxWidthOf(order[i]);
+                if (candidate <= available || i == order.Length - 1)
+                {
+                    maxWidth = candidate;
                     break;
-                case "normal":
-                    passageBlock.MaxWidth = 900;
-                    break;
-                case "wide":
-                    passageBlock.MaxWidth = 1200;
-                    break;
-                default:
-                    passageBlock.MaxWidth = 900;
-                    break;
+                }
+            }
+
+            // 宽度无变化时不重复赋值，避免多余布局抖动
+            if (Math.Abs(passageBlock.MaxWidth - maxWidth) > 0.5)
+            {
+                passageBlock.MaxWidth = maxWidth;
             }
         }
 
+        /// <summary>列宽偏好对应的正文最大宽度（窄 600、中 900、满 1200）。</summary>
+        private static double MaxWidthOf(string preference)
+        {
+            switch (preference)
+            {
+                case "narrow": return 600;
+                case "wide": return 1200;
+                default: return 900;
+            }
+        }
+
+        /// <summary>文本列样式菜单点击：切换窄/中/满列宽偏好并持久化，立即重排。</summary>
         private void ChangeLineWidth(object sender, RoutedEventArgs e)
         {
             string lineWidth = ((MenuFlyoutItem)sender).Tag.ToString();
-            ChangeLineWidth(lineWidth);
+            passageWidthPreference = lineWidth;
             // 键名与读取端一致（旧版本误存为 lineWidth）
             localSettings.Values["passageWidth"] = lineWidth;
+            ApplyPassageWidth();
         }
 
         private void ChangeTheme(string theme)
@@ -478,6 +535,12 @@ namespace Cactus_Reader.Sources.AppPages.Reader
 
         private async void CreateNewSticky(object sender, RoutedEventArgs e)
         {
+            // 密钥就绪检查：旧设备设置过密码时需先解锁（登录时已弹过，此处兜底防直开窗口）
+            if (!await StickyService.EnsureKeyReadyWithDialogAsync())
+            {
+                return;
+            }
+
             string serial = Guid.NewGuid().ToString("D").ToUpper();
             StickyQuickView stickyQuickView = StickyService.CreateNewStickyQuickView(serial);
 
@@ -488,6 +551,7 @@ namespace Cactus_Reader.Sources.AppPages.Reader
         private void ResizeImmersiveReadingMode(object sender, SizeChangedEventArgs e)
         {
             ChangeFocusLine((int)localSettings.Values["focusLine"]);
+            ApplyPassageWidth();
         }
     }
 }

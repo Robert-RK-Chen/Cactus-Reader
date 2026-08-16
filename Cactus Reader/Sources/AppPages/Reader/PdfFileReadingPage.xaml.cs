@@ -114,7 +114,25 @@ namespace Cactus_Reader.Sources.AppPages.Reader
 
         private void BackMainPage(object sender, RoutedEventArgs e)
         {
-            mainContent.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+            NavigateBackToMainPage();
+        }
+
+        /// <summary>
+        /// 返回主页：必须操作承载本页的外层 Frame（MainPage.mainContent），
+        /// 而不是本页内部的 mainContent Frame——否则会在阅读页内嵌套新 MainPage，页面逐层叠加。
+        /// 有返回栈时 GoBack 回到原 MainPage UI（实例不重建）；无返回栈时兜底导航新 MainPage。
+        /// </summary>
+        private void NavigateBackToMainPage()
+        {
+            Frame hostFrame = Frame;
+            if (hostFrame != null && hostFrame.CanGoBack)
+            {
+                hostFrame.GoBack();
+            }
+            else if (hostFrame != null)
+            {
+                hostFrame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+            }
         }
 
         private void InkToolClick(object sender, RoutedEventArgs e)

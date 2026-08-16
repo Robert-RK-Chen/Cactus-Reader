@@ -9,8 +9,6 @@
             <controls:XamlControlsResources.MergedDictionaries>
                 <!-- Other app resources here -->
                 <ResourceDictionary Source="/Sources/StickyNotes/StickyEditBoxStyle.xaml"/>
-                <ResourceDictionary Source="/Sources/StickyNotes/ThemeColorBrushResource.xaml"/>
-                <ResourceDictionary Source="/Sources/StickyNotes/QuickViewContainerStyle.xaml"/>
             </controls:XamlControlsResources.MergedDictionaries>
         </controls:XamlControlsResources>
     </Application.Resources>

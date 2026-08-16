@@ -8,6 +8,10 @@
     mc:Ignorable="d"
     muxc:BackdropMaterial.ApplyToRootOrPageBackground="True">
 
+    <Page.Resources>
+        <FontFamily x:Key="SegoeFluentIcons">/Sources/Fonts/Segoe Fluent Icons.ttf#Segoe Fluent Icons</FontFamily>
+    </Page.Resources>
+
     <Grid>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Canvas.ZIndex="1" VerticalAlignment="Top"
                     Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" Padding="24, 24, 24, 0" Height="108">

@@ -103,8 +103,20 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             string UID = localSettings.Values["UID"].ToString();
             try
             {
-                StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(UID);
-                BitmapImage image = new BitmapImage(new Uri(storageFolder.Path + "\\ProfilePicture.PNG"));
+                // TryGetItemAsync 不抛 FileNotFoundException：卸载重装后用户目录尚不存在
+                StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.TryGetItemAsync(UID) as StorageFolder;
+                if (storageFolder == null)
+                {
+                    userProfileImage.DisplayName = localSettings.Values["name"].ToString();
+                    return;
+                }
+                StorageFile avatarFile = await storageFolder.TryGetItemAsync("ProfilePicture.PNG") as StorageFile;
+                if (avatarFile == null)
+                {
+                    userProfileImage.DisplayName = localSettings.Values["name"].ToString();
+                    return;
+                }
+                BitmapImage image = new BitmapImage(new Uri(avatarFile.Path));
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
                     userProfileImage.ProfilePicture = image;

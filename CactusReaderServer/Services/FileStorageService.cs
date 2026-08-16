@@ -12,7 +12,9 @@ namespace CactusReaderService.Services
     ///
     /// 磁盘布局：
     ///   {DataRoot}/{UID}/ProfilePicture.PNG        用户头像
-    ///   {DataRoot}/{UID}/Notes/{serial}            用户便签
+    ///   {DataRoot}/{UID}/Notes/{serial}            用户便签（在用）
+    ///   {DataRoot}/{UID}/Library/{serial}          阅读内容存档（在用）
+    ///   {DataRoot}/{UID}/Recycle/{serial}          回收站内容（删除后暂存）
     /// </summary>
     public class FileStorageService
     {
@@ -105,16 +107,98 @@ namespace CactusReaderService.Services
         /// </summary>
         public List<string> ListNotes(string uid)
         {
-            List<string> files = new List<string>();
-            string notesPath = Path.Combine(_dataRoot, uid, "Notes");
-            if (Directory.Exists(notesPath))
+            return ListFiles(uid, "notes");
+        }
+
+        // ---------------- 通用存储区（library / recycle） ----------------
+
+        /// <summary>
+        /// 存储区目录名映射。notes / library / recycle 三区共用同一套增删查逻辑。
+        /// </summary>
+        private static string GetSectionDirectory(string section)
+        {
+            switch (section)
             {
-                foreach (string file in Directory.GetFiles(notesPath))
+                case "notes": return "Notes";
+                case "library": return "Library";
+                case "recycle": return "Recycle";
+                default: throw new ArgumentException($"未知存储区: {section}");
+            }
+        }
+
+        /// <summary>
+        /// 保存指定存储区的用户文件（覆盖同名文件）。
+        /// </summary>
+        public async Task SaveFileAsync(string uid, string serial, string section, Stream content, CancellationToken cancellationToken = default)
+        {
+            string directory = Path.Combine(_dataRoot, uid, GetSectionDirectory(section));
+            Directory.CreateDirectory(directory);
+
+            string filePath = Path.Combine(directory, serial);
+            await WriteFileAsync(filePath, content, cancellationToken);
+        }
+
+        /// <summary>
+        /// 读取指定存储区的用户文件；文件不存在时返回 false。
+        /// </summary>
+        public bool TryReadFile(string uid, string serial, string section, out byte[] bytes)
+        {
+            return TryReadFile(Path.Combine(_dataRoot, uid, GetSectionDirectory(section), serial), out bytes);
+        }
+
+        /// <summary>
+        /// 删除指定存储区的用户文件；返回文件是否存在。
+        /// </summary>
+        public bool DeleteFile(string uid, string serial, string section)
+        {
+            string filePath = Path.Combine(_dataRoot, uid, GetSectionDirectory(section), serial);
+            if (!File.Exists(filePath))
+            {
+                return false;
+            }
+            File.Delete(filePath);
+            return true;
+        }
+
+        /// <summary>
+        /// 列出指定存储区的用户文件名清单（不含目录）。目录不存在时返回空列表。
+        /// </summary>
+        public List<string> ListFiles(string uid, string section)
+        {
+            List<string> files = new List<string>();
+            string sectionPath = Path.Combine(_dataRoot, uid, GetSectionDirectory(section));
+            if (Directory.Exists(sectionPath))
+            {
+                foreach (string file in Directory.GetFiles(sectionPath))
                 {
                     files.Add(Path.GetFileName(file));
                 }
             }
             return files;
+        }
+
+        /// <summary>
+        /// 跨区移动文件（notes / library / recycle 之间）。源文件不存在返回 false；
+        /// 目标已存在同名文件时先覆盖删除。删除进回收站 / 从回收站恢复均走此操作。
+        /// </summary>
+        public bool MoveFile(string uid, string serial, string fromSection, string toSection)
+        {
+            string source = Path.Combine(_dataRoot, uid, GetSectionDirectory(fromSection), serial);
+            if (!File.Exists(source))
+            {
+                return false;
+            }
+
+            string targetDirectory = Path.Combine(_dataRoot, uid, GetSectionDirectory(toSection));
+            Directory.CreateDirectory(targetDirectory);
+            string target = Path.Combine(targetDirectory, serial);
+            if (File.Exists(target))
+            {
+                File.Delete(target);
+            }
+
+            File.Move(source, target);
+            return true;
         }
 
         // ---------------- 私有原子操作 ----------------

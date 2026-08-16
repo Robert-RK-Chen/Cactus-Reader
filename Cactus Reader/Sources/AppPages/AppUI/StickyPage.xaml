@@ -13,6 +13,15 @@
         <FontFamily x:Key="MiSans">/Sources/Fonts/MiSans/MiSans-Regular.ttf#MiSans</FontFamily>
         <FontFamily x:Key="MiSansBold">/Sources/Fonts/MiSans/MiSans-Bold.ttf#MiSans Bold</FontFamily>
         <FontFamily x:Key="SegoeFluentIcons">/Sources/Fonts/Segoe Fluent Icons.ttf#Segoe Fluent Icons</FontFamily>
+
+        <!-- 基于系统默认 GridViewItem 样式：内容横向撑满 ItemsWrapGrid 分配的列宽，
+             多选勾选/选中高亮等视觉全部沿用系统默认（Win11 规范） -->
+        <Style x:Key="StickyGridViewItemStyle" TargetType="GridViewItem"
+               BasedOn="{StaticResource DefaultGridViewItemStyle}">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
     </Page.Resources>
 
     <Grid>
@@ -33,7 +42,7 @@
                             <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE932;"/>
                         </AppBarButton.Icon>
                     </AppBarButton>
-                    <AppBarButton Label="选择便签">
+                    <AppBarButton x:Name="MultiSelectButton" Label="选择便签" Click="ToggleMultiSelectMode">
                         <AppBarButton.Icon>
                             <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE762;"/>
                         </AppBarButton.Icon>
@@ -42,13 +51,21 @@
                         <AppBarButton.Icon>
                             <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE8B3;"/>
                         </AppBarButton.Icon>
+                        <AppBarButton.Flyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Tag="1" Text="单列视图" Click="ChangeViewColumns"/>
+                                <MenuFlyoutItem Tag="2" Text="双列视图" Click="ChangeViewColumns"/>
+                                <MenuFlyoutItem Tag="3" Text="三列视图" Click="ChangeViewColumns"/>
+                                <MenuFlyoutItem Tag="4" Text="四列视图" Click="ChangeViewColumns"/>
+                            </MenuFlyout>
+                        </AppBarButton.Flyout>
                     </AppBarButton>
                 </CommandBar>
             </Grid>
             <AutoSuggestBox Height="36" PlaceholderText="搜索便签本 ......" VerticalContentAlignment="Center"
                             Margin="0, 8, 0, 0"/>
         </StackPanel>
-        <ScrollViewer VerticalScrollBarVisibility="Auto" Height="auto" Padding="24, 0, 24, 0">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Height="auto" Padding="16, 0, 16, 0">
             <Grid Padding="0, 0, 0, 16">
                 <Grid x:Name="EmptyPlaceholder" HorizontalAlignment="Center" VerticalAlignment="Center"
                       x:FieldModifier="Public" Padding="0, 128, 0, 0">
@@ -65,13 +82,30 @@
                                        Text="使用 Cactus Note 创建阅读计划，或者记下读书灵感。"/>
                     </StackPanel>
                 </Grid>
-                <ListView x:Name="StickyQuickViewList" x:FieldModifier="Public" Background="Transparent"
-                          Padding="0, 128, 0, 0" ItemContainerStyle="{StaticResource QuickViewContainerStyle}">
-                </ListView>
+                <GridView x:Name="StickyQuickViewList" x:FieldModifier="Public" Background="Transparent"
+                          Padding="0, 128, 0, 0" SelectionMode="None" IsItemClickEnabled="False"
+                          ItemContainerStyle="{StaticResource StickyGridViewItemStyle}"
+                          SelectionChanged="StickyQuickViewList_SelectionChanged"
+                          SizeChanged="StickyQuickViewList_SizeChanged">
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <!-- 间距由 ItemsWrapGrid 的 Margin 承担（左右 8），行间 8px 由下方 margin 留白 -->
+                            <ItemsWrapGrid Orientation="Horizontal" Margin="8, 0, 8, 8"
+                                           HorizontalAlignment="Stretch"/>
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
+                </GridView>
             </Grid>
         </ScrollViewer>
-        <muxc:InfoBar IsOpen="True" Severity="Informational" Title="Cactus Notes" VerticalAlignment="Bottom"
-                      Margin="24, 0, 24, 12" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-                      Message="我们正在调查一个问题，当你使用 Windows Hello 打开便签时，可能会等待较长的时间。" />
+        <!-- 多选模式删除按钮：右下角悬浮（Accent 强调色），仅多选且有选中项时显示 -->
+        <Button x:Name="DeleteSelectedButton" Click="DeleteSelectedSticky"
+                Style="{StaticResource AccentButtonStyle}"
+                Visibility="Collapsed" VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                Margin="0, 0, 16, 16" Padding="18, 10">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon FontFamily="{StaticResource SegoeFluentIcons}" Glyph="&#xE74D;" FontSize="16"/>
+                <TextBlock Text="删除" FontSize="14"/>
+            </StackPanel>
+        </Button>
     </Grid>
 </Page>
