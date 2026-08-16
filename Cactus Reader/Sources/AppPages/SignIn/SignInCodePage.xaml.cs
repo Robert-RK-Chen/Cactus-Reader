@@ -50,7 +50,7 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
                 else
                 {
                     // 服务端校验（校验即删，防重放）
-                    bool isValid = await AccountService.VerifyCodeAsync(currentUser.Email, "signin", codeInput);
+                    (bool isValid, _) = await AccountService.VerifyCodeAsync(currentUser.Email, "signin", codeInput);
                     if (isValid)
                     {
                         AccountService.CompleteLogin(currentUser);

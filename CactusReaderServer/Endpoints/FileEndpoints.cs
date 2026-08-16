@@ -127,7 +127,7 @@ namespace CactusReaderService.Endpoints
                 }
 
                 List<string> files = storage.ListFiles(uid, section);
-                string json = BuildJsonArray(files);
+                string json = JsonHelper.BuildJsonArray(files);
                 return Results.Text(json, "application/json; charset=utf-8", Encoding.UTF8);
             }
             catch (Exception ex)
@@ -160,26 +160,6 @@ namespace CactusReaderService.Endpoints
         private static bool IsValidSection(string section)
         {
             return section == "notes" || section == "library" || section == "recycle";
-        }
-
-        /// <summary>
-        /// 将字符串列表序列化为 JSON 数组（文件名由 Guid 生成，无需复杂转义）。
-        /// </summary>
-        private static string BuildJsonArray(List<string> values)
-        {
-            StringBuilder sb = new StringBuilder("[");
-            for (int i = 0; i < values.Count; i++)
-            {
-                if (i > 0)
-                {
-                    sb.Append(',');
-                }
-                sb.Append('"')
-                  .Append(values[i].Replace("\\", "\\\\").Replace("\"", "\\\""))
-                  .Append('"');
-            }
-            sb.Append(']');
-            return sb.ToString();
         }
     }
 }

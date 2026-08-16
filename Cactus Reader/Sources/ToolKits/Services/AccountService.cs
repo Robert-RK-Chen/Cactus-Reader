@@ -25,8 +25,8 @@ namespace Cactus_Reader.Sources.ToolKits
             return await MailCodeSender.Instance.SendVerifyCodeAsync(email, codeType);
         }
 
-        /// <summary>校验验证码（服务端校验即删，防重放）。</summary>
-        public static Task<bool> VerifyCodeAsync(string email, string codeType, string code)
+        /// <summary>校验验证码（服务端校验即删，防重放）。codeType 为 reset 时返回一次性重置令牌。</summary>
+        public static Task<(bool valid, string resetToken)> VerifyCodeAsync(string email, string codeType, string code)
         {
             return ApiClient.VerifyCodeAsync(email, codeType, code);
         }
@@ -151,10 +151,10 @@ namespace Cactus_Reader.Sources.ToolKits
             return ok;
         }
 
-        /// <summary>重置密码（服务端生成带盐哈希）。</summary>
-        public static Task<bool> ResetPasswordAsync(string uid, string password)
+        /// <summary>重置密码（需携带验证码校验通过后签发的一次性令牌，服务端校验）。</summary>
+        public static Task<bool> ResetPasswordAsync(string uid, string resetToken, string password)
         {
-            return ApiClient.ResetPasswordAsync(uid, password);
+            return ApiClient.ResetPasswordAsync(uid, resetToken, password);
         }
     }
 }

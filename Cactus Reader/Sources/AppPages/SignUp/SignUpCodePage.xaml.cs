@@ -50,7 +50,7 @@ namespace Cactus_Reader.Sources.AppPages.SignUp
                 else
                 {
                     // 服务端校验（校验即删，防重放）
-                    bool isValid = await AccountService.VerifyCodeAsync(currentUser.Email, "signup", codeInput);
+                    (bool isValid, _) = await AccountService.VerifyCodeAsync(currentUser.Email, "signup", codeInput);
                     if (isValid)
                     {
                         contentFrame.Navigate(typeof(SignUpUserInfoPage), currentUser, new SlideNavigationTransitionInfo()

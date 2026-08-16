@@ -16,7 +16,8 @@ namespace Cactus_Reader.Sources.ToolKits
     /// </summary>
     public static class ApiClient
     {
-        private const string BaseUrl = "http://127.0.0.1:9527";
+        /// <summary>CactusReaderServer 服务地址（上传/下载/认证统一入口，供 ProfileSyncTool/ProfileUploadTool 复用）。</summary>
+        public const string BaseUrl = "http://127.0.0.1:9527";
         private static readonly HttpClient client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
 
         /// <summary>POST JSON 并解析统一响应（{ ok: bool, ... }）。网络/服务异常时抛出。</summary>
@@ -138,9 +139,10 @@ namespace Cactus_Reader.Sources.ToolKits
             return (bool)(result["valid"] ?? false);
         }
 
-        public static async Task<bool> ResetPasswordAsync(string uid, string password)
+        /// <summary>重置密码（服务端校验一次性令牌：由 verify-code 校验通过后签发，防止仅凭 UID 重置他人密码）。</summary>
+        public static async Task<bool> ResetPasswordAsync(string uid, string resetToken, string password)
         {
-            JObject result = await PostAsync("/api/auth/reset-password", new { uid, password });
+            JObject result = await PostAsync("/api/auth/reset-password", new { uid, resetToken, password });
             return (bool)(result["ok"] ?? false);
         }
 
@@ -153,11 +155,11 @@ namespace Cactus_Reader.Sources.ToolKits
             return ((bool)(result["ok"] ?? false), (string)result["error"]);
         }
 
-        /// <summary>校验验证码（服务端校验即删，防重放）。</summary>
-        public static async Task<bool> VerifyCodeAsync(string email, string codeType, string code)
+        /// <summary>校验验证码（服务端校验即删，防重放）。codeType 为 "reset" 时校验通过会附带签发一次性重置令牌。</summary>
+        public static async Task<(bool valid, string resetToken)> VerifyCodeAsync(string email, string codeType, string code)
         {
             JObject result = await PostAsync("/api/auth/verify-code", new { email, codeType, code });
-            return (bool)(result["valid"] ?? false);
+            return ((bool)(result["valid"] ?? false), (string)result["resetToken"] ?? "");
         }
 
         // ---------------- Windows Hello 密钥注册 ----------------

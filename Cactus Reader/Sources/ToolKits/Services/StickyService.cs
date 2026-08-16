@@ -223,8 +223,10 @@ namespace Cactus_Reader.Sources.ToolKits
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // 孤儿文件清理失败（目录被占用 / 网络异常）：记录日志，下次进入便签页时用户可再次触发
+                System.Diagnostics.Debug.WriteLine($"孤儿便签清理失败：UID={uid}, {ex.Message}");
             }
         }
 
@@ -480,8 +482,10 @@ namespace Cactus_Reader.Sources.ToolKits
             {
                 await RecycleService.MoveStickyToRecycleAsync(uid, serial);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // 移入回收站失败（文件被占用 / 网络异常）：记录日志，避免删除静默失败
+                System.Diagnostics.Debug.WriteLine($"移入回收站失败：UID={uid}, Serial={serial}, {ex.Message}");
             }
         }
 

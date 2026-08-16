@@ -40,7 +40,8 @@ namespace Cactus_Reader
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
-                    // TODO: 从之前挂起的应用程序加载状态
+                    // 未实现运行时状态保存：阅读进度/便签等数据均有独立持久化（本地文件 + LocalSettings），
+                    // 终止后重新导航即可恢复，无需额外处理
                 }
 
                 // 将框架放在当前窗口中
@@ -112,8 +113,8 @@ namespace Cactus_Reader
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
-            // TODO: 保存应用状态并停止后台活动
-
+            // 数据均为即时落盘（本地文件 / LocalSettings），挂起时无需额外保存；
+            // 若有长任务（如正在进行的上传/下载）由 BackgroundTransfer 接管
             deferral.Complete();
         }
     }

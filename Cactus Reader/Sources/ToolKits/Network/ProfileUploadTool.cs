@@ -6,7 +6,8 @@ namespace Cactus_Reader.Sources.ToolKits
 {
     public class ProfileUploadTool
     {
-        readonly static string SERVER_IP_ADDRESS = "http://127.0.0.1:9527";
+        // CactusReaderServer 服务地址（与 ApiClient 共用单一常量）
+        private const string SERVER_ADDRESS = ApiClient.BaseUrl;
 
         private static ProfileUploadTool instance;
 
@@ -97,7 +98,7 @@ namespace Cactus_Reader.Sources.ToolKits
             uploader.Method = "POST";
 
             // 创建上传任务
-            UploadOperation uploadOpt = uploader.CreateUpload(new Uri(SERVER_IP_ADDRESS + method), file);
+            UploadOperation uploadOpt = uploader.CreateUpload(new Uri(SERVER_ADDRESS + method), file);
             SetUpLoad(uploadOpt, true);
         }
 
@@ -121,7 +122,7 @@ namespace Cactus_Reader.Sources.ToolKits
             uploader.Method = "POST";
 
             // 创建上传任务
-            UploadOperation uploadOpt = uploader.CreateUpload(new Uri(SERVER_IP_ADDRESS + method), file);
+            UploadOperation uploadOpt = uploader.CreateUpload(new Uri(SERVER_ADDRESS + method), file);
             SetUpLoad(uploadOpt, true);
         }
     }

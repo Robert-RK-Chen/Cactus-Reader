@@ -108,7 +108,7 @@ namespace CactusReaderService.Endpoints
                 }
 
                 List<string> files = storage.ListNotes(uid);
-                string json = BuildJsonArray(files);
+                string json = JsonHelper.BuildJsonArray(files);
                 return Results.Text(json, "application/json; charset=utf-8", Encoding.UTF8);
             }
             catch (Exception ex)
@@ -116,27 +116,6 @@ namespace CactusReaderService.Endpoints
                 Console.WriteLine(ex.Message);
                 return Results.StatusCode(StatusCodes.Status500InternalServerError);
             }
-        }
-
-        /// <summary>
-        /// 将字符串列表序列化为 JSON 数组（文件名由 Guid 生成，无需复杂转义）。
-        /// 保留与旧版逐字节一致的输出格式。
-        /// </summary>
-        private static string BuildJsonArray(List<string> values)
-        {
-            StringBuilder sb = new StringBuilder("[");
-            for (int i = 0; i < values.Count; i++)
-            {
-                if (i > 0)
-                {
-                    sb.Append(',');
-                }
-                sb.Append('"')
-                  .Append(values[i].Replace("\\", "\\\\").Replace("\"", "\\\""))
-                  .Append('"');
-            }
-            sb.Append(']');
-            return sb.ToString();
         }
     }
 }

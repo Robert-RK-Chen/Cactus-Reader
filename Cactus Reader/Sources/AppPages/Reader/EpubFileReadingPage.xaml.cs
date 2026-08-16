@@ -46,8 +46,8 @@ namespace Cactus_Reader.Sources.AppPages.Reader
             this.InitializeComponent();
             if (localSettings.Values["StickyTheme"] == null) { localSettings.Values["StickyTheme"] = "GingkoYellow"; }
             if (localSettings.Values["font"] != null) { currentFont = localSettings.Values["font"].ToString(); }
-            // 字号与设置页共用 fontSize 键（设置页为全局默认字号）
-            if (localSettings.Values["fontSize"] != null) { currentFontSize = Convert.ToDouble(localSettings.Values["fontSize"]); }
+            // 字号与设置页共用 fontSize 键（GetFontSize 兼容历史 Int32 存储）
+            if (localSettings.Values["fontSize"] != null) { currentFontSize = SettingsService.GetFontSize(); }
             // 文本列宽偏好（窄 1/3 / 中 1/2 / 满 1/1）
             if (localSettings.Values["columnWidth"] != null) { columnWidthPreference = localSettings.Values["columnWidth"].ToString(); }
 

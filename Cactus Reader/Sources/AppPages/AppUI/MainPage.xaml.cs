@@ -29,7 +29,8 @@ namespace Cactus_Reader
         {
             InitializeComponent();
             mainPage = this;
-            Task.Factory.StartNew(() => AsyncUserProfile());
+            // 登录后同步用户数据：Task.Run 解包（StartNew 返回 Task<Task> 且不等待内部异常）
+            _ = Task.Run(() => AsyncUserProfile());
 
             // 统一标题栏：透明按钮 + 隐藏系统标题栏 + 可拖拽区域 + 布局/显隐/激活同步
             TitleBarService.Attach(appTitleBar, TitleBarStyle.Standard, appTitle);
@@ -165,7 +166,7 @@ namespace Cactus_Reader
             }
             else if (contentFrame.SourcePageType == typeof(AboutInfoPage))
             {
-                navViewControl.SelectedItem = navViewControl.SelectedItem = navViewControl.FooterMenuItems
+                navViewControl.SelectedItem = navViewControl.FooterMenuItems
                     .OfType<Microsoft.UI.Xaml.Controls.NavigationViewItem>()
                     .First(n => n.Tag.Equals(item.Tag));
             }
@@ -202,7 +203,12 @@ namespace Cactus_Reader
         /// </summary>
         private async void AsyncUserProfile()
         {
-            string UID = localSettings.Values["UID"].ToString();
+            // 未登录（Temp User / 设置缺失）时无用户数据可同步
+            string UID = localSettings.Values["UID"]?.ToString();
+            if (string.IsNullOrEmpty(UID))
+            {
+                return;
+            }
 
             // 全量合并：开启同步时执行；同步开关关闭时内部自动跳过
             if (ProfileSyncTool.IsSyncEnabled())

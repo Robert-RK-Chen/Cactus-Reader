@@ -15,8 +15,8 @@ namespace Cactus_Reader.Sources.ToolKits
     public class ProfileSyncTool
     {
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        // CactusReaderServer 服务地址（同时承担上传与下载，不再依赖 Tomcat）
-        readonly static string SERVER_ADDRESS = "http://127.0.0.1:9527/";
+        // CactusReaderServer 服务地址（与 ApiClient 共用单一常量，末尾带 / 便于拼接路径）
+        private const string SERVER_ADDRESS = ApiClient.BaseUrl + "/";
 
         private static ProfileSyncTool instance;
 
@@ -167,7 +167,7 @@ namespace Cactus_Reader.Sources.ToolKits
             }
             catch (Exception)
             {
-                System.Diagnostics.Debug.Write("未连接，无法同步或无法访问资源。");
+                System.Diagnostics.Debug.WriteLine("未连接，无法同步或无法访问资源。");
             }
             finally
             {
@@ -311,7 +311,7 @@ namespace Cactus_Reader.Sources.ToolKits
             }
             catch (Exception)
             {
-                System.Diagnostics.Debug.Write("未连接，无法同步便签。");
+                System.Diagnostics.Debug.WriteLine("未连接，无法同步便签。");
             }
             finally
             {
@@ -361,7 +361,7 @@ namespace Cactus_Reader.Sources.ToolKits
             }
             catch (Exception)
             {
-                System.Diagnostics.Debug.Write("未连接，无法全量同步。");
+                System.Diagnostics.Debug.WriteLine("未连接，无法全量同步。");
             }
             finally
             {

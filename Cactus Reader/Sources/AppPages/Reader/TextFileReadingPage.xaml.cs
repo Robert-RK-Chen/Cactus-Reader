@@ -108,10 +108,11 @@ namespace Cactus_Reader.Sources.AppPages.Reader
         /// <summary>恢复阅读设置：字号/间距/行高/字体/行宽/主题从本地设置回填。</summary>
         private void RestoreReadingSettings()
         {
-            fontSizeSlider.Value = Convert.ToDouble(localSettings.Values["fontSize"]);
+            // 字号/字体走 SettingsService（GetFontSize 兼容历史 Int32 存储；GetAppFont 由 EnsureDefaultSettings 兜底）
+            fontSizeSlider.Value = SettingsService.GetFontSize();
             charSpacingSlider.Value = Convert.ToDouble(localSettings.Values["charSpacing"]);
             lineHeightSlider.Value = Convert.ToDouble(localSettings.Values["lineHeight"]);
-            passageBlock.FontFamily = new FontFamily(localSettings.Values["font"].ToString());
+            passageBlock.FontFamily = new FontFamily(SettingsService.GetAppFont());
             ApplyPassageWidth();
             ChangeTheme(localSettings.Values["theme"].ToString());
         }

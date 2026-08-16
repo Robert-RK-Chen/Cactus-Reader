@@ -1,6 +1,7 @@
 ﻿using Cactus_Reader.Entities;
 using Cactus_Reader.Sources.ToolKits;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -49,11 +50,11 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
                 }
                 else
                 {
-                    // 服务端校验（校验即删，防重放）
-                    bool isValid = await AccountService.VerifyCodeAsync(currentUser.Email, "reset", codeInput);
+                    // 服务端校验（校验即删，防重放）；reset 流程校验通过会签发一次性重置令牌
+                    (bool isValid, string resetToken) = await AccountService.VerifyCodeAsync(currentUser.Email, "reset", codeInput);
                     if (isValid)
                     {
-                        contentFrame.Navigate(typeof(ResetPassword), currentUser, new SlideNavigationTransitionInfo()
+                        contentFrame.Navigate(typeof(ResetPassword), new List<object> { currentUser, resetToken }, new SlideNavigationTransitionInfo()
                         {
                             Effect = SlideNavigationTransitionEffect.FromRight
                         });

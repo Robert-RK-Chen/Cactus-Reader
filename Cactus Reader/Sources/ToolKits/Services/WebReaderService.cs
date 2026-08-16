@@ -55,27 +55,27 @@ namespace Cactus_Reader.Sources.ToolKits
         /// <summary>提取五类节点：title、h1、h2、h3、p，拼接为段落文本。</summary>
         private static string ExtractImmersiveText(XmlDocument document)
         {
-            string contentText = string.Empty;
-            contentText += AppendNodes(document.GetElementsByTagName("title"));
-            contentText += AppendNodes(document.GetElementsByTagName("h1"));
-            contentText += AppendNodes(document.GetElementsByTagName("h2"));
-            contentText += AppendNodes(document.GetElementsByTagName("h3"));
-            contentText += AppendNodes(document.GetElementsByTagName("p"));
-            return contentText;
+            StringBuilder builder = new StringBuilder();
+            builder.Append(AppendNodes(document.GetElementsByTagName("title")));
+            builder.Append(AppendNodes(document.GetElementsByTagName("h1")));
+            builder.Append(AppendNodes(document.GetElementsByTagName("h2")));
+            builder.Append(AppendNodes(document.GetElementsByTagName("h3")));
+            builder.Append(AppendNodes(document.GetElementsByTagName("p")));
+            return builder.ToString();
         }
 
         private static string AppendNodes(XmlNodeList nodes)
         {
-            string builder = string.Empty;
+            StringBuilder builder = new StringBuilder();
             foreach (XmlElement element in nodes)
             {
                 string text = element.InnerText.TrimStart().TrimEnd();
                 if (text.Length > 0)
                 {
-                    builder += text + "\n\n";
+                    builder.Append(text).Append("\n\n");
                 }
             }
-            return builder;
+            return builder.ToString();
         }
 
         private static string SgmlTranslate(string input)

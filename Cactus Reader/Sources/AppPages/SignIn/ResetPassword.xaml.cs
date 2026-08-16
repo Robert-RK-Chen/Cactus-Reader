@@ -2,6 +2,7 @@
 using Cactus_Reader.Sources.AppPages.SignUp;
 using Cactus_Reader.Sources.ToolKits;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -14,10 +15,15 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
     {
         User currentUser = null;
 
+        // 验证码校验通过后签发的一次性重置令牌（服务端 reset-password 校验，防仅凭 UID 重置他人密码）
+        string resetToken = null;
+
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            currentUser = (User)e.Parameter;
+            List<object> parameter = (List<object>)e.Parameter;
+            currentUser = (User)parameter[0];
+            resetToken = (string)parameter[1];
             userMailBlock.Text = currentUser.Email;
         }
 
@@ -48,8 +54,8 @@ namespace Cactus_Reader.Sources.AppPages.SignIn
                 else if (AccountService.IsPasswordValid(password) && string.Equals(password, checkPwd))
                 {
                     ControllerVisibility.ShowProgressBar(statusBar);
-                    // 密码哈希由服务端生成（带盐）
-                    bool resetOk = await AccountService.ResetPasswordAsync(currentUser.UID, password);
+                    // 密码哈希由服务端生成（带盐）；携带一次性重置令牌，服务端校验后才允许改密
+                    bool resetOk = await AccountService.ResetPasswordAsync(currentUser.UID, resetToken, password);
                     ControllerVisibility.HideProgressBar(statusBar);
 
                     if (!resetOk)

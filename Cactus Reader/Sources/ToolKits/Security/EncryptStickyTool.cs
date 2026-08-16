@@ -513,7 +513,8 @@ namespace Cactus_Reader.Sources.ToolKits
             }
         }
 
-        public async void UnlockAllSticky()
+        /// <summary>批量解锁全部便签（关闭个人密码后调用；单个解密失败跳过，不中断其余）。</summary>
+        public async Task UnlockAllSticky()
         {
             try
             {

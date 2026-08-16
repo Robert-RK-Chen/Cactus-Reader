@@ -56,10 +56,10 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
             LoadAppSettings();
             UpdatePrivateKeyButtons();
 
-            // TODO: 加载用户头像
+            // 加载本地头像并显示（缺失时回退为用户名首字）
             await LoadAvatarAsync();
 
-            // TODO: 恢复后台传输列表
+            // 恢复上次会话未完成的后台上传任务（受跨设备同步开关控制）
             uploadTool.RecoveryBackgroundTransfer();
         }
 
@@ -73,7 +73,6 @@ namespace Cactus_Reader.Sources.AppPages.AppUI
         /// <summary>回填应用设置：预览字号/语速/音调/MiMo Key。</summary>
         private void LoadAppSettings()
         {
-            // TODO: 加载应用设置
             previewText.FontSize = SettingsService.GetFontSize();
             speedSlider.Value = SettingsService.GetVoiceSpeed();
             tuneSlider.Value = SettingsService.GetVoiceTune();

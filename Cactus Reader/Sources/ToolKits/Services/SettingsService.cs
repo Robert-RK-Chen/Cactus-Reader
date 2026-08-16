@@ -295,7 +295,8 @@ namespace Cactus_Reader.Sources.ToolKits
             bool vaultRemoved = await encryptStickyTool.RemoveVaultAsync();
             localSettings.Values.Remove("privateKey");
             localSettings.Values["alreadySetWindowsHello"] = false;
-            await Task.Factory.StartNew(() => encryptStickyTool.UnlockAllSticky());
+            // 批量解锁全部便签（UnlockAllSticky 内部已在后台线程执行文件 IO）
+            await encryptStickyTool.UnlockAllSticky();
             // 关闭密码后降级为无密码模式：重新备份明文密钥，保证换设备仍可免密恢复便签
             await encryptStickyTool.BackupPlainKeyIfNeededAsync();
             return vaultRemoved;

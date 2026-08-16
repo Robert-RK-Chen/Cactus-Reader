@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Concurrent;
+using System.Security.Cryptography;
 using CactusReaderService.Entities;
 using CactusReaderService.Services;
 using Microsoft.AspNetCore.Builder;
@@ -17,6 +19,12 @@ namespace CactusReaderService.Endpoints
         // 验证码限频间隔与有效期（分钟）
         private const double ResendIntervalMinutes = 1;
         private const double CodeValidMinutes = 5;
+        // 重置密码一次性令牌有效期（分钟），服务重启即失效（令牌存内存）
+        private static readonly TimeSpan ResetTokenTtl = TimeSpan.FromMinutes(5);
+
+        /// <summary>重置密码一次性令牌：verify-code 通过后签发，reset-password 校验即删除（防重放）。</summary>
+        private static readonly ConcurrentDictionary<string, (string Uid, DateTime ExpireAt)> ResetTokens =
+            new ConcurrentDictionary<string, (string Uid, DateTime ExpireAt)>(StringComparer.Ordinal);
 
         public static WebApplication MapAuthEndpoints(this WebApplication app,
             DbService db, MailService mail, PassportService passport, ILogger logger)
@@ -112,8 +120,20 @@ namespace CactusReaderService.Endpoints
 
             app.MapPost("/api/auth/reset-password", (ResetPasswordRequest req) =>
             {
-                if (req == null || string.IsNullOrWhiteSpace(req.Uid) || string.IsNullOrWhiteSpace(req.Password))
+                if (req == null || string.IsNullOrWhiteSpace(req.Uid) ||
+                    string.IsNullOrWhiteSpace(req.Password) || string.IsNullOrWhiteSpace(req.ResetToken))
+                {
                     return Results.Ok(new { ok = false });
+                }
+
+                // 必须先通过验证码校验拿到一次性令牌（verify-code 签发，此处校验即删除防重放）
+                if (!ResetTokens.TryRemove(req.ResetToken, out var entry) ||
+                    !string.Equals(entry.Uid, req.Uid, StringComparison.OrdinalIgnoreCase) ||
+                    entry.ExpireAt < DateTime.UtcNow)
+                {
+                    return Results.Ok(new { ok = false });
+                }
+
                 var user = fs.Select<User>().Where(u => u.UID == req.Uid).ToOne();
                 if (user is null) return Results.Ok(new { ok = false });
                 user.Password = new PasswordHashService().CreateHash(req.Password);
@@ -133,8 +153,8 @@ namespace CactusReaderService.Endpoints
                 if (recent != null && recent.CreateTime.AddMinutes(ResendIntervalMinutes) > DateTime.Now)
                     return Results.Ok(new { ok = false, error = "TOO_FREQUENT" });
 
-                // 2. 生成 6 位验证码
-                string verifyCode = new Random().Next(100000, 1000000).ToString();
+                // 2. 生成 6 位验证码（CSPRNG，不可预测；Random 以时间为种子易被预测）
+                string verifyCode = RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
 
                 // 3. 先写库（复合主键 Email+CodeType），邮件失败时回滚删除，
                 //    避免"验证码已入库但邮件未发出"的状态不一致
@@ -160,20 +180,33 @@ namespace CactusReaderService.Endpoints
                 if (req == null || string.IsNullOrWhiteSpace(req.Email) ||
                     string.IsNullOrWhiteSpace(req.CodeType) || string.IsNullOrWhiteSpace(req.Code))
                 {
-                    return Results.Ok(new { ok = true, valid = false });
+                    return Results.Ok(new { ok = true, valid = false, resetToken = "" });
                 }
 
                 var code = fs.Select<Code>()
                     .Where(c => c.Email == req.Email && c.CodeType == req.CodeType).ToOne();
                 if (code is null)
-                    return Results.Ok(new { ok = true, valid = false });
+                    return Results.Ok(new { ok = true, valid = false, resetToken = "" });
 
                 bool valid = code.VerifyCode == req.Code &&
                     code.CreateTime.AddMinutes(CodeValidMinutes) > DateTime.Now;
 
                 // 校验即删除：防重放，过期记录一并清理
                 fs.Delete<Code>().Where(c => c.Email == req.Email && c.CodeType == req.CodeType).ExecuteAffrows();
-                return Results.Ok(new { ok = true, valid });
+
+                // 重置密码流程：校验通过后签发一次性令牌，reset-password 凭令牌改密，
+                // 防止"仅靠 UID 即可重置他人密码"（客户端页面跳转不能作为服务端身份依据）
+                string resetToken = "";
+                if (valid && req.CodeType == "reset")
+                {
+                    var user = fs.Select<User>().Where(u => u.Email == req.Email).ToOne();
+                    if (user != null)
+                    {
+                        resetToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+                        ResetTokens[resetToken] = (user.UID, DateTime.UtcNow.Add(ResetTokenTtl));
+                    }
+                }
+                return Results.Ok(new { ok = true, valid, resetToken });
             });
 
             // ---------------- Windows Hello：密钥注册记录 ----------------
@@ -254,7 +287,7 @@ namespace CactusReaderService.Endpoints
         public record CheckNameRequest(string Name);
         public record SignUpRequest(string Email, string Name, string Password, string Mobile, string Uid);
         public record VerifyPasswordRequest(string Uid, string Password);
-        public record ResetPasswordRequest(string Uid, string Password);
+        public record ResetPasswordRequest(string Uid, string Password, string ResetToken);
         public record SendCodeRequest(string Email, string CodeType);
         public record VerifyCodeRequest(string Email, string CodeType, string Code);
         public record UserkeyUpdateRequest(string Uid, string DeviceId, string PublicKey, string Attestation);
